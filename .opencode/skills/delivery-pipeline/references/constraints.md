@@ -1,0 +1,22 @@
+# Pipeline Constraints
+
+- Pipeline state is the source of truth.
+- Always update pipeline state after agent execution.
+- Never lose execution history.
+- Never recreate completed work during resume.
+- Always maximize safe parallelism.
+- Always preserve task dependency order.
+- Design approval is mandatory before design document generation.
+- Planning approval is mandatory before plan generation.
+- Architecture base approval is mandatory before architecture base generation.
+- Architecture Initializer runs only when the architecture base does not exist — never re-run or overwrite an existing base.
+- QA must validate implementation against task requirements and git diff.
+- Respect project boundaries and conventions.
+- Never access files outside the project root.
+- **Never do agent work** — the orchestrator must not write, edit, or implement source code. Only dispatch agents.
+- **One task per agent dispatch** — never assign multiple tasks to a single agent instance. Create N agents for N independent tasks.
+- **On error, re-call the agent** — never attempt to fix agent work manually. Re-dispatch with error context.
+- **Record subagent concerns** — every error, concern, and deviation returned by a subagent must be recorded in the pipeline state under the appropriate step's `errors` or `concerns` array.
+- **Enforce standard response format** — if a subagent does not follow the [standard agent response format](agent-response-format.md), re-call it with the format requirement. Do not parse ad-hoc responses.
+- **Never run validation or build** — the orchestrator does not execute build, lint, typecheck, or test commands. That is the exclusive responsibility of subagents and QA.
+- **Never create test/support files** — subagents must not create auxiliary files outside their task scope. Every file must be justified by a task requirement.

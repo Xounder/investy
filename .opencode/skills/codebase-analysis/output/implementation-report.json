@@ -1,0 +1,4689 @@
+{
+  "generatedAt": "2026-06-18T02:23:59.157Z",
+  "mode": "implementation",
+  "parser": "regex",
+  "summary": {
+    "totalFiles": 85,
+    "totalTsFiles": 47,
+    "totalTsxFiles": 38,
+    "totalImports": 255,
+    "totalExports": 158,
+    "totalFunctions": 130,
+    "totalClasses": 4,
+    "totalInterfaces": 68,
+    "totalTypes": 5,
+    "totalArrowFunctions": 22,
+    "totalReactComponents": 3,
+    "totalHookOrUtilities": 19
+  },
+  "files": {
+    "apps/web/src/App.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "./contexts/AuthContext",
+          "default": false,
+          "named": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "./pages/LoginPage",
+          "default": false,
+          "named": [
+            "LoginPage"
+          ]
+        },
+        {
+          "source": "./pages/DashboardPage",
+          "default": false,
+          "named": [
+            "DashboardPage"
+          ]
+        },
+        {
+          "source": "./components/DevModeBadge",
+          "default": false,
+          "named": [
+            "DevModeBadge"
+          ]
+        },
+        {
+          "source": "./components/DevModePanel",
+          "default": false,
+          "named": [
+            "DevModePanel"
+          ]
+        },
+        {
+          "source": "./hooks/useDevMode",
+          "default": false,
+          "named": [
+            "useDevMode"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "default",
+          "name": "App"
+        }
+      ],
+      "declarations": []
+    },
+    "apps/web/src/components/CalendarView.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useRef",
+            "useEffect",
+            "useMemo"
+          ]
+        },
+        {
+          "source": "@fullcalendar/react",
+          "default": true,
+          "defaultName": "FullCalendar",
+          "named": []
+        },
+        {
+          "source": "@fullcalendar/daygrid",
+          "default": true,
+          "defaultName": "dayGridPlugin",
+          "named": []
+        },
+        {
+          "source": "@fullcalendar/timegrid",
+          "default": true,
+          "defaultName": "timeGridPlugin",
+          "named": []
+        },
+        {
+          "source": "@fullcalendar/interaction",
+          "default": true,
+          "defaultName": "interactionPlugin",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "ViewType",
+            "BlockType"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent",
+            "BlockedSlot"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "CalendarView"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CalendarView",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleEventClick",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleSelect",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleDatesSet",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleEventDragStart",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleEventDragStop",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleEventDidMount",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CalendarViewProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/DevModeBadge.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "DevModeBadge"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "DevModeBadge",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DevModeBadgeProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/DevModePanel.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "DevModePanel"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "DevModePanel",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DevModePanelProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/ErrorBoundary.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "./ErrorFallback",
+          "default": false,
+          "named": [
+            "ErrorFallback"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ErrorBoundary"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ErrorBoundary",
+          "exported": false,
+          "extends": "React"
+        },
+        {
+          "kind": "interface",
+          "name": "ErrorBoundaryProps",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "ErrorBoundaryState",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/ErrorFallback.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/ui",
+          "default": false,
+          "named": [
+            "Button"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ErrorFallback"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getErrorMessage",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "ErrorFallback",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "ErrorFallbackProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/Header.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "ViewType"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "ViewType"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "Header"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "Header",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "HeaderProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/MainLayout.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "./Header",
+          "default": false,
+          "named": [
+            "Header"
+          ]
+        },
+        {
+          "source": "./Sidebar",
+          "default": false,
+          "named": [
+            "Sidebar"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "ViewType",
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "MainLayout"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "MainLayout",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "MainLayoutProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/SettingsModal.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useMemo",
+            "useState"
+          ]
+        },
+        {
+          "source": "../contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "useSettings"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "DEFAULT_SETTINGS"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Settings"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SettingsModal"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "SettingsModal",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "to12h",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "ampm",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "SettingsModalProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/components/Sidebar.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        },
+        {
+          "source": "../features/tasks/TaskPanel",
+          "default": false,
+          "named": [
+            "TaskPanel"
+          ]
+        },
+        {
+          "source": "../features/blocks/BlockPanel",
+          "default": false,
+          "named": [
+            "BlockPanel"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "Sidebar"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "Sidebar",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "SidebarProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/contexts/AuthContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "User"
+          ]
+        },
+        {
+          "source": "../services/api",
+          "default": false,
+          "named": [
+            "api"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "AuthProvider"
+        },
+        {
+          "type": "named",
+          "name": "useAuth"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "AuthProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useAuth",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "AuthState",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "AuthContextValue",
+          "exported": false,
+          "extends": [
+            "AuthState"
+          ]
+        }
+      ]
+    },
+    "apps/web/src/contexts/BlockContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "BlockedSlot",
+            "BlockType"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "BlockType"
+          ]
+        },
+        {
+          "source": "../services/localStorage",
+          "default": false,
+          "named": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "BlockProvider"
+        },
+        {
+          "type": "named",
+          "name": "useBlockContext"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateId",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "loadBlocks",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "BlockProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useBlockContext",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "BlockContextValue",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/contexts/CalendarContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "CalendarEvent",
+            "ViewType"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "CalendarProvider"
+        },
+        {
+          "type": "named",
+          "name": "useCalendar"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CalendarProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useCalendar",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CalendarContextValue",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/contexts/PreviewContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/domain",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "GeneratedEvent",
+            "AllocationFailure"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "PreviewProvider"
+        },
+        {
+          "type": "named",
+          "name": "usePreview"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "PreviewProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "usePreview",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "PreviewState",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "PreviewContextValue",
+          "exported": false,
+          "extends": [
+            "PreviewState"
+          ]
+        }
+      ]
+    },
+    "apps/web/src/contexts/SettingsContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Settings"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "DEFAULT_SETTINGS"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SettingsProvider"
+        },
+        {
+          "type": "named",
+          "name": "useSettings"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "loadSettings",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "saveSettings",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "SettingsProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useSettings",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "SettingsContextValue",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/contexts/TaskContext.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "createContext",
+            "useContext",
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "Priority"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "Priority"
+          ]
+        },
+        {
+          "source": "../services/localStorage",
+          "default": false,
+          "named": [
+            "storage"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "TaskProvider"
+        },
+        {
+          "type": "named",
+          "name": "useTaskContext"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateId",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "loadTasks",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "TaskProvider",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useTaskContext",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "TaskContextValue",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/blocks/BlockCard.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "BlockedSlot",
+            "BlockType"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "BlockType"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "BlockCard"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "BlockCard",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "BlockCardProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/blocks/BlockModal.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "BlockedSlot",
+            "BlockType"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "BlockType"
+          ]
+        },
+        {
+          "source": "../../hooks/useBlocks",
+          "default": false,
+          "named": [
+            "useBlocks"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "BlockModal"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "BlockModal",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleSubmit",
+          "exported": false,
+          "async": false,
+          "reactComponent": true
+        },
+        {
+          "kind": "interface",
+          "name": "BlockModalProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/blocks/BlockPanel.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        },
+        {
+          "source": "../../hooks/useBlocks",
+          "default": false,
+          "named": [
+            "useBlocks"
+          ]
+        },
+        {
+          "source": "./BlockCard",
+          "default": false,
+          "named": [
+            "BlockCard"
+          ]
+        },
+        {
+          "source": "./BlockModal",
+          "default": false,
+          "named": [
+            "BlockModal"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "BlockedSlot"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "BlockPanel"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "BlockPanel",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/features/completion/CompletionAction.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "CompletionAction"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CompletionAction",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CompletionActionProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/completion/ConflictDialog.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ConflictDialog"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "ConflictDialog",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "ConflictDialogProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/completion/RefreshButton.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "RefreshButton"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "RefreshButton",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "RefreshButtonProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/preview/AllocationFailurePanel.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/domain",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AllocationFailure"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "AllocationFailurePanel"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "AllocationFailurePanel",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "AllocationFailurePanelProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/preview/CalculateWeekButton.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "CalculateWeekButton"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "CalculateWeekButton",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CalculateWeekButtonProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/preview/DeleteEventDialog.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "DeleteEventDialog"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "DeleteEventDialog",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DeleteEventDialogProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/preview/PreviewToolbar.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "./SaveButton",
+          "default": false,
+          "named": [
+            "SaveButton"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "PreviewToolbar"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "PreviewToolbar",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "PreviewToolbarProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/preview/SaveButton.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SaveButton"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "SaveButton",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "SaveButtonProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/shared/CreateActionModal.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "CreateActionModal"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "formatTimeDisplay",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "formatDateDisplay",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "CreateActionModal",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CreateActionModalProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/tasks/TaskCard.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "Priority"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "TaskCard"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "TaskCard",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "TaskCardProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/tasks/TaskModal.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "Priority",
+            "CustomRange",
+            "TimeGroupPreset",
+            "RestrictedRange",
+            "TaskRestriction"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "Priority",
+            "TIME_GROUP_PRESETS"
+          ]
+        },
+        {
+          "source": "../../hooks/useTasks",
+          "default": false,
+          "named": [
+            "useTasks"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "TaskModal"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extractTimeGroups",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "extractCustomRanges",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "formatPresetLabel",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "TaskModal",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleTimeGroupToggle",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleAddCustomRange",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleRemoveCustomRange",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleCustomRangeChange",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleSubmit",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "TaskModalProps",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/features/tasks/TaskPanel.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState"
+          ]
+        },
+        {
+          "source": "../../hooks/useTasks",
+          "default": false,
+          "named": [
+            "useTasks"
+          ]
+        },
+        {
+          "source": "./TaskCard",
+          "default": false,
+          "named": [
+            "TaskCard"
+          ]
+        },
+        {
+          "source": "./TaskModal",
+          "default": false,
+          "named": [
+            "TaskModal"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "TaskPanel"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "TaskPanel",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useBlocks.ts": {
+      "imports": [
+        {
+          "source": "../contexts/BlockContext",
+          "default": false,
+          "named": [
+            "useBlockContext"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useBlocks"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useBlocks",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useCalendar.ts": {
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "default": false,
+          "named": [
+            "useQuery"
+          ]
+        },
+        {
+          "source": "../services/api",
+          "default": false,
+          "named": [
+            "api"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useEffect"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useCalendarEvents"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useCalendarEvents",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useCalendarRefresh.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "default": false,
+          "named": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "../contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "usePreview"
+          ]
+        },
+        {
+          "source": "../services/calendarCache",
+          "default": false,
+          "named": [
+            "getCalendarCache",
+            "setCalendarCache",
+            "clearCalendarCache"
+          ]
+        },
+        {
+          "source": "../services/api",
+          "default": false,
+          "named": [
+            "api"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useCalendarRefresh"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useCalendarRefresh",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useCompletion.ts": {
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "default": false,
+          "named": [
+            "useMutation",
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "../services/api",
+          "default": false,
+          "named": [
+            "api"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useCompletion"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useCompletion",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "toggleCompletion",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useDevMode.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useState",
+            "useCallback"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useDevMode"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useDevMode",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DevModeState",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useSaveSchedule.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "default": false,
+          "named": [
+            "useMutation"
+          ]
+        },
+        {
+          "source": "../services/api",
+          "default": false,
+          "named": [
+            "api"
+          ]
+        },
+        {
+          "source": "../services/diffCalculator",
+          "default": false,
+          "named": [
+            "computeDiff"
+          ]
+        },
+        {
+          "source": "../contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "usePreview"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useSaveSchedule"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useSaveSchedule",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "SaveState",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useScheduleEditing.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useState",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "usePreview"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "../contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "useSettings"
+          ]
+        },
+        {
+          "source": "../contexts/BlockContext",
+          "default": false,
+          "named": [
+            "useBlockContext"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "BlockType"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useScheduleEditing"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "extractTime",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "timeToMinutes",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "useScheduleEditing",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "FcEventInfo",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "EditingState",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useScheduleGeneration.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useCallback"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/domain",
+          "default": false,
+          "named": [
+            "generateSchedule"
+          ]
+        },
+        {
+          "source": "../contexts/TaskContext",
+          "default": false,
+          "named": [
+            "useTaskContext"
+          ]
+        },
+        {
+          "source": "../contexts/BlockContext",
+          "default": false,
+          "named": [
+            "useBlockContext"
+          ]
+        },
+        {
+          "source": "../contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "useCalendar"
+          ]
+        },
+        {
+          "source": "../contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "useSettings"
+          ]
+        },
+        {
+          "source": "../contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "usePreview"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useScheduleGeneration"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useScheduleGeneration",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useSettings.ts": {
+      "imports": [
+        {
+          "source": "../contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "useSettings"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useSettings"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useSettings",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useTasks.ts": {
+      "imports": [
+        {
+          "source": "../contexts/TaskContext",
+          "default": false,
+          "named": [
+            "useTaskContext"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useTasks"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useTasks",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/hooks/useUnsavedChanges.ts": {
+      "imports": [
+        {
+          "source": "react",
+          "default": false,
+          "named": [
+            "useEffect",
+            "useCallback"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "useUnsavedChanges"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "useUnsavedChanges",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handler",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/main.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        },
+        {
+          "source": "react-dom/client",
+          "default": true,
+          "defaultName": "ReactDOM",
+          "named": []
+        },
+        {
+          "source": "@tanstack/react-query",
+          "default": false,
+          "named": [
+            "QueryClient",
+            "QueryClientProvider"
+          ]
+        },
+        {
+          "source": "./contexts/AuthContext",
+          "default": false,
+          "named": [
+            "AuthProvider"
+          ]
+        },
+        {
+          "source": "./contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "SettingsProvider"
+          ]
+        },
+        {
+          "source": "./contexts/CalendarContext",
+          "default": false,
+          "named": [
+            "CalendarProvider"
+          ]
+        },
+        {
+          "source": "./contexts/TaskContext",
+          "default": false,
+          "named": [
+            "TaskProvider"
+          ]
+        },
+        {
+          "source": "./contexts/BlockContext",
+          "default": false,
+          "named": [
+            "BlockProvider"
+          ]
+        },
+        {
+          "source": "./contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "PreviewProvider"
+          ]
+        },
+        {
+          "source": "./components/ErrorBoundary",
+          "default": false,
+          "named": [
+            "ErrorBoundary"
+          ]
+        },
+        {
+          "source": "./App",
+          "default": true,
+          "defaultName": "App",
+          "named": []
+        },
+        {
+          "source": "./styles/design-tokens.css",
+          "default": false,
+          "named": []
+        },
+        {
+          "source": "./styles/global.css",
+          "default": false,
+          "named": []
+        },
+        {
+          "source": "./styles/CalendarStyles.css",
+          "default": false,
+          "named": []
+        }
+      ],
+      "exports": [],
+      "declarations": []
+    },
+    "apps/web/src/pages/DashboardPage.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useState",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "../contexts/AuthContext",
+          "default": false,
+          "named": [
+            "useAuth"
+          ]
+        },
+        {
+          "source": "../contexts/SettingsContext",
+          "default": false,
+          "named": [
+            "useSettings"
+          ]
+        },
+        {
+          "source": "../contexts/TaskContext",
+          "default": false,
+          "named": [
+            "useTaskContext"
+          ]
+        },
+        {
+          "source": "../hooks/useCalendar",
+          "default": false,
+          "named": [
+            "useCalendarEvents"
+          ]
+        },
+        {
+          "source": "../hooks/useScheduleGeneration",
+          "default": false,
+          "named": [
+            "useScheduleGeneration"
+          ]
+        },
+        {
+          "source": "../hooks/useScheduleEditing",
+          "default": false,
+          "named": [
+            "useScheduleEditing"
+          ]
+        },
+        {
+          "source": "../hooks/useSaveSchedule",
+          "default": false,
+          "named": [
+            "useSaveSchedule"
+          ]
+        },
+        {
+          "source": "../contexts/PreviewContext",
+          "default": false,
+          "named": [
+            "usePreview"
+          ]
+        },
+        {
+          "source": "../hooks/useCompletion",
+          "default": false,
+          "named": [
+            "useCompletion"
+          ]
+        },
+        {
+          "source": "../hooks/useCalendarRefresh",
+          "default": false,
+          "named": [
+            "useCalendarRefresh"
+          ]
+        },
+        {
+          "source": "../components/MainLayout",
+          "default": false,
+          "named": [
+            "MainLayout"
+          ]
+        },
+        {
+          "source": "../components/CalendarView",
+          "default": false,
+          "named": [
+            "CalendarView"
+          ]
+        },
+        {
+          "source": "../components/SettingsModal",
+          "default": false,
+          "named": [
+            "SettingsModal"
+          ]
+        },
+        {
+          "source": "../features/preview/CalculateWeekButton",
+          "default": false,
+          "named": [
+            "CalculateWeekButton"
+          ]
+        },
+        {
+          "source": "../features/preview/PreviewToolbar",
+          "default": false,
+          "named": [
+            "PreviewToolbar"
+          ]
+        },
+        {
+          "source": "../features/preview/AllocationFailurePanel",
+          "default": false,
+          "named": [
+            "AllocationFailurePanel"
+          ]
+        },
+        {
+          "source": "../features/preview/DeleteEventDialog",
+          "default": false,
+          "named": [
+            "DeleteEventDialog"
+          ]
+        },
+        {
+          "source": "../features/completion/RefreshButton",
+          "default": false,
+          "named": [
+            "RefreshButton"
+          ]
+        },
+        {
+          "source": "../features/completion/ConflictDialog",
+          "default": false,
+          "named": [
+            "ConflictDialog"
+          ]
+        },
+        {
+          "source": "../hooks/useUnsavedChanges",
+          "default": false,
+          "named": [
+            "useUnsavedChanges"
+          ]
+        },
+        {
+          "source": "../contexts/BlockContext",
+          "default": false,
+          "named": [
+            "useBlockContext"
+          ]
+        },
+        {
+          "source": "../features/shared/CreateActionModal",
+          "default": false,
+          "named": [
+            "CreateActionModal"
+          ]
+        },
+        {
+          "source": "../features/tasks/TaskModal",
+          "default": false,
+          "named": [
+            "TaskModal"
+          ]
+        },
+        {
+          "source": "../features/blocks/BlockModal",
+          "default": false,
+          "named": [
+            "BlockModal"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "ViewType",
+            "CalendarEvent",
+            "Task",
+            "BlockedSlot"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "DashboardPage"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "DashboardPage",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handlePrev",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleNext",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleToday",
+          "exported": false,
+          "async": false,
+          "reactComponent": true
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleSave",
+          "exported": false,
+          "async": false,
+          "reactComponent": true
+        }
+      ]
+    },
+    "apps/web/src/pages/LoginPage.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useEffect"
+          ]
+        },
+        {
+          "source": "../contexts/AuthContext",
+          "default": false,
+          "named": [
+            "useAuth"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "LoginPage"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "LoginPage",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/web/src/services/api.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ApiError"
+        },
+        {
+          "type": "named",
+          "name": "api"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "ApiError",
+          "exported": false,
+          "extends": "Error"
+        },
+        {
+          "kind": "interface",
+          "name": "FetchOptions",
+          "exported": false,
+          "extends": [
+            "RequestInit"
+          ]
+        }
+      ]
+    },
+    "apps/web/src/services/calendarCache.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "CACHE_TTL_MS"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "setCalendarCache"
+        },
+        {
+          "type": "named",
+          "name": "getCalendarCache"
+        },
+        {
+          "type": "named",
+          "name": "clearCalendarCache"
+        },
+        {
+          "type": "named",
+          "name": "isCacheValid"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "setCalendarCache",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getCalendarCache",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "clearCalendarCache",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isCacheValid",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "CacheEntry",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/services/diffCalculator.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/domain",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "GeneratedEvent"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "DiffResult"
+        },
+        {
+          "type": "named",
+          "name": "computeDiff"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "computeDiff",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DiffResult",
+          "exported": false
+        }
+      ]
+    },
+    "apps/web/src/services/localStorage.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "storage"
+        }
+      ],
+      "declarations": []
+    },
+    "apps/api/src/index.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "express",
+          "named": [
+            "type Express"
+          ]
+        },
+        {
+          "source": "cors",
+          "default": true,
+          "defaultName": "cors",
+          "named": []
+        },
+        {
+          "source": "cookie-parser",
+          "default": true,
+          "defaultName": "cookieParser",
+          "named": []
+        },
+        {
+          "source": "helmet",
+          "default": true,
+          "defaultName": "helmet",
+          "named": []
+        },
+        {
+          "source": "./routes/auth.js",
+          "default": false,
+          "named": [
+            "authRouter"
+          ]
+        },
+        {
+          "source": "./routes/calendars.js",
+          "default": false,
+          "named": [
+            "calendarsRouter"
+          ]
+        },
+        {
+          "source": "./routes/events.js",
+          "default": false,
+          "named": [
+            "eventsRouter"
+          ]
+        },
+        {
+          "source": "./middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "errorHandler"
+          ]
+        },
+        {
+          "source": "./middleware/rateLimiter.js",
+          "default": false,
+          "named": [
+            "rateLimiter"
+          ]
+        },
+        {
+          "source": "./middleware/auth.js",
+          "default": false,
+          "named": [
+            "devModeMiddleware"
+          ]
+        }
+      ],
+      "exports": [],
+      "declarations": []
+    },
+    "apps/api/src/middleware/auth.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Request",
+            "Response",
+            "NextFunction"
+          ]
+        },
+        {
+          "source": "../services/session.js",
+          "default": false,
+          "named": [
+            "getSession"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "AuthenticatedRequest"
+        },
+        {
+          "type": "named",
+          "name": "requireAuth"
+        },
+        {
+          "type": "named",
+          "name": "setDevModeToken"
+        },
+        {
+          "type": "named",
+          "name": "clearDevModeToken"
+        },
+        {
+          "type": "named",
+          "name": "devModeMiddleware"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "requireAuth",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "setDevModeToken",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "clearDevModeToken",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "devModeMiddleware",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "AuthenticatedRequest",
+          "exported": false,
+          "extends": [
+            "Request"
+          ]
+        }
+      ]
+    },
+    "apps/api/src/middleware/errorHandler.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Request",
+            "Response",
+            "NextFunction"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "ApiResponse",
+            "ApiError"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "AppError"
+        },
+        {
+          "type": "named",
+          "name": "errorHandler"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "errorHandler",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "class",
+          "name": "AppError",
+          "exported": false,
+          "extends": "Error"
+        }
+      ]
+    },
+    "apps/api/src/middleware/rateLimiter.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Request",
+            "Response",
+            "NextFunction"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "rateLimiter"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "rateLimiter",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/api/src/routes/auth.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": false,
+          "named": [
+            "Router",
+            "type Router"
+          ]
+        },
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Response"
+          ]
+        },
+        {
+          "source": "../services/google-oauth.js",
+          "default": false,
+          "named": [
+            "getAuthUrl",
+            "exchangeCode",
+            "refreshAccessToken"
+          ]
+        },
+        {
+          "source": "../services/session.js",
+          "default": false,
+          "named": [
+            "createSession",
+            "getSession",
+            "destroySession"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": false,
+          "named": [
+            "requireAuth"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AuthenticatedRequest"
+          ]
+        },
+        {
+          "source": "../middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "authRouter"
+        }
+      ],
+      "declarations": []
+    },
+    "apps/api/src/routes/calendars.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": false,
+          "named": [
+            "Router",
+            "type Router"
+          ]
+        },
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Response"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": false,
+          "named": [
+            "requireAuth"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AuthenticatedRequest"
+          ]
+        },
+        {
+          "source": "../services/google-oauth.js",
+          "default": false,
+          "named": [
+            "getCalendarClient"
+          ]
+        },
+        {
+          "source": "../middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "calendarsRouter"
+        }
+      ],
+      "declarations": []
+    },
+    "apps/api/src/routes/events.ts": {
+      "imports": [
+        {
+          "source": "express",
+          "default": false,
+          "named": [
+            "Router",
+            "type Router"
+          ]
+        },
+        {
+          "source": "express",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Response"
+          ]
+        },
+        {
+          "source": "zod",
+          "default": false,
+          "named": [
+            "z"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": false,
+          "named": [
+            "requireAuth"
+          ]
+        },
+        {
+          "source": "../middleware/auth.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AuthenticatedRequest"
+          ]
+        },
+        {
+          "source": "../middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "eventsRouter"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getMonday",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/api/src/services/calendar-client.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/calendar",
+          "default": false,
+          "named": [
+            "fetchEvents",
+            "fetchEventsFromCalendar",
+            "createEvent",
+            "updateEvent",
+            "deleteEvent",
+            "setCompletionStatus",
+            "normalizeEvents"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/calendar",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CreateEventPayload"
+          ]
+        },
+        {
+          "source": "../middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "fetchEvents",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "fetchAllCalendarsEvents",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "createEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "updateEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "deleteEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "completeEvent",
+          "exported": false,
+          "async": true
+        }
+      ]
+    },
+    "apps/api/src/services/google-oauth.ts": {
+      "imports": [
+        {
+          "source": "googleapis",
+          "default": false,
+          "named": [
+            "google"
+          ]
+        },
+        {
+          "source": "../types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "SessionData"
+          ]
+        },
+        {
+          "source": "../middleware/errorHandler.js",
+          "default": false,
+          "named": [
+            "AppError"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "getAuthUrl"
+        },
+        {
+          "type": "named",
+          "name": "getCalendarClient"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getAuthUrl",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "exchangeCode",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "refreshAccessToken",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "getCalendarClient",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/api/src/services/session.ts": {
+      "imports": [
+        {
+          "source": "../types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "SessionData"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "createSession"
+        },
+        {
+          "type": "named",
+          "name": "getSession"
+        },
+        {
+          "type": "named",
+          "name": "destroySession"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createSession",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getSession",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "destroySession",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "apps/api/src/types.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SessionData"
+        },
+        {
+          "type": "named",
+          "name": "DevModeState"
+        },
+        {
+          "type": "named",
+          "name": "TokenPayload"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "interface",
+          "name": "SessionData",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "DevModeState",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "TokenPayload",
+          "exported": false
+        }
+      ]
+    },
+    "packages/shared/src/constants/index.ts": {
+      "imports": [
+        {
+          "source": "../types",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CustomRange",
+            "Settings",
+            "TimeGroupPreset"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SLOT_DURATION_MINUTES"
+        },
+        {
+          "type": "named",
+          "name": "ALLOWED_DURATIONS"
+        },
+        {
+          "type": "named",
+          "name": "CACHE_TTL_MS"
+        },
+        {
+          "type": "named",
+          "name": "DEFAULT_SETTINGS"
+        },
+        {
+          "type": "named",
+          "name": "TIME_GROUP_PRESETS"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/shared/src/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "re-export",
+          "source": "./types/index.js"
+        },
+        {
+          "type": "re-export",
+          "source": "./constants/index.js"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/shared/src/types/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "Priority"
+        },
+        {
+          "type": "named",
+          "name": "BlockType"
+        },
+        {
+          "type": "named",
+          "name": "ViewType"
+        },
+        {
+          "type": "named",
+          "name": "CompletionStatus"
+        },
+        {
+          "type": "named",
+          "name": "TimeGroupPreset"
+        },
+        {
+          "type": "named",
+          "name": "CustomRange"
+        },
+        {
+          "type": "named",
+          "name": "RestrictedRange"
+        },
+        {
+          "type": "named",
+          "name": "TaskRestriction"
+        },
+        {
+          "type": "named",
+          "name": "Task"
+        },
+        {
+          "type": "named",
+          "name": "BlockedSlot"
+        },
+        {
+          "type": "named",
+          "name": "Settings"
+        },
+        {
+          "type": "named",
+          "name": "CalendarEvent"
+        },
+        {
+          "type": "named",
+          "name": "User"
+        },
+        {
+          "type": "named",
+          "name": "ApiResponse"
+        },
+        {
+          "type": "named",
+          "name": "ApiError"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "interface",
+          "name": "CustomRange",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "Task",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "BlockedSlot",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "Settings",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "CalendarEvent",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "User",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "ApiResponse",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "ApiError",
+          "exported": false
+        },
+        {
+          "kind": "type",
+          "name": "TimeGroupPreset",
+          "exported": false
+        },
+        {
+          "kind": "type",
+          "name": "RestrictedRange",
+          "exported": false
+        },
+        {
+          "kind": "type",
+          "name": "TaskRestriction",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "generateSchedule"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/domain/src/internal/allocationReporter.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task"
+          ]
+        },
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AllocationFailure"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "reportAllocationFailures"
+        },
+        {
+          "type": "named",
+          "name": "summarizeFailures"
+        },
+        {
+          "type": "named",
+          "name": "allocationRate"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "reportAllocationFailures",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "summarizeFailures",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "allocationRate",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "RawFailure",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/availabilityCalculator.ts": {
+      "imports": [
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "WeekSlot",
+            "AvailabilityWindow"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "SLOT_DURATION_MINUTES"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "calculateAvailability"
+        },
+        {
+          "type": "named",
+          "name": "getAvailableSlots"
+        },
+        {
+          "type": "named",
+          "name": "countAvailableSlots"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "calculateAvailability",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getAvailableSlots",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "countAvailableSlots",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/priorityScorer.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "Priority"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "Priority"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "getPriorityWeight"
+        },
+        {
+          "type": "named",
+          "name": "comparePriority"
+        },
+        {
+          "type": "named",
+          "name": "sortByPriority"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getPriorityWeight",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "comparePriority",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "sortByPriority",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/shuffleEngine.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "SeededRandom"
+        },
+        {
+          "type": "named",
+          "name": "dateSeed"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "dateSeed",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "class",
+          "name": "SeededRandom",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/slotBuilder.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Settings"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "SLOT_DURATION_MINUTES"
+          ]
+        },
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "WeekSlot"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "buildWeekSlots"
+        },
+        {
+          "type": "named",
+          "name": "buildSlotsForRange"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "buildWeekSlots",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "buildSlotsForRange",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/taskDistributor.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "Settings",
+            "RestrictedRange"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "SLOT_DURATION_MINUTES",
+            "TIME_GROUP_PRESETS"
+          ]
+        },
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "AvailabilityWindow",
+            "GeneratedEvent",
+            "PreviousWeekSnapshot"
+          ]
+        },
+        {
+          "source": "./priorityScorer.js",
+          "default": false,
+          "named": [
+            "sortByPriority"
+          ]
+        },
+        {
+          "source": "./shuffleEngine.js",
+          "default": false,
+          "named": [
+            "SeededRandom",
+            "dateSeed"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "distributeTasks"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "distributeTasks",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "scoreSlot",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isInRestrictedRange",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getDayKey",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isGapSatisfied",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "DistributionResult",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/types.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "BlockedSlot",
+            "CalendarEvent",
+            "Settings"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "WeekSlot"
+        },
+        {
+          "type": "named",
+          "name": "AvailabilityWindow"
+        },
+        {
+          "type": "named",
+          "name": "GeneratedEvent"
+        },
+        {
+          "type": "named",
+          "name": "AllocationFailure"
+        },
+        {
+          "type": "named",
+          "name": "ScheduleResult"
+        },
+        {
+          "type": "named",
+          "name": "PreviousWeekSnapshot"
+        },
+        {
+          "type": "named",
+          "name": "ScheduleInput"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "interface",
+          "name": "WeekSlot",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "AvailabilityWindow",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "GeneratedEvent",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "AllocationFailure",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "ScheduleResult",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "PreviousWeekSnapshot",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "ScheduleInput",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/internal/validator.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "BlockedSlot",
+            "CalendarEvent",
+            "Settings"
+          ]
+        },
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "GeneratedEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ValidationError"
+        },
+        {
+          "type": "named",
+          "name": "validateSchedule"
+        },
+        {
+          "type": "named",
+          "name": "isScheduleValid"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "validateSchedule",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "eventsOverlap",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isScheduleValid",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "ValidationError",
+          "exported": false
+        }
+      ]
+    },
+    "packages/domain/src/public/generateSchedule.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "Task",
+            "BlockedSlot",
+            "CalendarEvent",
+            "Settings"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": false,
+          "named": [
+            "SLOT_DURATION_MINUTES"
+          ]
+        },
+        {
+          "source": "../internal/types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "ScheduleResult",
+            "ScheduleInput",
+            "PreviousWeekSnapshot"
+          ]
+        },
+        {
+          "source": "../internal/slotBuilder.js",
+          "default": false,
+          "named": [
+            "buildWeekSlots"
+          ]
+        },
+        {
+          "source": "../internal/availabilityCalculator.js",
+          "default": false,
+          "named": [
+            "calculateAvailability"
+          ]
+        },
+        {
+          "source": "../internal/taskDistributor.js",
+          "default": false,
+          "named": [
+            "distributeTasks"
+          ]
+        },
+        {
+          "source": "../internal/validator.js",
+          "default": false,
+          "named": [
+            "validateSchedule"
+          ]
+        },
+        {
+          "source": "../internal/allocationReporter.js",
+          "default": false,
+          "named": [
+            "reportAllocationFailures"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "generateSchedule"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "generateSchedule",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getMonday",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "markSlotsOccupied",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "applyBlocks",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isSameDay",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/domain/src/public/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "generateSchedule"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/calendar/src/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "fetchEvents"
+        },
+        {
+          "type": "named",
+          "name": "fetchEventsFromCalendar"
+        },
+        {
+          "type": "named",
+          "name": "createEvent"
+        },
+        {
+          "type": "named",
+          "name": "updateEvent"
+        },
+        {
+          "type": "named",
+          "name": "deleteEvent"
+        },
+        {
+          "type": "named",
+          "name": "setCompletionStatus"
+        },
+        {
+          "type": "named",
+          "name": "normalizeEvents"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/calendar/src/internal/metadata.ts": {
+      "imports": [
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "BrkRoutnXdleMetadata",
+            "GoogleCalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "createMetadata"
+        },
+        {
+          "type": "named",
+          "name": "touchMetadata"
+        },
+        {
+          "type": "named",
+          "name": "isBrkRoutnXdleEvent"
+        },
+        {
+          "type": "named",
+          "name": "extractMetadata"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createMetadata",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "touchMetadata",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "isBrkRoutnXdleEvent",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "extractMetadata",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/calendar/src/internal/normalizer.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        },
+        {
+          "source": "./types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "GoogleCalendarEvent"
+          ]
+        },
+        {
+          "source": "./metadata.js",
+          "default": false,
+          "named": [
+            "extractMetadata"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "normalizeEvent"
+        },
+        {
+          "type": "named",
+          "name": "normalizeEvents"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "normalizeEvent",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "normalizeEvents",
+          "exported": false,
+          "async": false
+        }
+      ]
+    },
+    "packages/calendar/src/internal/types.ts": {
+      "imports": [
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "GoogleCalendarEvent"
+        },
+        {
+          "type": "named",
+          "name": "BrkRoutnXdleMetadata"
+        },
+        {
+          "type": "named",
+          "name": "CreateEventPayload"
+        },
+        {
+          "type": "named",
+          "name": "UpdateEventPayload"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "interface",
+          "name": "GoogleCalendarEvent",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "BrkRoutnXdleMetadata",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "CreateEventPayload",
+          "exported": false
+        },
+        {
+          "kind": "interface",
+          "name": "UpdateEventPayload",
+          "exported": false
+        }
+      ]
+    },
+    "packages/calendar/src/public/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "fetchEvents"
+        },
+        {
+          "type": "named",
+          "name": "createEvent"
+        },
+        {
+          "type": "named",
+          "name": "updateEvent"
+        },
+        {
+          "type": "named",
+          "name": "deleteEvent"
+        }
+      ],
+      "declarations": []
+    },
+    "packages/calendar/src/public/operations.ts": {
+      "imports": [
+        {
+          "source": "googleapis",
+          "default": false,
+          "named": [
+            "google",
+            "calendar_v3"
+          ]
+        },
+        {
+          "source": "@brkroutnxdle/shared",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "CalendarEvent"
+          ]
+        },
+        {
+          "source": "../internal/normalizer.js",
+          "default": false,
+          "named": [
+            "normalizeEvent",
+            "normalizeEvents"
+          ]
+        },
+        {
+          "source": "../internal/metadata.js",
+          "default": false,
+          "named": [
+            "createMetadata"
+          ]
+        },
+        {
+          "source": "../internal/types.js",
+          "default": true,
+          "defaultName": "type",
+          "named": [
+            "GoogleCalendarEvent",
+            "CreateEventPayload"
+          ]
+        }
+      ],
+      "exports": [],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "createClient",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "function",
+          "name": "getBrkCalendarId",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "fetchEvents",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "fetchEventsFromCalendar",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "createEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "updateEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "deleteEvent",
+          "exported": false,
+          "async": true
+        },
+        {
+          "kind": "function",
+          "name": "setCompletionStatus",
+          "exported": false,
+          "async": true
+        }
+      ]
+    },
+    "packages/ui/src/components/BottomSheet.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useEffect"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "BottomSheet"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "BottomSheet",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleKeyDown",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "BottomSheetProps",
+          "exported": false
+        }
+      ]
+    },
+    "packages/ui/src/components/Button.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "ButtonVariant"
+        },
+        {
+          "type": "named",
+          "name": "ButtonSize"
+        },
+        {
+          "type": "named",
+          "name": "Button"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "Button",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "ButtonProps",
+          "exported": false,
+          "extends": [
+            "React.ButtonHTMLAttributes<HTMLButtonElement>"
+          ]
+        },
+        {
+          "kind": "type",
+          "name": "ButtonVariant",
+          "exported": false
+        },
+        {
+          "kind": "type",
+          "name": "ButtonSize",
+          "exported": false
+        }
+      ]
+    },
+    "packages/ui/src/components/FAB.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": []
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "FAB"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "FAB",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "FABProps",
+          "exported": false
+        }
+      ]
+    },
+    "packages/ui/src/components/Modal.tsx": {
+      "imports": [
+        {
+          "source": "react",
+          "default": true,
+          "defaultName": "React",
+          "named": [
+            "useEffect",
+            "useRef"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "type": "named",
+          "name": "Modal"
+        }
+      ],
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "Modal",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "arrow-function",
+          "name": "handleKeyDown",
+          "exported": false,
+          "async": false
+        },
+        {
+          "kind": "interface",
+          "name": "ModalProps",
+          "exported": false
+        }
+      ]
+    },
+    "packages/ui/src/index.ts": {
+      "imports": [],
+      "exports": [
+        {
+          "type": "named",
+          "name": "Button"
+        },
+        {
+          "type": "named",
+          "name": "Modal"
+        },
+        {
+          "type": "named",
+          "name": "FAB"
+        },
+        {
+          "type": "named",
+          "name": "BottomSheet"
+        }
+      ],
+      "declarations": []
+    }
+  },
+  "errors": [],
+  "dependencyCount": {
+    "react": 45,
+    "./contexts/AuthContext": 2,
+    "./pages/LoginPage": 1,
+    "./pages/DashboardPage": 1,
+    "./components/DevModeBadge": 1,
+    "./components/DevModePanel": 1,
+    "./hooks/useDevMode": 1,
+    "@fullcalendar/react": 1,
+    "@fullcalendar/daygrid": 1,
+    "@fullcalendar/timegrid": 1,
+    "@fullcalendar/interaction": 1,
+    "@brkroutnxdle/shared": 50,
+    "./ErrorFallback": 1,
+    "@brkroutnxdle/ui": 1,
+    "./Header": 1,
+    "./Sidebar": 1,
+    "../contexts/SettingsContext": 5,
+    "../features/tasks/TaskPanel": 1,
+    "../features/blocks/BlockPanel": 1,
+    "../services/api": 5,
+    "../services/localStorage": 2,
+    "@brkroutnxdle/domain": 4,
+    "../../hooks/useBlocks": 2,
+    "./BlockCard": 1,
+    "./BlockModal": 1,
+    "./SaveButton": 1,
+    "../../hooks/useTasks": 2,
+    "./TaskCard": 1,
+    "./TaskModal": 1,
+    "../contexts/BlockContext": 4,
+    "@tanstack/react-query": 5,
+    "../contexts/CalendarContext": 6,
+    "../contexts/PreviewContext": 5,
+    "../services/calendarCache": 1,
+    "../services/diffCalculator": 1,
+    "../contexts/TaskContext": 3,
+    "react-dom/client": 1,
+    "./contexts/SettingsContext": 1,
+    "./contexts/CalendarContext": 1,
+    "./contexts/TaskContext": 1,
+    "./contexts/BlockContext": 1,
+    "./contexts/PreviewContext": 1,
+    "./components/ErrorBoundary": 1,
+    "./App": 1,
+    "./styles/design-tokens.css": 1,
+    "./styles/global.css": 1,
+    "./styles/CalendarStyles.css": 1,
+    "../contexts/AuthContext": 2,
+    "../hooks/useCalendar": 1,
+    "../hooks/useScheduleGeneration": 1,
+    "../hooks/useScheduleEditing": 1,
+    "../hooks/useSaveSchedule": 1,
+    "../hooks/useCompletion": 1,
+    "../hooks/useCalendarRefresh": 1,
+    "../components/MainLayout": 1,
+    "../components/CalendarView": 1,
+    "../components/SettingsModal": 1,
+    "../features/preview/CalculateWeekButton": 1,
+    "../features/preview/PreviewToolbar": 1,
+    "../features/preview/AllocationFailurePanel": 1,
+    "../features/preview/DeleteEventDialog": 1,
+    "../features/completion/RefreshButton": 1,
+    "../features/completion/ConflictDialog": 1,
+    "../hooks/useUnsavedChanges": 1,
+    "../features/shared/CreateActionModal": 1,
+    "../features/tasks/TaskModal": 1,
+    "../features/blocks/BlockModal": 1,
+    "express": 10,
+    "cors": 1,
+    "cookie-parser": 1,
+    "helmet": 1,
+    "./routes/auth.js": 1,
+    "./routes/calendars.js": 1,
+    "./routes/events.js": 1,
+    "./middleware/errorHandler.js": 1,
+    "./middleware/rateLimiter.js": 1,
+    "./middleware/auth.js": 1,
+    "../services/session.js": 2,
+    "../services/google-oauth.js": 2,
+    "../middleware/auth.js": 6,
+    "../middleware/errorHandler.js": 5,
+    "zod": 1,
+    "@brkroutnxdle/calendar": 2,
+    "googleapis": 2,
+    "../types.js": 2,
+    "../types": 1,
+    "./types.js": 7,
+    "./priorityScorer.js": 1,
+    "./shuffleEngine.js": 1,
+    "../internal/types.js": 2,
+    "../internal/slotBuilder.js": 1,
+    "../internal/availabilityCalculator.js": 1,
+    "../internal/taskDistributor.js": 1,
+    "../internal/validator.js": 1,
+    "../internal/allocationReporter.js": 1,
+    "./metadata.js": 1,
+    "../internal/normalizer.js": 1,
+    "../internal/metadata.js": 1
+  },
+  "perPackage": {
+    "apps/web": {
+      "files": 49,
+      "imports": 173,
+      "exports": 59,
+      "declarations": 127
+    },
+    "apps/api": {
+      "files": 11,
+      "imports": 42,
+      "exports": 19,
+      "declarations": 25
+    },
+    "packages/shared": {
+      "files": 3,
+      "imports": 1,
+      "exports": 22,
+      "declarations": 11
+    },
+    "packages/domain": {
+      "files": 11,
+      "imports": 25,
+      "exports": 27,
+      "declarations": 36
+    },
+    "packages/calendar": {
+      "files": 6,
+      "imports": 10,
+      "exports": 21,
+      "declarations": 18
+    },
+    "packages/ui": {
+      "files": 5,
+      "imports": 4,
+      "exports": 10,
+      "declarations": 12
+    }
+  }
+}

@@ -1,0 +1,81 @@
+pipeline:
+  name: "calendar-regression-fixes"
+  status: planning
+  started_at: "2026-06-26T11:00:00.000Z"
+  updated_at: "2026-06-26T11:10:00.000Z"
+  current_step: tech-lead
+  current_agent: orchestrator
+  steps:
+    solution-designer:
+      status: skipped
+      notes: "Skipped — bugs are well-defined, no design exploration needed"
+      updated_at: "2026-06-26T11:10:00.000Z"
+      errors: []
+      concerns: []
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+    planning-analyst:
+      status: completed
+      notes: "Approved by user. Proceeding to Tech Lead."
+      updated_at: "2026-06-26T11:15:00.000Z"
+      errors: []
+      concerns: []
+    tech-lead:
+      status: pending
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+    senior-frontend:
+      status: pending
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+      tasks: []
+    senior-backend:
+      status: pending
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+      tasks: []
+    qa-frontend:
+      status: pending
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+    qa-backend:
+      status: pending
+      notes: null
+      updated_at: null
+      errors: []
+      concerns: []
+  tasks: {}
+  history:
+    - step: pipeline-init
+      agent: orchestrator
+      action: created
+      notes: "New pipeline: calendar-regression-fixes. User reports: Google Calendar tasks not synced, X button on blocks missing/dysfunctional, blocks unmovable, task deletion modal X missing, sidebar tasks appear draggable to calendar but don't work."
+      timestamp: "2026-06-26T11:00:00.000Z"
+    - step: planning-analyst
+      agent: orchestrator
+      action: completed
+      notes: "Analysis of 5 bugs complete — CSS overflow, eventAllow excludeEventId, timezone mismatch, API error handling. 4 tasks proposed."
+      timestamp: "2026-06-26T11:10:00.000Z"
+  handoff:
+    context: calendar-regression-fixes
+    selected_approach: null
+    design_summary: null
+    planning_summary: null
+    task_summary: null
+    acceptance_criteria: []
+    dependencies: []
+    additional_context: []
+  resume:
+    last_completed_agent: null
+    last_completed_step: null
+    recovery_required: false
