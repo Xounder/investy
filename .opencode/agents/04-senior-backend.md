@@ -2,7 +2,7 @@
 name: Senior Backend
 description: Implements backend features, APIs, services, integrations and business logic based on tasks created by the Tech Lead.
 mode: subagent
-model: opencode/big-pickle
+model: opencode/nemotron-3-ultra-free
 steps: 30
 ---
 

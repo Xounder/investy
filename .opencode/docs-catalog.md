@@ -17,7 +17,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 
 | File | Content | When to modify |
 |---|---|---|
-| `agents/00-architecture-initializer.md` | Architecture Initializer — bootstraps the architecture base (index.md, architecture.md, schema, initial ADRs) when no app exists yet | Architecture base output format changes; pipeline flow adjustments |
+| `agents/00-architecture-initializer.md` | Architecture Initializer — bootstraps the architecture documentation set (architecture folder with index.md, architecture.md, schema, ADRs; docs-catalog.md; project-structure.md) when no app exists or when a codebase lacks the set | Architecture documentation set changes; pipeline flow adjustments |
 | `agents/00-planning-agent.md` | Planning Analyst — feasibility, risk, impact analysis, on-demand planning docs for PM | New analysis types; planning output format changes |
 | `agents/01-solution-designer.md` | Solution Designer instructions — collaborative design analysis, trade-off evaluation, web research, design document creation in design-docs/ | SD flow changes; new artifact types |
 | `agents/02-tech-lead.md` | TL instructions — decomposition, folder-per-task output, one .md per task, pipeline.yaml | Task format changes; allocation changes |
@@ -65,8 +65,11 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 
 | File | Content | When to modify |
 |---|---|---|
-| `architecture/index.md` | Architecture entry point — links to all architecture docs | Architecture changes |
-| TODO | TODO | TODO |
+| `architecture/index.md` | Architecture entry point — document list, ADR summary | Architecture changes |
+| `architecture/architecture.md` | System architecture, principles, stack, key decisions, success criteria | Architecture decisions change |
+| `architecture/architecture-folder-schema.md` | Folder purpose map | Folder structure changes |
+| `architecture/commit-pattern.md` | Commit message convention — per-task `feat(<feature>)[TASK-XX]` commits and separate `docs(<area>)` commits | Commit rules or formats change |
+| `architecture/docs/adrs/` | Architecture Decision Records (ADR-001 to ADR-010) | New ADRs accepted |
 
 ---
 

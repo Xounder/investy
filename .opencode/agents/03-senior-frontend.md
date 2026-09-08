@@ -2,7 +2,7 @@
 name: Senior Frontend
 description: Implements frontend features, screens, components, state management and API integrations based on tasks created by the Tech Lead.
 mode: subagent
-model: opencode/big-pickle
+model: opencode/nemotron-3-ultra-free
 steps: 30
 ---
 

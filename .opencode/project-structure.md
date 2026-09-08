@@ -1,7 +1,7 @@
 # Project Structure
 
 ```
-BrkRoutnXdle/
+Investy/
 ├── AGENTS.md                  # Entry point — rules, conventions, pipeline
 ├── .gitignore
 │
@@ -28,27 +28,17 @@ BrkRoutnXdle/
     ├── architecture/          # Architecture docs
     │   ├── index.md            # Architecture entry point index
     │   ├── architecture.md     # System architecture, principles, ADR references
-    │   ├── canonical-data-model.md
+    │   ├── architecture-folder-schema.md
     │   ├── commit-pattern.md
-    │   ├── domain-model.md
-    │   ├── event-classification.md
-    │   ├── generation-algorithm.md
-    │   ├── google-calendar-integration.md
-    │   ├── monorepo-structure.md
-    │   ├── package-contracts.md
-    │   ├── ux-flows.md
     │   ├── references/         # Reference files (detailed content from oversized docs)
     │   └── docs/               # Subdirectory docs
-    │       ├── adrs/           # ADR-001 through ADR-009
+    │       ├── adrs/           # ADR-001 through ADR-010
     │       ├── backend/        # API specification
-    │       ├── feature/        # Priority & generation workflow
-    │       ├── frontend/       # Component architecture
-    │       ├── design-system.md
-    │       ├── testing-strategy.md
-    │       ├── deployment-strategy.md
-    │       ├── security-architecture.md
-    │       ├── error-handling-strategy.md
-    │       └── logging-monitoring-strategy.md
+    │       │   └── references/
+    │       ├── feature/        # Feature-level architecture
+    │       │   └── references/
+    │       └── frontend/       # Component architecture
+    │           └── references/
     │
     ├── commands/              # Custom opencode commands
     │   ├── delivery-pipeline-new.md

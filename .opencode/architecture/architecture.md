@@ -1,399 +1,187 @@
-# Architecture.md
-
-# BrkRoutnXdle Architecture
+# Investy Architecture
 
 ## Overview
 
-BrkRoutnXdle is an orchestration layer built on top of Google Calendar.
+Investy is a multi-user investment portfolio dashboard for the Brazilian retail market, inspired by Investidor10's Gerenciador de Carteiras, Organizze, and the B3 portfolio-consolidation guidance.
 
-The system's goal is to allow users to define recurring tasks and constraints, automatically generating a distributed and partially randomized weekly schedule.
+Users consolidate holdings from multiple brokers across asset classes — ações, FIIs, ETFs (nacionais, americanos, irlandeses), BDRs, criptomoedas, renda fixa and Tesouro Direto — and get a live, consolidated view of portfolio value, cost basis, unrealized P&L, diversification, dividend income and performance over time, benchmarked against CDI, IBOV, IFIX and S&P 500.
 
-The system has no database of its own.
+Market data is consumed from public providers (brapi.dev, BCB SGS, Yahoo Finance, CoinGecko) through a server-side proxy that caches quotes and degrades gracefully. The UI follows the DocuForge design system extended into a data-dense, chart-driven dashboard language.
 
-Google Calendar acts as the source of truth for events.
-
-The frontend only maintains local configurations and task definitions via localStorage.
+Investy is a full-stack application (Option C): React SPA + Node API + managed PostgreSQL + scheduled sync worker, with multi-user authentication and multi-device support from day one.
 
 ---
 
 # Core Principles
 
-## Google Calendar First
+## Transaction Journal Is the Source of Truth
 
-Every generated event must exist in Google Calendar.
+Every position is derived from the transaction journal (buy, sell, dividend, split, manual adjustment). Manual holding entry and CSV/JSON import are supported input paths that always produce journal entries. No position state exists outside the journal.
 
-The system must never maintain a parallel copy of events.
+## User Data Ownership
 
-Events are always read from Google Calendar.
+Users own their data. The system must provide full export (JSON/CSV) and automated backups. Public market data is shared; user portfolio data is never shared across accounts.
 
-Events are always persisted to Google Calendar.
+## Multi-User Isolation
 
----
+The application is multi-user from day one. Every record (portfolio, holding, transaction, dividend, quote override) is scoped to an owner. The API enforces ownership filtering on every query; cross-user access is forbidden and tested.
 
-## Stateless Backend
+## Provider-Agnostic Market Data
 
-The backend has no database.
+Market prices are consumed through a provider interface with caching, so neither UI nor domain logic depends on a specific vendor. Manual price overrides and last-known-good values keep the dashboard correct when a provider is down or lacks coverage.
 
-The backend does not store users.
+## No Secrets in the Browser
 
-The backend does not maintain persistent sessions.
+Provider API keys, database credentials, and session secrets live only on the server. The frontend never receives secrets. Server-to-server calls are restricted; CORS is locked to the application origin.
 
-The backend exists only for:
+## Design System with a Dashboard Language
 
-* Google OAuth
-* Refresh Tokens
-* Communication with Google APIs
-* Response normalization
+The UI is rooted in the DocuForge design tokens (palette, typography, spacing) and deliberately extended beyond a documentation look into a data-dense dashboard language: sidebar navigation, cards, chips, tables, KPI bands, and charts.
 
----
+## Multi-Device from Day One
 
-## Calendar As Source Of Truth
-
-Google Calendar is responsible for storing:
-
-* Generated events
-* Dates
-* Times
-* Completion status
-* Event metadata
+All mutable state is server-side; the SPA is stateless. Users can log in from any device and see identical data, with daily performance snapshots stored in the database.
 
 ---
 
-## Local Configuration
-
-The browser is responsible for storing:
-
-* Tasks
-* Settings
-* Blocks
-* Preferences
-
-Cross-device synchronization is not a V1 goal.
-
----
-
-# High Level Architecture
+# High-Level Architecture
 
 ```text
-┌─────────────────────┐
-│ React Frontend      │
-└──────────┬──────────┘
-           │
-           │ HTTPS
-           │
-┌──────────▼──────────┐
-│ Express BFF         │
-└──────────┬──────────┘
-           │
-           │
-           ▼
-┌─────────────────────┐
-│ Google Calendar API │
-└─────────────────────┘
+┌────────────────────────────────────┐
+│  Browser — React SPA (apps/web)    │
+│  Vite · TanStack Query · Tailwind  │
+└────────────────┬───────────────────┘
+                 │ HTTPS + JSON
+┌────────────────▼───────────────────┐
+│  apps/api (Node · Hono)            │
+│  auth · REST · market-data proxy   │
+│  + cache · import/export           │
+└────────────────┬───────────────────┘
+                 │ Drizzle ORM
+┌────────────────▼───────────────────┐
+│  PostgreSQL (managed)              │
+│  users · journal · positions ·     │
+│  dividends · quotes · snapshots    │
+└────────────────▲───────────────────┘
+                 │ scheduled jobs
+┌────────────────┴───────────────────┐
+│  Worker process (apps/api worker)  │
+│  quote refresh · daily snapshot    │
+│  dividend agenda · backups         │
+└────────────────┬───────────────────┘
+                 │ provider clients
+  brapi.dev · BCB SGS · Yahoo · CoinGecko
 ```
 
 ---
 
 # Technology Stack
 
-## Frontend
-
-* React
-* TypeScript
-* Vite
-* React Query
-* React Hook Form
-* Context API
-* Zod
-* FullCalendar
-
----
-
-## Backend
-
-* Node.js
-* Express
-* TypeScript
-* googleapis
-* Zod
+| Layer | Choice | Rationale |
+|-------|--------|-----------|
+| Frontend | React 18 + Vite + TypeScript | Mature ecosystem, fast dev loop, data-dense UI fits |
+| Frontend state | TanStack Query + Zustand | Server cache vs. transient UI state separation |
+| Styling | Tailwind CSS v4 theme on DocuForge tokens | Token-driven design system, low overhead |
+| Charts | Recharts | Declarative, themeable, covers line/area/donut/bar |
+| Backend | Node.js + Hono + TypeScript | Light, TS-first HTTP layer for API + proxy |
+| Validation | zod | Runtime validation at API and import boundaries |
+| Storage | PostgreSQL (managed) + Drizzle ORM | Multi-user OLTP, transactional journal, migrations |
+| Auth | Email/password + httpOnly cookie sessions, OAuth2-ready | Secure defaults, extensible to Google/Open Finance |
+| Market data | brapi.dev (B3/FII/ETF/BDR/crypto + indicators), BCB SGS (Selic/CDI/IPCA), Yahoo chart (US/IE), CoinGecko (crypto fallback) | Redundancy + official macro source, server-side caching |
+| Worker | Node process in `apps/api`, scheduler (node-cron / platform cron) | Shares schema and domain code, single deploy unit |
+| Hosting | Web on Vercel/Netlify optional; api+worker on Railway/Fly/Render; managed Postgres on Neon/Supabase/Railway | Cheap multi-user deploy, secrets in env vars |
+| Tests | Vitest (unit/domain/API) + Playwright (E2E) | Correctness of money math and key flows |
+| Money | Integer cents (BIGINT), BR formatting via Intl | No floating-point drift on BRL arithmetic |
 
 ---
 
-# Calendar Strategy
+# Key Decisions
 
-## Dedicated Calendar
-
-A dedicated calendar will be created during first login.
-
-Name:
-
-```text
-BrkRoutnXdle
-```
-
----
-
-## Calendar Responsibilities
-
-### Primary Calendar
-
-Read-only.
-
-Used for:
-
-* Discovering existing events
-* Discovering busy time slots
+| # | Decision | Status | ADR |
+|---|----------|--------|-----|
+| ADR-001 | Full-stack Option C architecture (SPA + API + Postgres + auth + worker) | Accepted | [ADR-001](docs/adrs/ADR-001-full-stack-architecture.md) |
+| ADR-002 | pnpm monorepo: `apps/web`, `apps/api`, `packages/domain`; worker inside `apps/api` | Accepted | [ADR-002](docs/adrs/ADR-002-monorepo-structure.md) |
+| ADR-003 | Server-side market-data proxy with provider interface + cache + manual override | Accepted | [ADR-003](docs/adrs/ADR-003-market-data-proxy.md) |
+| ADR-004 | Managed PostgreSQL as system of record via Drizzle; money in integer cents | Accepted | [ADR-004](docs/adrs/ADR-004-postgres-storage.md) |
+| ADR-005 | Transaction journal is source of truth; B3 nota de corretagem import in V1 | Accepted | [ADR-005](docs/adrs/ADR-005-transaction-journal.md) |
+| ADR-006 | Email/password + httpOnly cookie sessions; per-user data isolation | Accepted | [ADR-006](docs/adrs/ADR-006-auth-multiuser.md) |
+| ADR-007 | Scheduled sync worker: quotes, daily snapshots, dividend agenda, backups | Accepted | [ADR-007](docs/adrs/ADR-007-scheduled-worker.md) |
+| ADR-008 | Platform-hosted api+worker with managed Postgres; no secrets in frontend | Accepted | [ADR-008](docs/adrs/ADR-008-hosting-deployment.md) |
+| ADR-009 | Tailwind v4 theme on DocuForge tokens + Recharts; data-dense dashboard UI | Accepted | [ADR-009](docs/adrs/ADR-009-design-system-frontend.md) |
+| ADR-010 | Security foundation: server-side secrets, CORS lockdown, rate limits, zod | Accepted | [ADR-010](docs/adrs/ADR-010-security.md) |
 
 ---
 
-### BrkRoutnXdle Calendar
+# Domain Data Model
 
-Read and write.
+| Entity | Purpose | Notes |
+|--------|---------|-------|
+| `User` | Auth identity | Owner scope for all records |
+| `Portfolio` | Named container of holdings (per user) | e.g., "Minha carteira", "Previdência" |
+| `Broker` / `Account` | Where assets are held | Enables consolidation across brokers |
+| `Asset` | Catalog entry: ticker, name, class, currency, sector | Class: acao/fii/etf/bdr/crypto/rf/tesouro/indice |
+| `Transaction` | Journal row: buy/sell/dividend/split/adjustment | Source of truth for positions |
+| `Holding` | Derived position: asset × portfolio × quantity × avg price | Computed from journal, materialized for reads |
+| `Dividend` | Provento: ex-date, pay-date, value, status | Powers agenda de dividendos |
+| `Quote` | Price point: symbol, timestamp, price, currency, source | Cached market data with TTL |
+| `PortfolioSnapshot` | Daily total value + allocation | Powers performance-over-time chart |
+| `BenchmarkSeries` | Daily Selic/CDI/IPCA/IBOV/IFIX/SPX | Cached via worker + proxy |
 
-Used for:
-
-* Generated tasks
-* Completed tasks
-* System updates
-
----
-
-# Event Metadata
-
-Every generated event must include:
-
-```json
-{
-  "extendedProperties": {
-    "private": {
-      "app": "BrkRoutnXdle",
-      "generated": "true",
-      "completed": "false",
-      "taskId": "task-id",
-      "created": "timestamp",
-      "updated": "timestamp"
-    }
-  }
-}
-```
+All user-owned tables include an owner scope enforced by the API layer.
 
 ---
 
-# Local Storage
-
-## Structure
-
-```json
-{
-  "tasks": [],
-  "blockedSlots": [],
-  "settings": {}
-}
-```
-
----
-
-## Cache Structure
-
-```json
-{
-  "calendarCache": {
-    "data": {},
-    "expiresAt": 0
-  }
-}
-```
-
----
-
-## Cache Duration
-
-```text
-5 minutes
-```
-
-After expiration:
-
-```text
-Refetch Google Calendar
-```
-
----
-
-# Time Model
-
-## Slot Duration
-
-The system works in slots of:
-
-```text
-30 minutes
-```
-
----
-
-## Allowed Task Durations
-
-Allowed:
-
-```text
-30
-60
-90
-120
-150
-180
-...
-```
-
-Not allowed:
-
-```text
-15
-45
-75
-95
-```
-
----
-
-# Security
-
-## Authentication
-
-Google OAuth.
-
----
-
-## Authorization
-
-Only authenticated user.
-
----
-
-## Secrets
-
-Never exposed to the frontend.
-
----
-
-# ADRs
-
-## ADR-001
-
-Google Calendar is source of truth.
-
----
-
-## ADR-002
-
-No database.
-
----
-
-## ADR-003
-
-Settings in localStorage.
-
----
-
-## ADR-004
-
-Dedicated BrkRoutnXdle calendar.
-
----
-
-## ADR-005
-
-30-minute slots.
-
----
-
-## ADR-006
-
-Stateless backend.
-
----
-
-## ADR-007
-
-Preview required before saving.
-
----
-
-## ADR-008
-
-Recalculate only future events.
-
----
-
-## ADR-009
-
-Google Calendar always wins conflicts.
-
----
-
-# Future Improvements
-
-## Optional
-
-* Google Drive Sync
-* Shared Schedules
-* Multi Device Sync
-* Mobile App
-* Notifications
-* AI Assisted Scheduling
-* Smart Recommendations
-* Historical Analytics
-* Habit Tracking
-* Gamification
-
----
-
-# Non Goals
-
-Not part of V1.
-
-* Database
-* Multiplayer
-* Sharing
-* Marketplace
-* Chat
-* Social Features
-* Machine Learning
-* Real Time Collaboration
-* Cross Device Synchronization
+# Non-Goals (V1)
+
+- Real-time streaming quotes (intraday delay is acceptable; daily close is the primary cadence)
+- Options, futures, or leveraged derivative tracking
+- Tax reporting (IRPF/GCAP) and fee aggregation
+- Open Finance / bank account aggregation
+- AI agent integration and smart recommendations
+- Native mobile apps (responsive web only)
+- Notifications / alerts
+- News feeds and social features
+- Orders execution / trading
 
 ---
 
 # Success Criteria
 
-The system will be considered functional when it can:
+The system is considered functional when it can:
 
-1. Authenticate with Google.
-2. Create dedicated calendar.
-3. Read user availability.
-4. Generate weekly schedule.
-5. Display preview.
-6. Persist events.
-7. Partially recalculate week.
-8. Respect blocks.
-9. Respect previous week.
-10. Sync changes with Google Calendar.
-11. Allow full management through a single screen.
+1. Authenticate multiple users and keep each user's portfolio fully isolated.
+2. Register holdings via manual entry, CSV/JSON import, or the B3 nota de corretagem import.
+3. Reconcile a position from an imported B3 nota de corretagem (buy/sell/dividend) into the journal and derive the resulting position correctly.
+4. Show consolidated portfolio value, cost basis, and unrealized P&L per asset and in total, accurate to the last confirmed quote.
+5. Refresh prices automatically (intraday TTL + daily close) with graceful fallback to last-known-good and manual override.
+6. Render the dividend agenda and income by month/asset.
+7. Show performance over time (daily snapshots) compared with CDI, IBOV, IFIX and S&P 500.
+8. Produce full JSON/CSV export and automatic backups on a schedule.
+9. Allow the same data to be accessed from multiple devices with identical results.
+10. Run the UI following the DocuForge design system extended as a data-dense dashboard.
 
 ---
 
 # Related Documents
 
-Detailed topics are documented in dedicated files:
-
 | Topic | Document |
 |-------|----------|
-| Domain Model | [domain-model.md](domain-model.md) |
-| Canonical Data Model | [canonical-data-model.md](canonical-data-model.md) |
-| Week Generation Algorithm | [generation-algorithm.md](generation-algorithm.md) |
-| Error Handling | [docs/error-handling-strategy.md](docs/error-handling-strategy.md) |
-| User Interface / UX Flows | [ux-flows.md](ux-flows.md) |
-| Google Calendar Integration | [google-calendar-integration.md](google-calendar-integration.md) |
-| Event Classification | [event-classification.md](event-classification.md) |
+| System architecture (this file) | `architecture.md` |
+| Architecture index | `index.md` |
+| Folder schema | `architecture-folder-schema.md` |
+| Decision records | `docs/adrs/ADR-001-*.md` … `ADR-010-*.md` |
+| API specification | `docs/backend/api-specification.md` (planned) |
+| Frontend component architecture | `docs/frontend/component-architecture.md` (planned) |
+| Feature catalog | `docs/feature/` (planned) |
+| Design system | `docs/design-system.md` (planned) |
+| Commit convention | `commit-pattern.md` |
+
+---
+
+# Open Questions
+
+- Managed Postgres provider preference (Neon vs Supabase vs Railway) — finalize at implementation.
+- Hosting platform preference for api+worker (Railway vs Fly.io vs Render).
+- Auth scope: email/password only in V1, or also Google OAuth at launch.
+- Broker list must be extensible; acceptable to seed a preconfigured set (XP, Rico, Clear, Nu Invest, Inter) in V1.
+- Whether Tesouro Direto prices should be imported from an external source or manually entered in V1.
