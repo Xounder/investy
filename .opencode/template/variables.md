@@ -5,6 +5,9 @@
 
 [ARCHITECTURE_TEMPLATE_FILE] = .opencode/template/architecture-template.md
 
+[DOCS_CATALOG_FILE] = .opencode/docs-catalog.md
+[PROJECT_STRUCTURE_FILE] = .opencode/project-structure.md
+
 [PLAN_FOLDER_LOCATION] = .opencode/plan/<context>
 
 [DESIGN_FOLDER_LOCATION] = [PLAN_FOLDER_LOCATION]/design-docs

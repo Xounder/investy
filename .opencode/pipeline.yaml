@@ -1,75 +1,231 @@
 pipeline:
-  name: "calendar-regression-fixes"
-  status: planning
-  started_at: "2026-06-26T11:00:00.000Z"
-  updated_at: "2026-06-26T11:10:00.000Z"
-  current_step: tech-lead
-  current_agent: orchestrator
+  name: "investy-dashboard"
+  status: in-progress
+  started_at: "2026-09-04T00:00:00.000Z"
+  updated_at: "2026-09-06T23:30:00.000Z"
+  current_step: implementation
+  current_agent: senior-backend
   steps:
-    solution-designer:
-      status: skipped
-      notes: "Skipped — bugs are well-defined, no design exploration needed"
-      updated_at: "2026-06-26T11:10:00.000Z"
-      errors: []
-      concerns: []
-      notes: null
-      updated_at: null
-      errors: []
-      concerns: []
-    planning-analyst:
+    architecture-initializer:
       status: completed
-      notes: "Approved by user. Proceeding to Tech Lead."
-      updated_at: "2026-06-26T11:15:00.000Z"
+      notes: "Approved by user (Option C). Base created for Investy, replacing stale BrkRoutnXdle. ADR-001..010 documented."
+      updated_at: "2026-09-04T12:30:00.000Z"
+      errors: []
+      concerns:
+        - "Primary agents (Architecture Initializer) were dispatched as `general` with full workflow inline — custom primary agent type not exposed as a Task subagent_type in this environment."
+        - "Stale codebase-analysis output reports still reference old BrkRoutnXdle paths; to be regenerated on next codebase-analysis run."
+        - "pipeline.yaml history intentionally retains the BrkRoutnXdle notes as a record of the base replacement."
+    solution-designer:
+      status: completed
+      notes: "Approved by user. Design Option C + full nota scope + USD/FX + avg-cost display + full scope (multi-portfolio, FII projection, pt-BR, retain snapshots). 8 design docs written."
+      updated_at: "2026-09-04T13:00:00.000Z"
+      errors: []
+      concerns:
+        - "Primary agents (Solution Designer) were dispatched as `general` with full workflow inline — custom primary agent type not exposed as a Task subagent_type in this environment."
+        - "Pagination cursor strategy deferred to backend agent at implementation (design-04 open question)."
+    planning-analyst:
+      status: skipped
+      notes: "Skipped — no codebase exists (greenfield); Solution Designer handled feasibility; proceeding directly to Tech Lead."
+      updated_at: "2026-09-04T13:00:00.000Z"
       errors: []
       concerns: []
     tech-lead:
-      status: pending
-      notes: null
-      updated_at: null
+      status: completed
+      notes: "Task breakdown created: 15 tasks (TASK-01..15), index.md with dependency graph, ownership mapping, file overlaps, parallelization plan. Backend owns 9 tasks, frontend owns 6."
+      updated_at: "2026-09-06T14:10:00.000Z"
       errors: []
-      concerns: []
+      concerns:
+        - "TASK-13 originally authored as mixed backend+frontend; split into TASK-13 (backend) and TASK-14 (frontend settings), TASK-15 renumbered from old TASK-14."
+        - "Pagination cursor strategy deferred to backend agent at TASK-05 implementation (design-04 open question)."
+        - "Managed Postgres provider + API host deferred to implementation (architecture.md open questions), no effect on task structure."
     senior-frontend:
-      status: pending
-      notes: null
-      updated_at: null
+      status: in-progress
+      notes: "TASK-06 completed (UI foundation). Next: TASK-07."
+      updated_at: "2026-09-06T14:40:00.000Z"
       errors: []
-      concerns: []
-      tasks: []
+      concerns:
+        - "TASK-06: Vitest unit tests (test:unit) could not be executed — run-package-command tool has no test:unit option and direct vitest invocation is blocked by shell restrictions. App.test.tsx exists (real assertions); E2E via 'test' passed 1/1."
+      tasks: [TASK-06]
     senior-backend:
-      status: pending
-      notes: null
-      updated_at: null
-      errors: []
-      concerns: []
-      tasks: []
+      status: in-progress
+      notes: "QA corrections CLOSED: D1, C1, C2, C3, C4, C5, D4, D3 (apps/api 51 tests green; domain 57 green; all build/typecheck/lint green). D2 (drizzle migration) REMAINS blocked by drizzle-kit 0.30.6 BigInt snapshot bug; documented workaround: temp default(0n)->default(0), generate, revert. TASK-04 next: provider rate-limit/quota, TASK-04 unit+integration tests (currently none exist), D2 migration, final validation."
+      updated_at: "2026-09-06T23:30:00.000Z"
+      errors:
+        - "D2: drizzle-kit 0.30.6 'Do not know how to serialize a BigInt' on db:generate — workaround documented, not yet applied."
+      concerns:
+        - "No TASK-04 market/asset service or route tests exist yet (must be created this milestone)."
+        - "Repeated step-budget exhaustion; all work lands incrementally."
     qa-frontend:
-      status: pending
-      notes: null
-      updated_at: null
+      status: completed
+      notes: "TASK-06 (UI foundation) APPROVED by QA. All acceptance criteria satisfied; build/typecheck/lint/E2E green. Minor non-blocking items flagged for TASK-07: OnboardingPage BTG option stray leading space; ReportsPage pt-BR typo 'allocção'. DataTable exposes render callback for P&L coloring (TASK-07/11 must implement coloring)."
+      updated_at: "2026-09-06T15:30:00.000Z"
       errors: []
-      concerns: []
+      concerns:
+        - "test:unit (vitest run) still not runnable via run-package-command tooling — tool exposes only build/lint/typecheck/test (E2E)."
+        - "Transient esbuild OS-thread/memory crashes during concurrent build validation (environmental, resolved on retry)."
+      reviewed: [TASK-06]
     qa-backend:
-      status: pending
-      notes: null
-      updated_at: null
+      status: reviewed-corrections-needed
+      notes: "QA Backend reviewed TASK-01/02/03 → CORRECTIONS NEEDED. Blocking: D1 apps/api build/typecheck fail (TS2769 repositories/base.ts:60); D2 no Drizzle migration generated (journal empty); D3 TASK-03 integration acceptance tests missing + several trivial tests; D4 broker seedCatalog never invoked. High-risk: C1 packages/domain dist ESM-incompatible (extensionless imports -> ERR_MODULE_NOT_FOUND on runtime value import); C2 sessions not revoked at middleware (table never checked); C3 400 path uses throw new Response, untested; C4 quotes.fxRateToBRL integer (5.20->5) and benchmarkSeries.value bigint number-mode. Low: C5 email case-sensitivity; C6 base.ts JS-side filtering; C8 register sets cookie w/o sessions row. Verified correct: ADR-002/004 purity+integer cents, ADR-005 journal engine (57 tests incl. property), ADR-006 ownership scoping, Argon2id+cookie attrs+409/401 semantics, schema 14 entities."
+      updated_at: "2026-09-06T18:45:00.000Z"
       errors: []
-      concerns: []
-  tasks: {}
+      concerns:
+        - "git-diff main..HEAD unusable (no main ref); review used direct file inspection."
+      reviewed: [TASK-01, TASK-02, TASK-03]
+  tasks:
+    - id: TASK-01
+      title: "Monorepo Foundation, Domain Skeleton, CI, and Test Harness (M0)"
+      owner: senior-backend
+      status: completed
+      commit: "9bb61c3"
+    - id: TASK-02
+      title: "Domain Engine — JournalEngine, Money, FX, Rateio (M1)"
+      owner: senior-backend
+      status: completed
+      commit: "bde1399"
+    - id: TASK-03
+      title: "Authentication, Ownership, Database Schema (M2)"
+      owner: senior-backend
+      status: completed
+      commit: "31adbab"
+    - id: TASK-04
+      title: "Market Data Proxy and Asset Catalog (M3)"
+      owner: senior-backend
+      status: in-progress
+    - id: TASK-05
+      title: "REST API Endpoints — Journals, Holdings, Portfolios (M4 API)"
+      owner: senior-backend
+      status: pending
+    - id: TASK-06
+      title: "UI Foundation — Tailwind Theme, Design System, Layout, Routing (M0 FE)"
+      owner: senior-frontend
+      status: completed
+      commit: "481eb28"
+    - id: TASK-07
+      title: "Register Drawer, Journal Screen, Holdings Table (M4 FE)"
+      owner: senior-frontend
+      status: pending
+    - id: TASK-08
+      title: "CSV Template Import and B3 Nota Import (M5)"
+      owner: senior-backend
+      status: pending
+    - id: TASK-09
+      title: "Dividend Tracking — Agenda, Projection, Income History (M6)"
+      owner: senior-backend
+      status: pending
+    - id: TASK-10
+      title: "Scheduled Worker — Quotes, Snapshots, Dividend Sync, Backups (M7 Worker)"
+      owner: senior-backend
+      status: pending
+    - id: TASK-11
+      title: "Dashboard Hub — KPIs, Indicators, Allocation, Performance (M7 FE)"
+      owner: senior-frontend
+      status: pending
+    - id: TASK-12
+      title: "Reports & Analytics Screen (M8 FE)"
+      owner: senior-frontend
+      status: pending
+    - id: TASK-13
+      title: "Export, Backup Status, and Account Erasure API (M8 BE)"
+      owner: senior-backend
+      status: pending
+    - id: TASK-14
+      title: "Settings Screen — Profile, Portfolios, Export, Danger Zone (M8/M9 FE)"
+      owner: senior-frontend
+      status: pending
+    - id: TASK-15
+      title: "E2E Testing, Isolation, Security, Deploy Config (M9)"
+      owner: senior-frontend
+      status: pending
   history:
     - step: pipeline-init
       agent: orchestrator
       action: created
-      notes: "New pipeline: calendar-regression-fixes. User reports: Google Calendar tasks not synced, X button on blocks missing/dysfunctional, blocks unmovable, task deletion modal X missing, sidebar tasks appear draggable to calendar but don't work."
-      timestamp: "2026-06-26T11:00:00.000Z"
-    - step: planning-analyst
-      agent: orchestrator
+      notes: "New pipeline: investy-dashboard. New product — investment portfolio dashboard (Brazilian market focus) inspired by Investidor10 portfolio manager and Organizze. Design base: DocuForge design system (blue-purple-gray palette, Plus Jakarta Sans + Inter, generous whitespace, sidebar navigation). Existing architecture base documents a different product (BrkRoutnXdle) and will be replaced via Architecture Initializer."
+      timestamp: "2026-09-04T00:00:00.000Z"
+    - step: architecture-initializer
+      agent: architecture-initializer
       action: completed
-      notes: "Analysis of 5 bugs complete — CSS overflow, eventAllow excludeEventId, timezone mismatch, API error handling. 4 tasks proposed."
-      timestamp: "2026-06-26T11:10:00.000Z"
+      notes: "User approved Option C (full-stack + Postgres + auth) with both entry methods (manual + CSV and transaction journal + B3 nota import) and Tailwind+Recharts design. Base files created; 10 ADRs; old docs replaced."
+      timestamp: "2026-09-04T12:30:00.000Z"
+    - step: solution-designer
+      agent: solution-designer
+      action: completed
+      notes: "User approved design: Option C IA/UX, full nota scope (PDF+text/CSV/XML + rateio), USD quote + FX, avg-cost display only, full scope (multi-portfolio, FII projection, pt-BR, retain snapshots). 8 design docs in plan/investy-dashboard/design-docs."
+      timestamp: "2026-09-04T13:00:00.000Z"
+    - step: tech-lead
+      agent: tech-lead
+      action: completed
+      notes: "15 tasks created: TASK-01..15. Backend: TASK-01..05, 08, 09, 10, 13 (≈30d). Frontend: TASK-06, 07, 11, 12, 14, 15 (≈21d). Dependencies + file overlaps documented."
+      timestamp: "2026-09-06T14:10:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-01 completed: M0 monorepo scaffold. pnpm workspace (apps/web, apps/api, packages/domain), Vite+React+Tailwind v4, Hono+Drizzle+Postgres, domain skeleton, Vitest+Playwright. All 11 validations green (build/typecheck/lint/test × 3 packages). Playwright pinned to ~1.60.0 for browser cache compatibility."
+      timestamp: "2026-09-06T14:15:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-02 completed: domain engine (M1). JournalEngine 8 event types, Money BigInt, Fx, Rateio largest-remainder. 57 tests + 4 property tests green. Zero runtime deps."
+      timestamp: "2026-09-06T14:40:00.000Z"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-06 completed: UI foundation (M0 FE). Tailwind v4 DocuForge tokens, design system composites, layout, routing, auth pages, onboarding skeleton. Build/typecheck/lint/E2E green. Vitest unit tests not runnable via tooling (concern)."
+      timestamp: "2026-09-06T14:40:00.000Z"
+    - step: qa
+      agent: qa-frontend
+      action: completed
+      notes: "TASK-06 (UI foundation) APPROVED. All runnable validations green. Minor cosmetic fixes flagged for TASK-07 (BTG option stray space; ReportsPage 'allocção' typo)."
+      timestamp: "2026-09-06T15:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-03 first dispatch hit max steps. Rate limiter + auth/onboarding routes + scoped repositories (incl. broker seed) implemented. app.ts route registration, CORS verify, Drizzle migrations, tests, and validation pending. Re-dispatching to complete."
+      timestamp: "2026-09-06T15:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-03 COMPLETED (5 incrementally-landed dispatches): auth/onboarding routes, scoped repositories + broker seed, rate limiting, CORS, inline zod validation. Build/typecheck/lint green; 34 tests/7 files pass. Concern: Drizzle db:generate requires live Postgres DATABASE_URL."
+      timestamp: "2026-09-06T17:00:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 partial: market-data services (QuoteProvider registry, 4 providers, TTL cache, FX, overrides), asset catalog + 50-asset seed, market/assets routes, app.ts registration. Seed-boot hook, provider rate limiting, tests, validation pending."
+      timestamp: "2026-09-06T18:30:00.000Z"
+    - step: qa
+      agent: qa-backend
+      action: reviewed
+      notes: "QA Backend review of TASK-01/02/03: CORRECTIONS NEEDED. Blocking D1-D4 (base.ts TS2769 build/typecheck fail; no migrations; weak/missing AC tests; broker seed never invoked) + high-risk C1 (domain dist ESM incompatible) and C2-C8. Feed into combined remediation dispatch."
+      timestamp: "2026-09-06T18:45:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "QA corrections progress: D1+C1+C3+C5 CLOSED. apps/api build/typecheck/lint/test ALL GREEN (34 tests). packages/domain ALL GREEN (57 tests). ~8 incremental dispatches due to step-budget limits."
+      timestamp: "2026-09-06T20:15:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "QA corrections CLOSED D1/C1/C2/C3/C4/C5/D3/D4. apps/api ALL GREEN (51 tests). packages/domain ALL GREEN (57 tests). Only D2 (drizzle-kit 0.30.6 BigInt bug) remains for migrations."
+      timestamp: "2026-09-06T23:30:00.000Z"
   handoff:
-    context: calendar-regression-fixes
-    selected_approach: null
-    design_summary: null
+    context: investy-dashboard
+    architecture_summary: |
+      Product: Investy — multi-user investment portfolio dashboard for the Brazilian retail market.
+      Stack: React 18 + Vite + TypeScript SPA; Tailwind CSS v4 theme on DocuForge tokens; Recharts; TanStack Query + Zustand; Node.js + Hono API; zod; PostgreSQL (managed) + Drizzle ORM; email/password auth with httpOnly cookie sessions (OAuth2-ready); scheduled worker process; Vitest + Playwright.
+      Core principles: transaction journal as source of truth; user data ownership; multi-user isolation at API layer; provider-agnostic market data proxy with caching + manual override; no secrets in browser; DocuForge design system extended as data-dense dashboard language; multi-device from day one.
+      Key decisions (ADR-001..010): full-stack Option C; pnpm monorepo (apps/web, apps/api, packages/domain, worker in apps/api); market-data proxy (brapi.dev + BCB SGS + Yahoo + CoinGecko, TTL cache, manual override); Postgres system of record with integer-cent money; transaction journal + B3 nota import (V1); auth & multi-user isolation; scheduled worker (quotes, snapshots, dividend agenda, backups); hosting/deployment (managed Postgres, no secrets in frontend); design system + Recharts; security foundation.
+      Entry files: .opencode/architecture/index.md, architecture.md, architecture-folder-schema.md, commit-pattern.md, docs/adrs/ADR-001..ADR-010.
+    selected_approach: "Option C full-stack (ADR-001); IA Option C module-first drawer-amplified; nota full scope with rateio; USD quote + FX; avg-cost display only; full scope remaining items."
+    design_summary: |
+      Approved design decisions (docs: .opencode/plan/investy-dashboard/design-docs/index.md + design-01..07):
+      D1 scope — 9 modules V1 (Auth/Onboarding, Dashboard, Holdings, Transactions/Journal, Nota import, Dividends, Assets Catalog, Reports, Settings); V1/V2/non-goals explicit, reconciled with success criteria + ADR-005.
+      D2 IA/UX — Option C module-first + drawer-amplified; global '+ Registrar'; inline holdings row actions; deep-link widgets; tabular numerals; pt-BR only.
+      D3 domain/data — journal-first + materialized holdings; integer cents; average-cost realized P&L (display only); USD quote + FX to BRL on read; amortização as capital-return event; rateio de custos (largest-remainder).
+      D4 API — resource-oriented REST + aggregates (summary/allocation/snapshots/agenda/benchmarks); nota preview→confirm with importToken; ownership scoping; zod; rate limits.
+      D5 design system — DocuForge tokens to dashboard composites (KPI, tables, chips, strips) + Recharts theme; light baseline; skeleton/empty/error states; responsive.
+      D6 import/export — lossless journal round-trip (JSON/CSV); nota PDF/text/CSV/XML; verified backups; account erasure; retain all snapshots.
+      D7 effort — ~40 dev-days across milestones M0..M9; domain engine first; parallel tracks after M3; matches ADR-001 4-6 wk MVP.
     planning_summary: null
     task_summary: null
     acceptance_criteria: []

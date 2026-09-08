@@ -305,6 +305,12 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
         .normalize("NFKC")
         .replace(/[\u200B-\u200D\uFEFF]/g, "")
 
+      // Treat `rtk` as a git shim alias: `rtk git <subcommand>` behaves as `git <subcommand>`.
+      // This matches the real command the shell produces when `git` is invoked.
+      if (/^rtk\s+git(?:\s+|$)/i.test(normalized)) {
+        normalized = normalized.replace(/^rtk\s+/i, "")
+      }
+
       // Parse command
       const parsed = parseCommand(normalized)
       if (!parsed) {

@@ -127,6 +127,24 @@ or
 - [ ] Build passes
 - [ ] Lint passes
 - [ ] Validation completed
+- [ ] Commits created (`feat(<feature>)[TASK-XX]` and separate `docs(<area>)` when `.opencode/` files changed)
+
+---
+
+## Commit
+
+Each finalized task produces:
+
+1. One implementation commit:
+   ```text
+   feat(<feature-from-pipeline.yaml>)[<TASK-XX>]: <subject>
+   ```
+2. One separate documentation commit when the task touched `.opencode/`:
+   ```text
+   docs(<area>): <detailed description>
+   ```
+
+Example subject: `add database schema and repository`. Record the commit SHAs in `pipeline.yaml` task metadata (`feat_commit`, `docs_commit`).
 
 ---
 

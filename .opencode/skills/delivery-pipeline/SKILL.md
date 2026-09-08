@@ -21,7 +21,7 @@ Before dispatching any agent, the orchestrator MUST:
 1. Read `variables.md` to load all variable definitions
 2. Resolve `[PLAN_FOLDER_LOCATION]` by substituting `<context>` with `pipeline.yaml.name`
 3. Resolve all dependent variables (`[DESIGN_FOLDER_LOCATION]`, `[TASKS_FOLDER_LOCATION]`, etc.)
-4. Resolve architecture variables (`[ARCHITECTURE_FOLDER_LOCATION]`, `[ARCHITECTURE_ENTRY_FILE]`, `[ARCHITECTURE_INDEX_FILE]`, `[ARCHITECTURE_TEMPLATE_FILE]`)
+4. Resolve architecture variables (`[ARCHITECTURE_FOLDER_LOCATION]`, `[ARCHITECTURE_ENTRY_FILE]`, `[ARCHITECTURE_INDEX_FILE]`, `[ARCHITECTURE_TEMPLATE_FILE]`, `[DOCS_CATALOG_FILE]`, `[PROJECT_STRUCTURE_FILE]`)
 5. Pass the resolved values to the agent as part of the execution context
 
 Example:
@@ -44,7 +44,7 @@ Responsibilities:
 1. Generate a context name.
 2. Create the planning folder structure using the `create-folder-structure` tool. The tool creates `design-docs/`, `planning/`, and `tasks/` subfolders. If the selected workflow does not use all folders, unused ones remain empty — this is expected.
 3. Create [PIPELINE_FILE] using [PIPELINE_TEMPLATE_FILE].
-4. Check whether an architecture base exists at `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`). If it does **not** exist, execute the [Architecture Initialization Flow](#architecture-initialization-flow) before routing.
+4. Check whether the architecture documentation set is complete: `.opencode/architecture/` with `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) and `[ARCHITECTURE_INDEX_FILE]`, `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), and the INDEX.md `# Architecture` section. If any piece is missing (including when a codebase exists without these docs), execute the [Architecture Initialization Flow](#architecture-initialization-flow) before routing.
 5. Invoke the Workflow Router skill.
 6. Execute the selected workflow.
 7. Persist progress after every agent execution.
@@ -63,7 +63,7 @@ Responsibilities:
 2. Identify incomplete steps.
 3. Resume execution from the last known state.
 4. Avoid re-executing completed work.
-5. If the `architecture-initializer` step is `pending` (or `running` without output) and `[ARCHITECTURE_ENTRY_FILE]` does not exist, resume the [Architecture Initialization Flow](#architecture-initialization-flow). Never re-run it when the step is `completed` or when `[ARCHITECTURE_ENTRY_FILE]` already exists. For legacy pipelines without the step, infer from the folder — skip if the base exists, otherwise run it.
+5. If the `architecture-initializer` step is `pending` (or `running` without output) and the architecture documentation set is missing or incomplete (no `[ARCHITECTURE_ENTRY_FILE]`, no `[DOCS_CATALOG_FILE]`, no `[PROJECT_STRUCTURE_FILE]`, or empty INDEX.md `# Architecture` section), resume the [Architecture Initialization Flow](#architecture-initialization-flow). Never re-run it when the step is `completed` or when the documentation set is already complete. For legacy pipelines without the step, infer from the files — skip if the set is complete, otherwise run it.
 
 ## Pipeline State
 
@@ -82,7 +82,7 @@ It must be updated after every agent execution by the orchestrator.
 
 Responsible for:
 
-* Invoking Architecture Initializer (only when no architecture base exists)
+* Invoking Architecture Initializer (only when the architecture documentation set is missing or incomplete)
 * Invoking Workflow Router
 * Invoking Solution Designer
 * Invoking Planning Analyst
@@ -91,6 +91,7 @@ Responsible for:
 * Invoking Senior Backend agents
 * Invoking QA Frontend
 * Invoking QA Backend
+* Creating per-task commits (implementation + docs) after QA approval
 
 ### State Management
 
@@ -109,7 +110,9 @@ Responsible for:
 
 **Primary agents** (Architecture Initializer, Planning Analyst, Solution Designer) are defined with `mode: primary` in their agent files. They must be dispatched using their proper agent type name via `task` with `subagent_type` matching the agent name. Do NOT dispatch primary agents as `general` or any other type — this skips their workflow and prevents file creation.
 
-**Subagents** (Senior Frontend, Senior Backend, QA) use `mode: subagent` and are dispatched as `general` with their task instructions inline.
+**Subagents** (Senior Frontend, Senior Backend, QA) use `mode: subagent` and are dispatched using their proper agent type name via `task` with `subagent_type` matching the agent name, with their task instructions inline.
+
+**Dispatch stalls/failures:** If a named agent dispatch fails or stalls (e.g., a model-resolution error such as `Model not found: opencode/...`), retry the SAME dispatch up to 3 consecutive attempts. If all 3 attempts fail, ABORT the step and REPORT the error — never fall back to dispatching as `general` or any other agent type to work around a failed dispatch.
 
 ### Orchestrator Must Never Do Agent Work
 
@@ -166,7 +169,7 @@ The orchestrator should consolidate and pass:
 flowchart TD
 
 A[User Request]
---> AI{Architecture Base Exists?}
+--> AI{Architecture Docs Complete?}
 
 AI -->|No| ABI[Architecture Initializer]
 
@@ -209,26 +212,27 @@ QABE -->|Approved| DONE
 
 ### Architecture Initialization Flow
 
-Runs only when no app has been bootstrapped — `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) does not exist.
+Runs when the **architecture documentation set** is missing or incomplete:
+
+- No app has been bootstrapped — `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) does not exist
+- A codebase exists but the supporting docs are missing — `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), or the INDEX.md `# Architecture` section
 
 1. Dispatch the **Architecture Initializer** as a primary agent — invoke using the agent's full workflow directly, never via `task` with `subagent_type: general`.
 2. Present product vision, stack, and architecture options to the user.
 3. Wait for semantic approval.
 4. Repeat the design loop until approved.
-5. The Architecture Initializer generates the physical base in `[ARCHITECTURE_FOLDER_LOCATION]`:
-   - `index.md`
-   - `architecture.md`
-   - `architecture-folder-schema.md`
-   - `docs/adrs/ADR-001-*.md` (+ follow-up ADRs)
-   - Folder skeleton (`references/`, `docs/backend/`, `docs/feature/`, `docs/frontend/`)
-6. Orchestrator MUST verify the base files were physically created before proceeding. If files are missing, re-dispatch the Architecture Initializer with the file creation requirement.
+5. The Architecture Initializer generates the physical architecture documentation:
+   - `[ARCHITECTURE_FOLDER_LOCATION]` — `index.md`, `architecture.md`, `architecture-folder-schema.md`, `docs/adrs/ADR-001-*.md` (+ follow-up ADRs), folder skeleton (`references/`, `docs/backend/`, `docs/feature/`, `docs/frontend/`)
+   - Missing supporting docs — `[DOCS_CATALOG_FILE]`, `[PROJECT_STRUCTURE_FILE]`
+   - INDEX.md `# Architecture` section seeded with the created files; `TODO` entries for any pending file
+6. Orchestrator MUST verify the files were physically created before proceeding, and that any uncreated required file is marked `TODO` in INDEX.md. If files are missing without a TODO entry, re-dispatch the Architecture Initializer with the file creation requirement.
 7. Record the architecture summary (stack, principles, key decisions, file paths) in `pipeline.yaml` `handoff` and pass it downstream to the Solution Designer / Planning Analyst.
 8. Update pipeline (step `architecture-initializer` → `completed`).
 9. Proceed to Step 1 (Route Request).
 
 Architecture base files must not be created before approval.
 
-This flow runs once per app. If the base already exists, skip it and go directly to Step 1.
+This flow runs once per app, plus the backfill run that completes a partial documentation set. If the set is already complete, skip it and go directly to Step 1.
 
 ### Step 1 - Route Request
 
@@ -372,6 +376,27 @@ The orchestrator must:
 
 Repeat until approved.
 
+### Task Commit
+
+Commit each task immediately after QA approval — do not wait for pipeline completion.
+
+The orchestrator creates the commits following the [commit pattern](../../architecture/commit-pattern.md):
+
+1. **Implementation commit** — the task's files, one commit per task:
+   ```text
+   feat(<feature>)[<TASK-XX>]: <subject>
+   ```
+   `<feature>` is the `pipeline.yaml` `name`; `<TASK-XX>` is the task ID.
+2. **Documentation commit** — if the task created or modified files under `.opencode/`, commit them **separately**:
+   ```text
+   docs(<area>): <detailed description>
+   ```
+   Include a body with session context and rationale for non-trivial changes.
+
+Record both commit SHAs in the task metadata in `pipeline.yaml` as `feat_commit` and `docs_commit`.
+
+Only the finalized task's files are staged. Never re-commit previously committed task work.
+
 ### Completion
 
 Workflow completes when:
@@ -382,7 +407,7 @@ Workflow completes when:
 
 Upon completion, the orchestrator MUST:
 
-1. Update `pipeline.yaml` status to `completed`, record final errors/concerns, set `updated_at`.
+1. Update `pipeline.yaml` status to `completed`, record final errors/concerns, set `updated_at`, and commit the remaining non-task changes (e.g., pipeline state) following the [commit pattern](../../architecture/commit-pattern.md) — task work is already committed per task.
 2. Invoke the mandatory STOP chain: load `learning-improvement` skill → after it completes, load `continuous-learning` skill → after it completes, load `session-save` skill.
 3. Do NOT return to the user or end the session before the STOP chain completes. The STOP chain is part of the pipeline, not optional cleanup.
 
@@ -414,7 +439,7 @@ After every agent execution update:
 
 and append a history record.
 
-Implementation task status must also be updated.
+Implementation task status must also be updated, including the commit SHAs (`feat_commit`, `docs_commit`) created for each finalized task.
 
 Examples:
 

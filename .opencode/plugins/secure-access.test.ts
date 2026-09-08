@@ -181,7 +181,15 @@ const commandRules: CommandRule[] = [
   },
 ]
 
+const normalizeCommand = (cmd: string): string => {
+  if (/^rtk\s+git(?:\s+|$)/i.test(cmd)) {
+    return cmd.replace(/^rtk\s+/i, "")
+  }
+  return cmd
+}
+
 const parseCommand = (cmd: string): { type: string; args: string[] } | null => {
+  cmd = normalizeCommand(cmd)
   for (const rule of commandRules) {
     const match = cmd.match(rule.pattern)
     if (match) {
@@ -372,6 +380,36 @@ describe("parseCommand", () => {
     block("git add")
     block("git commit without message")
     block("git restore")
+  })
+
+  // --- rtk git alias (git shim) ---
+  describe("rtk git alias", () => {
+    const ok = (cmd: string) =>
+      it(cmd, () => expect(parseCommand(cmd)?.type).toBe("git"))
+
+    const block = (cmd: string) =>
+      it(cmd, () => expect(() => parseCommand(cmd)).toThrow(VALIDATION_ERROR))
+
+    ok("rtk git status")
+    ok("rtk git status --short")
+    ok("rtk git diff")
+    ok("rtk git diff HEAD")
+    ok("rtk git log --oneline -5")
+    ok("rtk git add src/file.ts")
+    ok("rtk git commit -m 'fix bug'")
+    ok("rtk git checkout main")
+    ok("rtk git push origin main")
+    ok("rtk git pull upstream main")
+    ok("rtk git stash")
+    ok("rtk git branch")
+    ok("rtk git fetch")
+    ok("rtk git reset --hard")
+
+    block("rtk git add")
+    block("rtk git commit without message")
+    block("rtk git restore")
+    block("rtk git push origin --exec evil")
+    block("rtk git pull --upload-pack evil")
   })
 
   // --- Fase 27: Node/TSX flag blocking ---

@@ -9,7 +9,7 @@
 - Design approval is mandatory before design document generation.
 - Planning approval is mandatory before plan generation.
 - Architecture base approval is mandatory before architecture base generation.
-- Architecture Initializer runs only when the architecture base does not exist — never re-run or overwrite an existing base.
+- Architecture Initializer runs only when the architecture documentation set is missing or incomplete (architecture folder, docs-catalog.md, project-structure.md, INDEX.md architecture section) — never re-run it on a complete set and never overwrite existing architecture files; backfill only what is missing and mark uncreated files as `TODO` in INDEX.md.
 - QA must validate implementation against task requirements and git diff.
 - Respect project boundaries and conventions.
 - Never access files outside the project root.
