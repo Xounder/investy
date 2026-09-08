@@ -29,6 +29,7 @@ Read in this order:
 ## Delivery Pipeline
 
 - skills/delivery-pipeline/SKILL.md
+- skills/delivery-pipeline/references/execution-phases.md — detailed phase execution (architecture init, planning, parallel execution, QA, task commit, completion)
 
 ## Workflow Router
 
@@ -43,7 +44,7 @@ Read in this order:
 - agents/03-senior-frontend.md — Senior Frontend
 - agents/04-senior-backend.md — Senior Backend
 - agents/05-qa-reviewer.md — QA Reviewer
-- agents/shared/ — Shared agent references
+- agents/shared/ — Shared agent references (implementation-rules.md, subagent-common.md)
 
 # Skills
 

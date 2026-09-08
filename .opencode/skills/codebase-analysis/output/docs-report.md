@@ -1,6 +1,6 @@
 # Codebase Analysis — Documentation
 
-Generated: 2026-09-08T00:13:04.774Z
+Generated: 2026-09-08T00:21:44.803Z
 
 ```
 
@@ -8,45 +8,45 @@ Generated: 2026-09-08T00:13:04.774Z
 ║     Codebase — Documentation Report      ║
 ╚══════════════════════════════════════════╝
 
-Generated: 2026-09-08T00:13:04.774Z
+Generated: 2026-09-08T00:21:44.803Z
 
 ── Overview ──
-  Total files:       60
-  Markdown (.md):    50
+  Total files:       63
+  Markdown (.md):    53
   JSON:              6
   YAML:              4
   Text (.txt):       0
-  Total headings:    507
-  Total code blocks: 50
-  Total list items:  1309
+  Total headings:    516
+  Total code blocks: 60
+  Total list items:  1313
 
 ── Code Block Languages ──
-  text                 28
+  text                 36
   ts                   9
-  (none)               6
+  (none)               7
   yaml                 4
+  mermaid              2
   json                 2
-  mermaid              1
 
-── Duplicate Headings (55) ──
+── Duplicate Headings (56) ──
   "role" — 7x
   "inputs" — 7x
   "responsibilities" — 8x
   "workflow" — 13x
   "9. update pipeline" — 2x
-  "return format" — 3x
-  "retry limit (failure escalation)" — 5x
+  "return format" — 4x
+  "retry limit (failure escalation)" — 6x
   "constraints" — 11x
-  "parallelization rules" — 3x
   "output" — 3x
   "1. review assigned tasks" — 3x
   "2. review relevant code" — 2x
   "3. implement solution" — 2x
   "4. review changes" — 2x
   "5. validate implementation" — 2x
-  ... and 40 more
+  "8. return results" — 3x
+  ... and 41 more
 
-── All Headings (336) ──
+── All Headings (341) ──
   architecture initializer agent                .opencode/agents/00-architecture-initializer.md
   role                                          .opencode/agents/00-architecture-initializer.md
   architecture documentation set                .opencode/agents/00-architecture-initializer.md
@@ -77,7 +77,7 @@ Generated: 2026-09-08T00:13:04.774Z
   7. compare approaches (independent flow only) .opencode/agents/00-planning-agent.md
   8. approval loop                              .opencode/agents/00-planning-agent.md
   9. create planning documents                  .opencode/agents/00-planning-agent.md
-  ... and 306 more
+  ... and 311 more
 
 ── Files Scanned ──
   .opencode/INDEX.md  [13 headings, 0 code blocks]
@@ -85,10 +85,12 @@ Generated: 2026-09-08T00:13:04.774Z
   .opencode/agents/00-architecture-initializer.md  [20 headings, 5 code blocks]
   .opencode/agents/00-planning-agent.md  [18 headings, 0 code blocks]
   .opencode/agents/01-solution-designer.md  [18 headings, 4 code blocks]
-  .opencode/agents/02-tech-lead.md  [22 headings, 0 code blocks]
+  .opencode/agents/02-tech-lead.md  [21 headings, 0 code blocks]
   .opencode/agents/03-senior-frontend.md  [20 headings, 0 code blocks]
   .opencode/agents/04-senior-backend.md  [21 headings, 0 code blocks]
   .opencode/agents/05-qa-reviewer.md  [19 headings, 0 code blocks]
+  .opencode/agents/shared/implementation-rules.md  [5 headings, 0 code blocks]
+  .opencode/agents/shared/subagent-common.md  [3 headings, 0 code blocks]
   .opencode/architecture/architecture-folder-schema.md  [15 headings, 1 code blocks]
   .opencode/architecture/architecture.md  [18 headings, 1 code blocks]
   .opencode/architecture/commit-pattern.md  [10 headings, 7 code blocks]
@@ -123,9 +125,10 @@ Generated: 2026-09-08T00:13:04.774Z
   .opencode/skills/codebase-analysis/output/implementation-report.md  [1 headings, 1 code blocks]
   .opencode/skills/codebase-analysis/scripts/package.json  [keys: name, type, private, dependencies]
   .opencode/skills/continuous-learning/SKILL.md  [4 headings, 0 code blocks]
-  .opencode/skills/delivery-pipeline/SKILL.md  [33 headings, 0 code blocks]
+  .opencode/skills/delivery-pipeline/SKILL.md  [22 headings, 6 code blocks]
   .opencode/skills/delivery-pipeline/references/agent-response-format.md  [2 headings, 2 code blocks]
   .opencode/skills/delivery-pipeline/references/constraints.md  [1 headings, 0 code blocks]
+  .opencode/skills/delivery-pipeline/references/execution-phases.md  [13 headings, 4 code blocks]
   .opencode/skills/delivery-pipeline/references/failure-recovery.md  [4 headings, 2 code blocks]
   .opencode/skills/delivery-pipeline/references/parallelization-rules.md  [3 headings, 2 code blocks]
   .opencode/skills/delivery-pipeline/references/task-tracking.md  [1 headings, 1 code blocks]

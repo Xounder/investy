@@ -24,6 +24,8 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `agents/03-senior-frontend.md` | Frontend agent instructions | Frontend conventions change |
 | `agents/04-senior-backend.md` | Backend agent instructions | Backend conventions change |
 | `agents/05-qa-reviewer.md` | QA agent instructions — pipeline.yaml, frontend/backend verification, checklist | QA checklist changes; new patterns |
+| `agents/shared/implementation-rules.md` | Shared implementation rules (architecture, money/data rules, code quality, testing) — referenced by Senior Frontend and Senior Backend | Shared implementation rules change |
+| `agents/shared/subagent-common.md` | Shared subagent blocks — standard return format and retry limit — referenced by all agents to avoid prompt duplication | Return format or retry limit policy changes |
 
 
 ---
@@ -38,6 +40,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `skills/delivery-pipeline/references/task-tracking.md` | Task tracking in pipeline state | Tracking format changes |
 | `skills/delivery-pipeline/references/agent-response-format.md` | Standard agent response format | Response format changes |
 | `skills/delivery-pipeline/references/constraints.md` | Pipeline constraint list | Constraint rules change |
+| `skills/delivery-pipeline/references/execution-phases.md` | Phase execution details — architecture init, routing, planning, tech lead, parallel execution, QA, corrections, task commit, completion | Phase flows change |
 | `skills/workflow-router/SKILL.md` | Request classification and workflow routing | Classification logic or routing changes |
 | `skills/learning-improvement/SKILL.md` | Session evaluation (step 1/3 of STOP) | Evaluation format changes; chaining enforcement |
 | `skills/continuous-learning/SKILL.md` | Doc update proposal (step 2/3 of STOP) | Scope of analyzed docs changes |

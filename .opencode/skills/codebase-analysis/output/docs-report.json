@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-09-08T00:13:04.774Z",
+  "generatedAt": "2026-09-08T00:21:44.803Z",
   "mode": "docs",
   "summary": {
-    "totalFiles": 60,
-    "totalMdFiles": 50,
+    "totalFiles": 63,
+    "totalMdFiles": 53,
     "totalJsonFiles": 6,
     "totalYamlFiles": 4,
     "totalTxtFiles": 0,
-    "totalHeadings": 507,
-    "totalCodeBlocks": 50,
-    "totalListItems": 1309
+    "totalHeadings": 516,
+    "totalCodeBlocks": 60,
+    "totalListItems": 1313
   },
   "files": {
     ".opencode/agents/00-architecture-initializer.md": {
-      "size": 12472,
-      "lines": 294,
+      "size": 12315,
+      "lines": 290,
       "type": "markdown",
       "headings": [
         {
@@ -122,7 +122,7 @@
           "lines": 3
         }
       ],
-      "totalListItems": 102,
+      "totalListItems": 99,
       "sections": [
         "Architecture Initializer Agent",
         "Role",
@@ -370,8 +370,8 @@
       ]
     },
     ".opencode/agents/02-tech-lead.md": {
-      "size": 6711,
-      "lines": 278,
+      "size": 6568,
+      "lines": 250,
       "type": "markdown",
       "headings": [
         {
@@ -440,11 +440,7 @@
         },
         {
           "level": 3,
-          "text": "Dependency Rules"
-        },
-        {
-          "level": 3,
-          "text": "Parallelization Rules"
+          "text": "Dependency and Parallelization Rules"
         },
         {
           "level": 2,
@@ -463,10 +459,10 @@
           "text": "Constraints"
         }
       ],
-      "totalHeadings": 22,
+      "totalHeadings": 21,
       "totalCodeBlocks": 0,
       "codeBlocks": [],
-      "totalListItems": 73,
+      "totalListItems": 64,
       "sections": [
         "Tech Lead Agent",
         "Role",
@@ -484,8 +480,7 @@
         "9. Update Pipeline",
         "Task Rules",
         "Task Granularity",
-        "Dependency Rules",
-        "Parallelization Rules",
+        "Dependency and Parallelization Rules",
         "Output",
         "Parallelization Requirements",
         "Retry Limit (failure escalation)",
@@ -493,8 +488,8 @@
       ]
     },
     ".opencode/agents/03-senior-frontend.md": {
-      "size": 4467,
-      "lines": 169,
+      "size": 3964,
+      "lines": 162,
       "type": "markdown",
       "headings": [
         {
@@ -581,7 +576,7 @@
       "totalHeadings": 20,
       "totalCodeBlocks": 0,
       "codeBlocks": [],
-      "totalListItems": 53,
+      "totalListItems": 50,
       "sections": [
         "Senior Frontend Agent",
         "Role",
@@ -606,8 +601,8 @@
       ]
     },
     ".opencode/agents/04-senior-backend.md": {
-      "size": 4309,
-      "lines": 191,
+      "size": 3806,
+      "lines": 184,
       "type": "markdown",
       "headings": [
         {
@@ -698,7 +693,7 @@
       "totalHeadings": 21,
       "totalCodeBlocks": 0,
       "codeBlocks": [],
-      "totalListItems": 61,
+      "totalListItems": 58,
       "sections": [
         "Senior Backend Agent",
         "Role",
@@ -724,8 +719,8 @@
       ]
     },
     ".opencode/agents/05-qa-reviewer.md": {
-      "size": 4431,
-      "lines": 196,
+      "size": 4045,
+      "lines": 191,
       "type": "markdown",
       "headings": [
         {
@@ -808,7 +803,7 @@
       "totalHeadings": 19,
       "totalCodeBlocks": 0,
       "codeBlocks": [],
-      "totalListItems": 63,
+      "totalListItems": 60,
       "sections": [
         "QA Reviewer Agent",
         "Role",
@@ -829,6 +824,72 @@
         "Scope",
         "Retry Limit (failure escalation)",
         "Constraints"
+      ]
+    },
+    ".opencode/agents/shared/implementation-rules.md": {
+      "size": 2031,
+      "lines": 37,
+      "type": "markdown",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Implementation Rules"
+        },
+        {
+          "level": 2,
+          "text": "Architecture"
+        },
+        {
+          "level": 2,
+          "text": "Money and Data Rules"
+        },
+        {
+          "level": 2,
+          "text": "Code Quality"
+        },
+        {
+          "level": 2,
+          "text": "Testing and Validation"
+        }
+      ],
+      "totalHeadings": 5,
+      "totalCodeBlocks": 0,
+      "codeBlocks": [],
+      "totalListItems": 22,
+      "sections": [
+        "Implementation Rules",
+        "Architecture",
+        "Money and Data Rules",
+        "Code Quality",
+        "Testing and Validation"
+      ]
+    },
+    ".opencode/agents/shared/subagent-common.md": {
+      "size": 821,
+      "lines": 19,
+      "type": "markdown",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Subagent Common Rules"
+        },
+        {
+          "level": 2,
+          "text": "Return Format"
+        },
+        {
+          "level": 2,
+          "text": "Retry Limit (failure escalation)"
+        }
+      ],
+      "totalHeadings": 3,
+      "totalCodeBlocks": 0,
+      "codeBlocks": [],
+      "totalListItems": 3,
+      "sections": [
+        "Subagent Common Rules",
+        "Return Format",
+        "Retry Limit (failure escalation)"
       ]
     },
     ".opencode/architecture/architecture-folder-schema.md": {
@@ -1681,7 +1742,7 @@
       "sections": []
     },
     ".opencode/commands/learning-improvement.md": {
-      "size": 242,
+      "size": 246,
       "lines": 7,
       "type": "markdown",
       "headings": [],
@@ -1692,8 +1753,8 @@
       "sections": []
     },
     ".opencode/docs-catalog.md": {
-      "size": 6911,
-      "lines": 100,
+      "size": 7556,
+      "lines": 103,
       "type": "markdown",
       "headings": [
         {
@@ -1745,8 +1806,8 @@
       ]
     },
     ".opencode/INDEX.md": {
-      "size": 3324,
-      "lines": 99,
+      "size": 3534,
+      "lines": 100,
       "type": "markdown",
       "headings": [
         {
@@ -1805,7 +1866,7 @@
       "totalHeadings": 13,
       "totalCodeBlocks": 0,
       "codeBlocks": [],
-      "totalListItems": 50,
+      "totalListItems": 51,
       "sections": [
         "Project Documentation Index",
         "Getting Started",
@@ -2003,8 +2064,8 @@
       ]
     },
     ".opencode/pipeline.yaml": {
-      "size": 16368,
-      "lines": 233,
+      "size": 16464,
+      "lines": 237,
       "type": "yaml",
       "topKeys": [
         "pipeline"
@@ -2031,8 +2092,8 @@
       ]
     },
     ".opencode/project-structure.md": {
-      "size": 3675,
-      "lines": 103,
+      "size": 3785,
+      "lines": 106,
       "type": "markdown",
       "headings": [
         {
@@ -2045,7 +2106,7 @@
       "codeBlocks": [
         {
           "language": "(none)",
-          "lines": 98
+          "lines": 101
         }
       ],
       "totalListItems": 0,
@@ -2339,6 +2400,101 @@
         "Pipeline Constraints"
       ]
     },
+    ".opencode/skills/delivery-pipeline/references/execution-phases.md": {
+      "size": 8022,
+      "lines": 206,
+      "type": "markdown",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Execution Phases"
+        },
+        {
+          "level": 2,
+          "text": "Architecture Initialization Flow"
+        },
+        {
+          "level": 2,
+          "text": "Step 1 - Route Request"
+        },
+        {
+          "level": 2,
+          "text": "Solution Designer Flow"
+        },
+        {
+          "level": 2,
+          "text": "Planning Flow"
+        },
+        {
+          "level": 2,
+          "text": "Tech Lead Flow"
+        },
+        {
+          "level": 2,
+          "text": "Parallel Development Phase"
+        },
+        {
+          "level": 2,
+          "text": "Parallel Execution Phase"
+        },
+        {
+          "level": 2,
+          "text": "Concurrent File Modification Prevention"
+        },
+        {
+          "level": 2,
+          "text": "QA Phase"
+        },
+        {
+          "level": 2,
+          "text": "Corrections Loop"
+        },
+        {
+          "level": 2,
+          "text": "Task Commit"
+        },
+        {
+          "level": 2,
+          "text": "Completion"
+        }
+      ],
+      "totalHeadings": 13,
+      "totalCodeBlocks": 4,
+      "codeBlocks": [
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 1
+        }
+      ],
+      "totalListItems": 70,
+      "sections": [
+        "Execution Phases",
+        "Architecture Initialization Flow",
+        "Step 1 - Route Request",
+        "Solution Designer Flow",
+        "Planning Flow",
+        "Tech Lead Flow",
+        "Parallel Development Phase",
+        "Parallel Execution Phase",
+        "Concurrent File Modification Prevention",
+        "QA Phase",
+        "Corrections Loop",
+        "Task Commit",
+        "Completion"
+      ]
+    },
     ".opencode/skills/delivery-pipeline/references/failure-recovery.md": {
       "size": 1754,
       "lines": 51,
@@ -2442,8 +2598,8 @@
       ]
     },
     ".opencode/skills/delivery-pipeline/SKILL.md": {
-      "size": 18563,
-      "lines": 477,
+      "size": 10544,
+      "lines": 278,
       "type": "markdown",
       "headings": [
         {
@@ -2507,52 +2663,8 @@
           "text": "Workflow"
         },
         {
-          "level": 3,
-          "text": "Architecture Initialization Flow"
-        },
-        {
-          "level": 3,
-          "text": "Step 1 - Route Request"
-        },
-        {
-          "level": 3,
-          "text": "Solution Designer Flow"
-        },
-        {
-          "level": 3,
-          "text": "Planning Flow"
-        },
-        {
-          "level": 3,
-          "text": "Tech Lead Flow"
-        },
-        {
-          "level": 3,
-          "text": "Parallel Development Phase"
-        },
-        {
-          "level": 3,
-          "text": "Parallel Execution Phase"
-        },
-        {
-          "level": 3,
-          "text": "Concurrent File Modification Prevention"
-        },
-        {
-          "level": 3,
-          "text": "QA Phase"
-        },
-        {
-          "level": 3,
-          "text": "Corrections Loop"
-        },
-        {
-          "level": 3,
-          "text": "Task Commit"
-        },
-        {
-          "level": 3,
-          "text": "Completion"
+          "level": 2,
+          "text": "Execution Phases"
         },
         {
           "level": 2,
@@ -2579,10 +2691,35 @@
           "text": "Constraints"
         }
       ],
-      "totalHeadings": 33,
-      "totalCodeBlocks": 0,
-      "codeBlocks": [],
-      "totalListItems": 142,
+      "totalHeadings": 22,
+      "totalCodeBlocks": 6,
+      "codeBlocks": [
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 1
+        },
+        {
+          "language": "text",
+          "lines": 4
+        },
+        {
+          "language": "mermaid",
+          "lines": 42
+        },
+        {
+          "language": "(none)",
+          "lines": 6
+        }
+      ],
+      "totalListItems": 71,
       "sections": [
         "Delivery Pipeline Skill",
         "Purpose",
@@ -2599,18 +2736,7 @@
         "Orchestrator Must Never Do Agent Work",
         "Information Handoff",
         "Workflow",
-        "Architecture Initialization Flow",
-        "Step 1 - Route Request",
-        "Solution Designer Flow",
-        "Planning Flow",
-        "Tech Lead Flow",
-        "Parallel Development Phase",
-        "Parallel Execution Phase",
-        "Concurrent File Modification Prevention",
-        "QA Phase",
-        "Corrections Loop",
-        "Task Commit",
-        "Completion",
+        "Execution Phases",
         "Parallelization Rules",
         "Failure Recovery",
         "Pipeline Updates",
@@ -3603,14 +3729,16 @@
     "return format": [
       ".opencode/agents/00-architecture-initializer.md",
       ".opencode/agents/00-planning-agent.md",
-      ".opencode/agents/01-solution-designer.md"
+      ".opencode/agents/01-solution-designer.md",
+      ".opencode/agents/shared/subagent-common.md"
     ],
     "retry limit (failure escalation)": [
       ".opencode/agents/00-architecture-initializer.md",
       ".opencode/agents/02-tech-lead.md",
       ".opencode/agents/03-senior-frontend.md",
       ".opencode/agents/04-senior-backend.md",
-      ".opencode/agents/05-qa-reviewer.md"
+      ".opencode/agents/05-qa-reviewer.md",
+      ".opencode/agents/shared/subagent-common.md"
     ],
     "constraints": [
       ".opencode/agents/00-architecture-initializer.md",
@@ -3730,13 +3858,8 @@
     "task granularity": [
       ".opencode/agents/02-tech-lead.md"
     ],
-    "dependency rules": [
+    "dependency and parallelization rules": [
       ".opencode/agents/02-tech-lead.md"
-    ],
-    "parallelization rules": [
-      ".opencode/agents/02-tech-lead.md",
-      ".opencode/skills/delivery-pipeline/references/parallelization-rules.md",
-      ".opencode/skills/delivery-pipeline/SKILL.md"
     ],
     "output": [
       ".opencode/agents/02-tech-lead.md",
@@ -3783,11 +3906,13 @@
     ],
     "implementation rules": [
       ".opencode/agents/03-senior-frontend.md",
-      ".opencode/agents/04-senior-backend.md"
+      ".opencode/agents/04-senior-backend.md",
+      ".opencode/agents/shared/implementation-rules.md"
     ],
     "architecture": [
       ".opencode/agents/03-senior-frontend.md",
       ".opencode/agents/04-senior-backend.md",
+      ".opencode/agents/shared/implementation-rules.md",
       ".opencode/docs-catalog.md",
       ".opencode/INDEX.md"
     ],
@@ -3850,6 +3975,18 @@
     "scope": [
       ".opencode/agents/05-qa-reviewer.md",
       ".opencode/template/planning-template.md"
+    ],
+    "money and data rules": [
+      ".opencode/agents/shared/implementation-rules.md"
+    ],
+    "code quality": [
+      ".opencode/agents/shared/implementation-rules.md"
+    ],
+    "testing and validation": [
+      ".opencode/agents/shared/implementation-rules.md"
+    ],
+    "subagent common rules": [
+      ".opencode/agents/shared/subagent-common.md"
     ],
     "architecture folder schema": [
       ".opencode/architecture/architecture-folder-schema.md"
@@ -4291,6 +4428,46 @@
     "pipeline constraints": [
       ".opencode/skills/delivery-pipeline/references/constraints.md"
     ],
+    "execution phases": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md",
+      ".opencode/skills/delivery-pipeline/SKILL.md"
+    ],
+    "architecture initialization flow": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "step 1 - route request": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "solution designer flow": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "planning flow": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "tech lead flow": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "parallel development phase": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "parallel execution phase": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "concurrent file modification prevention": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "qa phase": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "corrections loop": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "task commit": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
+    "completion": [
+      ".opencode/skills/delivery-pipeline/references/execution-phases.md"
+    ],
     "failure recovery": [
       ".opencode/skills/delivery-pipeline/references/failure-recovery.md",
       ".opencode/skills/delivery-pipeline/SKILL.md"
@@ -4303,6 +4480,10 @@
     ],
     "abandoned pipeline detection": [
       ".opencode/skills/delivery-pipeline/references/failure-recovery.md"
+    ],
+    "parallelization rules": [
+      ".opencode/skills/delivery-pipeline/references/parallelization-rules.md",
+      ".opencode/skills/delivery-pipeline/SKILL.md"
     ],
     "allowed": [
       ".opencode/skills/delivery-pipeline/references/parallelization-rules.md"
@@ -4341,42 +4522,6 @@
       ".opencode/skills/delivery-pipeline/SKILL.md"
     ],
     "information handoff": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "architecture initialization flow": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "step 1 - route request": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "solution designer flow": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "planning flow": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "tech lead flow": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "parallel development phase": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "parallel execution phase": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "concurrent file modification prevention": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "qa phase": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "corrections loop": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "task commit": [
-      ".opencode/skills/delivery-pipeline/SKILL.md"
-    ],
-    "completion": [
       ".opencode/skills/delivery-pipeline/SKILL.md"
     ],
     "pipeline updates": [
@@ -4698,11 +4843,11 @@
     ]
   },
   "codeBlockLanguages": {
-    "text": 28,
-    "(none)": 6,
+    "text": 36,
+    "(none)": 7,
     "ts": 9,
     "yaml": 4,
-    "json": 2,
-    "mermaid": 1
+    "mermaid": 2,
+    "json": 2
   }
 }

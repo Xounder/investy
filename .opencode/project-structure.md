@@ -23,7 +23,8 @@ Investy/
     │   ├── 04-senior-backend.md
     │   ├── 05-qa-reviewer.md
     │   └── shared/
-    │       └── implementation-rules.md
+    │       ├── implementation-rules.md
+    │       └── subagent-common.md
     │
     ├── architecture/          # Architecture docs
     │   ├── index.md            # Architecture entry point index
@@ -53,7 +54,9 @@ Investy/
     │   │       ├── parallelization-rules.md
     │   │       ├── failure-recovery.md
     │   │       ├── task-tracking.md
-    │   │       └── agent-response-format.md
+    │   │       ├── agent-response-format.md
+    │   │       ├── constraints.md
+    │   │       └── execution-phases.md
     │   ├── workflow-router/
     │   │   └── SKILL.md
     │   ├── learning-improvement/

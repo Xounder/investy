@@ -270,11 +270,7 @@ See [agent-response-format.md](../skills/delivery-pipeline/references/agent-resp
 
 ## Retry Limit (failure escalation)
 
-If the same action fails 3 consecutive times, the agent MUST NOT retry. Instead, it must return to the orchestrator that created it, reporting:
-
-1. Which action failed
-2. The error reason observed
-3. That it cannot proceed further
+See [shared/subagent-common.md](shared/subagent-common.md) — Retry Limit.
 
 ## Constraints
 

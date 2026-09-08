@@ -164,15 +164,15 @@ TASK-N-*.md
 
 One task per file.
 
-For each task, preencha a seção **Edge Cases** com cenários de borda específicos:
-- Race conditions (concorrência entre states, carregamento assíncrono)
-- Estados vazios (empty arrays, null/undefined, fallbacks)
-- Falhas de API ou storage (quota excedida, parse error, timeout)
-- Campos opcionais ou ausentes (eventos sem `end`, sem `title`)
-- Limites (datas extremas, eventos recorrentes, many items)
-- Regressões em funcionalidades existentes
+For each task, include an **Edge Cases** section with specific boundary scenarios:
+- Race conditions (state concurrency, asynchronous loading)
+- Empty states (empty arrays, null/undefined, fallbacks)
+- API or storage failures (quota exceeded, parse error, timeout)
+- Optional or missing fields (events without `end`, without `title`)
+- Limits (extreme dates, recurring events, many items)
+- Regressions in existing functionality
 
-Quando uma task modificar um arquivo que também é modificado por outra task, documente um **File Overlap Warning** no corpo da task e inclua a **merge strategy** recomendada (execução sequencial vs paralelo com merge cuidadoso em seções diferentes do mesmo arquivo).
+When a task modifies a file that another task also modifies, document a **File Overlap Warning** in the task body and include the recommended **merge strategy** (sequential execution vs parallel with careful merge of different sections of the same file).
 
 If template variables were not resolved in your input, use `[TASK_TEMPLATE_FILE]` as the template reference or call `resolve-template` with `template: '.opencode/template/task-template.md'` and the pipeline context name to get the rendered content.
 
@@ -190,8 +190,8 @@ The index must contain:
 - Execution order
 - Dependency graph
 - Ownership mapping
-- **File Overlaps** — lista de arquivos tocados por múltiplas tasks com estratégia de merge (sequencial vs paralelo com merge cuidadoso)
-- **Parallelization Plan** — batches recomendados com justificativa (ex: "Batch 1: TASK-A + TASK-B independentes; Batch 2: TASK-C (depende de TASK-A)")
+- **File Overlaps** — files touched by multiple tasks with their merge strategy (sequential vs parallel with careful merge)
+- **Parallelization Plan** — recommended batches with justification (e.g., "Batch 1: TASK-A + TASK-B independent; Batch 2: TASK-C (depends on TASK-A)")
 
 ### 9. Update Pipeline
 
@@ -215,39 +215,14 @@ Tasks must not:
 - Be excessively small
 - Be excessively large
 
-### Dependency Rules
+### Dependency and Parallelization Rules
 
-Prefer:
+Apply the [parallelization rules](../skills/delivery-pipeline/references/parallelization-rules.md) when designing the task graph. In addition, the Tech Lead must:
 
-```text
-Backend
-+
-Frontend
-```
-
-running simultaneously.
-
-Avoid dependencies whenever possible.
-
-Dependencies are only allowed when:
-
-- Data contracts are undefined
-- Shared interfaces must exist first
-- Architectural constraints require sequencing
-
-### Parallelization Rules
-
-The Tech Lead must design the task graph to maximize:
-
-- Parallel execution
-- Developer utilization
-- Delivery speed
-
-while preserving:
-
-- Correctness
-- Maintainability
-- Architectural integrity
+- Maximize parallel execution, developer utilization, and delivery speed while preserving correctness, maintainability, and architectural integrity
+- Prefer `Backend + Frontend` running simultaneously
+- Avoid dependencies whenever possible
+- Only create dependencies when: data contracts are undefined, shared interfaces must exist first, or architectural constraints require sequencing
 
 ## Output
 
@@ -259,10 +234,7 @@ See [Task Rules](#task-rules) above — all dependency and parallelism rules are
 
 ## Retry Limit (failure escalation)
 
-If the same action fails 3 consecutive times, the subagent MUST NOT retry. Instead, it must return to the orchestrator/agent that created it, reporting:
-1. Which action failed
-2. The error reason observed
-3. That it cannot proceed further
+See [shared/subagent-common.md](shared/subagent-common.md) — Retry Limit.
 
 ## Constraints
 

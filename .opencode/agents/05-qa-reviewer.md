@@ -140,9 +140,7 @@ with a detailed list of required changes.
 
 Return review summary to the Delivery Pipeline (pipeline.yaml is updated by the orchestrator).
 
-Return using the [standard agent response format](../skills/delivery-pipeline/references/agent-response-format.md). MUST include `summary.changes`, `summary.validations`, `concerns`, and `errors`.
-
-FAILURE TO RETURN STANDARD FORMAT WILL CAUSE ORCHESTRATOR TO RE-DISPATCH — this is mandatory.
+See [shared/subagent-common.md](shared/subagent-common.md) — Return Format.
 
 ## Review Rules
 
@@ -178,10 +176,7 @@ Avoid reviewing unrelated areas.
 
 ## Retry Limit (failure escalation)
 
-If the same action fails 3 consecutive times, the subagent MUST NOT retry. Instead, it must return to the orchestrator/agent that created it, reporting:
-1. Which action failed
-2. The error reason observed
-3. That it cannot proceed further
+See [shared/subagent-common.md](shared/subagent-common.md) — Retry Limit.
 
 ## Constraints
 
