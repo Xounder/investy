@@ -1,0 +1,39 @@
+{
+  "name": "@investy/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Investy API — Hono REST server, market-data proxy, and worker entrypoint (ADR-001/ADR-002)",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-validator": "^0.4.0",
+    "@investy/domain": "workspace:*",
+    "@node-rs/argon2": "^2.0.1",
+    "cookie": "^0.7.2",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.0",
+    "hono": "^4.6.0",
+    "pg": "^8.13.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/cookie": "^0.6.0",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.10",
+    "drizzle-kit": "^0.30.0",
+    "eslint": "^9.15.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.8.3",
+    "vitest": "^3.1.0"
+  }
+}
