@@ -25,7 +25,7 @@ Routing requires a complete **architecture documentation set**:
 
 If any piece is missing (or a codebase exists without these docs), the pipeline dispatches the Architecture Initializer to bootstrap or backfill the set.
 
-- New execution and resume/recovery handling for the set check, dispatch, approval, verification, and update live in the **delivery-pipeline** skill — see [Architecture Initialization Flow](../delivery-pipeline/SKILL.md#architecture-initialization-flow). That skill is the single source of truth for the flow.
+- New execution and resume/recovery handling for the set check, dispatch, approval, verification, and update live in the **delivery-pipeline** skill — see [Architecture Initialization Flow](../delivery-pipeline/references/execution-phases.md#architecture-initialization-flow). That skill is the single source of truth for the flow.
 - The router itself does **not** route to the Architecture Initializer — dispatch happens before routing.
 
 ## Decision Tree

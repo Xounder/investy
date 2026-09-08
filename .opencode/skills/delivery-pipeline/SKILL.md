@@ -44,7 +44,7 @@ Responsibilities:
 1. Generate a context name.
 2. Create the planning folder structure using the `create-folder-structure` tool. The tool creates `design-docs/`, `planning/`, and `tasks/` subfolders. If the selected workflow does not use all folders, unused ones remain empty — this is expected.
 3. Create [PIPELINE_FILE] using [PIPELINE_TEMPLATE_FILE].
-4. Check whether the architecture documentation set is complete: `.opencode/architecture/` with `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) and `[ARCHITECTURE_INDEX_FILE]`, `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), and the INDEX.md `# Architecture` section. If any piece is missing (including when a codebase exists without these docs), execute the [Architecture Initialization Flow](#architecture-initialization-flow) before routing.
+4. Check whether the architecture documentation set is complete: `.opencode/architecture/` with `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) and `[ARCHITECTURE_INDEX_FILE]`, `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), and the INDEX.md `# Architecture` section. If any piece is missing (including when a codebase exists without these docs), execute the [Architecture Initialization Flow](references/execution-phases.md#architecture-initialization-flow) before routing.
 5. Invoke the Workflow Router skill.
 6. Execute the selected workflow.
 7. Persist progress after every agent execution.
@@ -63,7 +63,7 @@ Responsibilities:
 2. Identify incomplete steps.
 3. Resume execution from the last known state.
 4. Avoid re-executing completed work.
-5. If the `architecture-initializer` step is `pending` (or `running` without output) and the architecture documentation set is missing or incomplete (no `[ARCHITECTURE_ENTRY_FILE]`, no `[DOCS_CATALOG_FILE]`, no `[PROJECT_STRUCTURE_FILE]`, or empty INDEX.md `# Architecture` section), resume the [Architecture Initialization Flow](#architecture-initialization-flow). Never re-run it when the step is `completed` or when the documentation set is already complete. For legacy pipelines without the step, infer from the files — skip if the set is complete, otherwise run it.
+5. If the `architecture-initializer` step is `pending` (or `running` without output) and the architecture documentation set is missing or incomplete (no `[ARCHITECTURE_ENTRY_FILE]`, no `[DOCS_CATALOG_FILE]`, no `[PROJECT_STRUCTURE_FILE]`, or empty INDEX.md `# Architecture` section), resume the [Architecture Initialization Flow](references/execution-phases.md#architecture-initialization-flow). Never re-run it when the step is `completed` or when the documentation set is already complete. For legacy pipelines without the step, infer from the files — skip if the set is complete, otherwise run it.
 
 ## Pipeline State
 
@@ -210,206 +210,9 @@ QAFE -->|Approved| DONE[Completed]
 QABE -->|Approved| DONE
 ```
 
-### Architecture Initialization Flow
+## Execution Phases
 
-Runs when the **architecture documentation set** is missing or incomplete:
-
-- No app has been bootstrapped — `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) does not exist
-- A codebase exists but the supporting docs are missing — `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), or the INDEX.md `# Architecture` section
-
-1. Dispatch the **Architecture Initializer** as a primary agent — invoke using the agent's full workflow directly, never via `task` with `subagent_type: general`.
-2. Present product vision, stack, and architecture options to the user.
-3. Wait for semantic approval.
-4. Repeat the design loop until approved.
-5. The Architecture Initializer generates the physical architecture documentation:
-   - `[ARCHITECTURE_FOLDER_LOCATION]` — `index.md`, `architecture.md`, `architecture-folder-schema.md`, `docs/adrs/ADR-001-*.md` (+ follow-up ADRs), folder skeleton (`references/`, `docs/backend/`, `docs/feature/`, `docs/frontend/`)
-   - Missing supporting docs — `[DOCS_CATALOG_FILE]`, `[PROJECT_STRUCTURE_FILE]`
-   - INDEX.md `# Architecture` section seeded with the created files; `TODO` entries for any pending file
-6. Orchestrator MUST verify the files were physically created before proceeding, and that any uncreated required file is marked `TODO` in INDEX.md. If files are missing without a TODO entry, re-dispatch the Architecture Initializer with the file creation requirement.
-7. Record the architecture summary (stack, principles, key decisions, file paths) in `pipeline.yaml` `handoff` and pass it downstream to the Solution Designer / Planning Analyst.
-8. Update pipeline (step `architecture-initializer` → `completed`).
-9. Proceed to Step 1 (Route Request).
-
-Architecture base files must not be created before approval.
-
-This flow runs once per app, plus the backfill run that completes a partial documentation set. If the set is already complete, skip it and go directly to Step 1.
-
-### Step 1 - Route Request
-
-Invoke:
-
-```text
-workflow-router
-```
-
-The router determines whether the request should be handled by:
-
-* Solution Designer
-* Planning Analyst
-* Tech Lead
-
-### Solution Designer Flow
-
-When Solution Designer is selected:
-
-1. Execute Solution Designer.
-2. Present approaches to the user.
-3. Wait for semantic approval.
-4. Repeat design loop until approved.
-5. Generate design documents.
-6. Update pipeline.
-
-If a codebase exists:
-  7. Execute Planning Analyst (pass design_summary and design-docs/ path as context).
-  8. Present planning analysis to the user.
-  9. Wait for semantic approval.
-  10. Repeat planning loop until approved.
-  11. Generate planning documents.
-  12. Update pipeline.
-  13. Execute Tech Lead.
-
-If no codebase exists:
-  7. Execute Tech Lead directly.
-
-Design documents must not be created before approval.
-Planning documents must not be created before approval.
-
-### Planning Flow
-
-When Planning Analyst is selected:
-
-1. Execute Planning Analyst as a primary agent — invoke using the agent's full workflow directly (not via `task` with `subagent_type`).
-2. Present approaches to the user.
-3. Wait for semantic approval.
-4. Repeat planning loop until approved.
-5. Planning Analyst generates planning documents (index.md, feasibility.md, impact-analysis.md, risks.md) in `[PLAN_FOLDER_LOCATION]`.
-6. Orchestrator MUST verify planning files were physically created before proceeding. If files are missing, re-dispatch the Planning Analyst with the file creation requirement.
-7. Update pipeline.
-8. Execute Tech Lead.
-
-Planning documents must not be created before approval.
-
-### Tech Lead Flow
-
-Execute Tech Lead.
-
-Expected outputs:
-
-* Task files
-* Task dependencies
-* Ownership assignments
-* Execution order
-
-Update pipeline.
-
-### Parallel Development Phase
-
-Read task ownership and dependencies.
-
-Tasks without unmet dependencies may execute immediately.
-
-The orchestrator must maximize parallel execution whenever dependencies allow.
-
-### Parallel Execution Phase
-
-Dispatch **multiple** Senior Frontend/Backend agents simultaneously when independent tasks are available. Do not limit to one agent per role — if 3 frontend tasks are independent, create 3 Senior Frontend agents in parallel. Each agent receives exactly one task.
-
-Pass:
-
-* Assigned task (one per agent)
-* Acceptance criteria
-* Relevant context
-* Dependency information
-* Task file path for exact step-by-step code
-* Standard response format requirement — instruct the agent to return using the [standard agent response format](references/agent-response-format.md)
-
-Update pipeline after every completed task.
-
-**Important: one agent per task** — never assign multiple tasks to a single agent if they can run in parallel.
-
-### Concurrent File Modification Prevention
-
-When multiple tasks modify the same file, assign them sequentially or use a merge strategy. Review task file lists for overlaps before parallel dispatch. If overlap is detected, choose one of:
-
-1. **Sequence**: Run tasks that touch the same file sequentially, in a logical order (e.g., type changes first, then component changes, then layout changes).
-2. **Parallel with non-overlapping sections**: If tasks affect clearly separate sections of the same file (different functions, different JSX branches), dispatch in parallel and instruct each agent to only modify its designated lines.
-3. **Merge agent**: When 3+ tasks overlap on the same file, consider dispatching a single agent with all related tasks to minimize merge conflicts.
-
-The Tech Lead should flag file overlaps in the task metadata so the orchestrator can plan the dispatch order early.
-
-### QA Phase
-
-Execute:
-
-* QA Frontend
-* QA Backend
-
-in parallel whenever possible.
-
-Provide:
-
-* Original task
-* Acceptance criteria
-* Relevant implementation context
-* Git diff for files modified by the reviewed task
-
-QA validates implementation against requirements.
-
-Exactly one QA Frontend instance reviews frontend work.
-
-Exactly one QA Backend instance reviews backend work.
-
-### Corrections Loop
-
-If QA returns:
-
-```text
-Corrections Needed
-```
-
-The orchestrator must:
-
-1. Update pipeline.
-2. Send feedback to the responsible implementation agent.
-3. Re-execute implementation.
-4. Re-execute QA.
-
-Repeat until approved.
-
-### Task Commit
-
-Commit each task immediately after QA approval — do not wait for pipeline completion.
-
-The orchestrator creates the commits following the [commit pattern](../../architecture/commit-pattern.md):
-
-1. **Implementation commit** — the task's files, one commit per task:
-   ```text
-   feat(<feature>)[<TASK-XX>]: <subject>
-   ```
-   `<feature>` is the `pipeline.yaml` `name`; `<TASK-XX>` is the task ID.
-2. **Documentation commit** — if the task created or modified files under `.opencode/`, commit them **separately**:
-   ```text
-   docs(<area>): <detailed description>
-   ```
-   Include a body with session context and rationale for non-trivial changes.
-
-Record both commit SHAs in the task metadata in `pipeline.yaml` as `feat_commit` and `docs_commit`.
-
-Only the finalized task's files are staged. Never re-commit previously committed task work.
-
-### Completion
-
-Workflow completes when:
-
-* All tasks are completed
-* All QA reviews are approved
-* No pending work remains
-
-Upon completion, the orchestrator MUST:
-
-1. Update `pipeline.yaml` status to `completed`, record final errors/concerns, set `updated_at`, and commit the remaining non-task changes (e.g., pipeline state) following the [commit pattern](../../architecture/commit-pattern.md) — task work is already committed per task.
-2. Invoke the mandatory STOP chain: load `learning-improvement` skill → after it completes, load `continuous-learning` skill → after it completes, load `session-save` skill.
-3. Do NOT return to the user or end the session before the STOP chain completes. The STOP chain is part of the pipeline, not optional cleanup.
+The detailed phase execution — Architecture Initialization Flow, Routing, Solution Designer Flow, Planning Flow, Tech Lead Flow, Parallel Execution, QA, Corrections, Task Commit, and Completion — is documented in [references/execution-phases.md](references/execution-phases.md).
 
 ## Parallelization Rules
 
@@ -459,9 +262,7 @@ concerns:
 
 ### Pipeline Completion
 
-When all steps are completed (all tasks approved by QA):
-1. Update `pipeline.status` to `completed`
-2. Invoke the STOP chain: `learning-improvement` → `continuous-learning` → `session-save`
+When all steps are completed (all tasks approved by QA), follow the [Execution Phases — Completion](references/execution-phases.md#completion) procedure.
 
 ## References
 
@@ -469,6 +270,7 @@ When all steps are completed (all tasks approved by QA):
 - [Task Tracking](references/task-tracking.md)
 - [Parallelization Rules](references/parallelization-rules.md)
 - [Failure Recovery](references/failure-recovery.md)
+- [Execution Phases](references/execution-phases.md)
 - [Constraints](references/constraints.md)
 
 ## Constraints
