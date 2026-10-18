@@ -66,6 +66,43 @@ export function requireUser(c: Context): string {
   return userId;
 }
 
+/**
+ * Optional authentication middleware (ADR-006).
+ *
+ * Attaches the authenticated user id to the context when the request carries a
+ * valid, non-expired session cookie. When the cookie is missing, malformed, or
+ * revoked, the request continues unauthenticated instead of responding 401 —
+ * unlike `authMiddleware`, which rejects the request. Use it for public
+ * endpoints that enrich their response for signed-in users.
+ *
+ * When an upstream middleware already resolved the user (for example
+ * `authMiddleware`), the session is not looked up again.
+ */
+export async function optionalUser(c: Context, next: Next): Promise<void> {
+  if (typeof c.get(USER_ID_CONTEXT_KEY) !== 'string') {
+    const token = extractCookie(c.req.header('cookie'), SESSION_COOKIE_NAME);
+    if (token) {
+      const sessionPayload = verifySessionToken(token);
+      if (sessionPayload) {
+        const session = await sessionRepository.findByToken(token);
+        if (session && session.expiresAt >= new Date()) {
+          c.set(USER_ID_CONTEXT_KEY, sessionPayload.userId);
+        }
+      }
+    }
+  }
+  await next();
+}
+
+/**
+ * Returns the authenticated user id from the Hono context, or null when the
+ * request is unauthenticated. Never throws.
+ */
+export function getOptionalUserId(c: Context): string | null {
+  const userId = c.get(USER_ID_CONTEXT_KEY);
+  return typeof userId === 'string' && userId.length > 0 ? userId : null;
+}
+
 /** Parses a raw Cookie header value for a single cookie name. */
 export function extractCookie(
   cookieHeader: string | undefined,
