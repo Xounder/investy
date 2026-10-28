@@ -20,6 +20,8 @@ import { getUserOverridesByAssetIds } from '../services/market-data/overrides.js
 import { optionalUser, getOptionalUserId } from '../middleware/auth.js';
 import type { AssetClass } from '@investy/domain';
 import { nativeDayChangePercent } from '../services/valuation.js';
+import { loadCdiIndex } from '../services/market-data/cdi-index.js';
+import { benchmarkValue } from '../services/market-data/benchmark-units.js';
 
 const app = new Hono();
 
@@ -39,6 +41,7 @@ const benchmarksQuerySchema = z.object({
 
 const indicatorsQuerySchema = z.object({});
 
+const cdiIndexQuerySchema = z.object({ range: z.enum(['1m', '3m']).default('1m') }).strict();
 
 // Helper for query validation
 async function validateQuery<T>(c: Context, schema: z.ZodSchema<T>): Promise<T> {
@@ -212,11 +215,17 @@ app.get('/benchmarks', async (c) => {
     symbol,
     series: (bySymbol.get(symbol) ?? []).map(row => ({
       date: row.date.toISOString(),
-      value: Number(row.value),
+      value: benchmarkValue(row),
     })),
   }));
 
   return c.json({ benchmarks: response });
+});
+
+/** GET /api/v1/market/benchmarks/cdi-index?range=1m|3m — accumulated, not raw rates. */
+app.get('/benchmarks/cdi-index', async (c) => {
+  const { range } = await validateQuery(c, cdiIndexQuerySchema);
+  return c.json({ cdiIndex: await loadCdiIndex(range ?? '1m') });
 });
 
 /**
@@ -249,7 +258,7 @@ app.get('/indicators', async (c) => {
     if (!row) return null;
     return {
       symbol,
-      value: Number(row.value),
+      value: benchmarkValue(row),
       date: row.date.toISOString(),
     };
   }).filter(Boolean);
