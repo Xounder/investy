@@ -183,6 +183,7 @@ export async function updateJournalEvent(
   return db.transaction(async (tx) => {
     const existing = await findOwnedTransaction(tx, userId, transactionId);
     await lockAccount(tx, userId, existing.accountId, existing.portfolioId);
+    if (existing.dividendId) throw new JournalServiceError('CONFLICT', 'Linked dividend receipts cannot be edited');
     if (usesMoney(existing.type)) requireMoney(existing.currency ?? 'BRL', patch.fxRateToBRL === undefined ? existing.fxRateToBRL : patch.fxRateToBRL);
 
     const [row] = await tx
@@ -214,6 +215,7 @@ export async function deleteJournalEvent(userId: string, transactionId: string):
   await db.transaction(async (tx) => {
     const existing = await findOwnedTransaction(tx, userId, transactionId);
     await lockAccount(tx, userId, existing.accountId, existing.portfolioId);
+    if (existing.dividendId) throw new JournalServiceError('CONFLICT', 'Linked dividend receipts cannot be deleted');
 
     await tx
       .delete(transactions)

@@ -29,6 +29,13 @@
       "when": 1791048569611,
       "tag": "0003_quote_previous_close",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791048569612,
+      "tag": "0004_dividend_receipt_link",
+      "breakpoints": true
     }
   ]
 }

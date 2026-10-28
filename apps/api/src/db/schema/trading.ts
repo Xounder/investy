@@ -54,6 +54,7 @@ export const transactions = pgTable(
     amortRateCents: bigint('amort_rate_cents', { mode: 'bigint' }),
     source: varchar('source', { length: 30 }).notNull().default('manual'),
     notaRefId: text('nota_ref_id'),
+    dividendId: text('dividend_id').references(() => dividends.id, { onDelete: 'cascade' }),
     notes: text('notes'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -66,6 +67,7 @@ export const transactions = pgTable(
     index('transactions_asset_id_idx').on(t.assetId),
     index('transactions_date_idx').on(t.date),
     index('transactions_account_date_idx').on(t.accountId, t.date),
+    uniqueIndex('transactions_dividend_account_idx').on(t.dividendId, t.accountId),
   ],
 );
 

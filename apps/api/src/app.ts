@@ -14,6 +14,7 @@ import portfolioRoutes from './routes/portfolios.js';
 import brokerRoutes from './routes/brokers.js';
 import accountRoutes from './routes/accounts.js';
 import portfolioAggregateRoutes from './routes/portfolio-aggregates.js';
+import dividendRoutes from './routes/dividends.js';
 
 /**
  * Investy REST API (M3 — TASK-04).
@@ -81,5 +82,6 @@ app.route('/api/v1/accounts', accountRoutes);
 
 // Dashboard aggregate routes (TASK-05)
 app.route('/api/v1/portfolio', portfolioAggregateRoutes);
+app.route('/api/v1/dividends', dividendRoutes);
 
 export default app;
