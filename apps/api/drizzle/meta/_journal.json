@@ -36,6 +36,34 @@
       "when": 1791048569612,
       "tag": "0004_dividend_receipt_link",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791048569613,
+      "tag": "0005_erasure_tombstones",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791048569614,
+      "tag": "0006_backup_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791048569615,
+      "tag": "0007_snapshot_backfill_progress",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791048569616,
+      "tag": "0008_erasure_cleanup",
+      "breakpoints": true
     }
   ]
 }

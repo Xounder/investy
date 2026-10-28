@@ -13,3 +13,6 @@ export * from './schema/trading.js';
 export * from './schema/analytics.js';
 export * from './schema/relations.js';
 export * from './schema/types.js';
+export * from './schema/erasure.js';
+export * from './schema/backups.js';
+export * from './schema/backfill.js';
