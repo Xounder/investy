@@ -9,12 +9,13 @@
 // Transaction types
 // ---------------------------------------------------------------------------
 
-/** The 8 journal event types supported in V1. */
+/** Journal event types supported in V1. */
 export type TransactionType =
   | 'buy'
   | 'sell'
   | 'split'
   | 'bonificacao'
+  | 'dividend'
   | 'jcp'
   | 'amortizacao'
   | 'adjustment'
@@ -74,10 +75,14 @@ export interface JournalEvent {
   readonly date: string;
   /** Quantity of shares/units (buy/sell/bonificacao) or 0 for income events. */
   readonly qty: bigint;
-  /** Price per unit in cents (buy/sell/jcp) or 0 for events that don't use it. */
+  /** Price per unit in cents (buy/sell/dividend/jcp) or 0 for events that don't use it. */
   readonly unitPriceCents: bigint;
   /** Transaction fee in cents (buy/sell); 0 for corporate events. */
   readonly feeCents: bigint;
+  /** Rounded total dividend/JCP income in BRL cents, after applying historical FX once. */
+  readonly dividendIncomeCents?: bigint;
+  /** Rounded total capital return in BRL cents, before reducing the position basis. */
+  readonly amortizationCents?: bigint;
   /** Split ratio — positive integer (e.g. 2 for 2:1). Only used by 'split'. */
   readonly factor?: number;
   /** Amortisation rate in cents per share. Only used by 'amortizacao'. */

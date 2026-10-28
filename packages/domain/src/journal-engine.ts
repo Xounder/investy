@@ -4,7 +4,7 @@
  * Processes journal events and derives holding state using the average-cost
  * method. All money values are integer cents (bigint, ADR-004).
  *
- * Supported event types: buy, sell, split, bonificacao, jcp, amortizacao,
+ * Supported event types: buy, sell, split, bonificacao, dividend, jcp, amortizacao,
  * adjustment, opening.
  */
 
@@ -72,7 +72,8 @@ export function processTransaction(holding: Holding, event: JournalEvent): Holdi
     case 'bonificacao':
       return applyBonificacao(holding, event);
     case 'jcp':
-      return applyJcp(holding, event);
+    case 'dividend':
+      return applyIncome(holding, event);
     case 'amortizacao':
       return applyAmortizacao(holding, event);
     case 'adjustment':
@@ -185,14 +186,20 @@ function applyBonificacao(holding: Holding, event: JournalEvent): Holding {
 }
 
 /**
- * JCP / Rendimento: income = qty × unitPriceCents; no qty change.
+ * Dividend / JCP: income = qty × unitPriceCents; no qty or cost basis change.
  */
-function applyJcp(holding: Holding, event: JournalEvent): Holding {
+function applyIncome(holding: Holding, event: JournalEvent): Holding {
   if (event.qty <= 0n) {
-    throw new JournalError('JCP quantity must be positive', event.type);
+    throw new JournalError('Income quantity must be positive', event.type);
+  }
+  if (event.type === 'dividend' && (event.unitPriceCents <= 0n || event.feeCents !== 0n)) {
+    throw new JournalError('Dividend price must be positive and fee must be zero', event.type);
+  }
+  if (event.dividendIncomeCents !== undefined && event.dividendIncomeCents < 0n) {
+    throw new JournalError('Dividend income must not be negative', event.type);
   }
 
-  const income = event.qty * event.unitPriceCents;
+  const income = event.dividendIncomeCents ?? event.qty * event.unitPriceCents;
 
   return {
     ...holding,
@@ -213,7 +220,8 @@ function applyAmortizacao(holding: Holding, event: JournalEvent): Holding {
     throw new JournalError('Amortization rate must not be negative', event.type);
   }
 
-  const cashInflow = holding.qty * BigInt(Math.round(rate));
+  const cashInflow = event.amortizationCents ?? holding.qty * BigInt(Math.round(rate));
+  if (cashInflow < 0n) throw new JournalError('Amortization amount must not be negative', event.type);
   const newCostBasis = holding.costBasisCents - cashInflow;
   const flooredCostBasis = newCostBasis < 0n ? 0n : newCostBasis;
   const newAvg = holding.qty > 0n ? flooredCostBasis / holding.qty : 0n;
