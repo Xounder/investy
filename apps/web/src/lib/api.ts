@@ -1,9 +1,9 @@
 /**
  * Typed API client with session cookie handling and error normalization.
  *
- * Shared fetch/error helpers — later tasks add endpoint methods here.
- * Never modify the helpers below when extending.
+ * Shared fetch/error helpers for JSON API requests.
  */
+
 
 const API_BASE = '/api';
 
@@ -11,20 +11,28 @@ export interface ApiError {
   status: number;
   message: string;
   code?: string;
+  fields?: string[];
 }
 
 function normalizeError(response: Response, body?: unknown): ApiError {
+  const envelope = typeof body === 'object' && body !== null ? body as Record<string, unknown> : null;
+  const payload = envelope?.error && typeof envelope.error === 'object' && !Array.isArray(envelope.error)
+    ? envelope.error as Record<string, unknown>
+    : envelope;
   const message =
-    typeof body === 'object' && body !== null && 'message' in body
-      ? String((body as Record<string, unknown>).message)
+    payload && 'message' in payload
+      ? String(payload.message)
       : `Erro ${response.status}`;
 
   const code =
-    typeof body === 'object' && body !== null && 'code' in body
-      ? String((body as Record<string, unknown>).code)
+    payload && 'code' in payload
+      ? String(payload.code)
       : undefined;
 
-  return { status: response.status, message, code };
+  const fields = payload && Array.isArray(payload.fields) && payload.fields.every((field) => typeof field === 'string')
+    ? payload.fields as string[]
+    : undefined;
+  return { status: response.status, message, code, ...(fields ? { fields } : {}) };
 }
 
 /**
@@ -57,12 +65,14 @@ export async function apiFetch<T>(
     throw normalizeError(response, body);
   }
 
+
   // 204 No Content
   if (response.status === 204) {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  const body = await response.json() as T;
+  return body;
 }
 
 /**

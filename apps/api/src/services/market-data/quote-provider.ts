@@ -11,11 +11,24 @@ import type { AssetClass } from '@investy/domain';
 export interface QuoteResult {
   /** Price in integer cents of the asset's native currency. */
   priceCents: bigint;
+  /** Previous trading close in the same native currency as priceCents, if supplied. */
+  previousCloseCents?: bigint;
   /** ISO 4217 currency code (e.g., 'BRL', 'USD'). */
   currency: string;
   /** Provider identifier (e.g., 'brapi', 'yahoo', 'coingecko', 'bcb'). */
   source: string;
 }
+
+/** A provider's dated observation. unit is percentage points per business day for SGS 12. */
+export interface DailyRateObservation { date: string; percentPerDay: number }
+
+/** Optional capability for providers offering a complete requested historical window. */
+export interface DailyRateHistoryProvider {
+  fetchDailyRateHistory(start: string, end: string): Promise<DailyRateObservation[] | null>;
+}
+
+/** Unadjusted daily index closes, in native index points (not money). */
+export interface IndexObservation { date: string; points: number }
 
 /** Provider interface for fetching quotes. */
 export interface QuoteProvider {
@@ -36,6 +49,8 @@ export interface QuoteProvider {
    * @returns True if the provider can fetch quotes for this class.
    */
   supports(assetClass: AssetClass): boolean;
+  fetchDailyRateHistory?(start: string, end: string): Promise<DailyRateObservation[] | null>;
+  fetchIndexHistory?(symbol: string, start: string, end: string): Promise<IndexObservation[] | null>;
 }
 
 /** Provider registry for managing primary/fallback chains. */

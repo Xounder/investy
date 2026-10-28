@@ -79,6 +79,7 @@ export async function computeValuations(
       priceCents = cached.quote.priceCents;
       currency = cached.quote.currency;
       isStale = cached.isStale || cached.isExpired;
+      dayChangePercent = nativeDayChangePercent(cached.quote.priceCents, cached.quote.previousCloseCents);
     } else {
       // No quote and no override — valuation fields stay null.
       currency = holding.asset.currency;

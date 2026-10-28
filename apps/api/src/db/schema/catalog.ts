@@ -49,6 +49,7 @@ export const quotes = pgTable(
       .notNull()
       .references(() => assets.id, { onDelete: 'cascade' }),
     priceCents: bigint('price_cents', { mode: 'bigint' }).notNull(),
+    previousCloseCents: bigint('previous_close_cents', { mode: 'bigint' }),
     currency: varchar('currency', { length: 3 }).notNull().default('BRL'),
     fxRateToBRL: bigint('fx_rate_to_brl', { mode: 'bigint' }),
     source: varchar('source', { length: 40 }).notNull(),

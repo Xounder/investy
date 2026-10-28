@@ -7,7 +7,7 @@
  */
 import { getDb } from '../../db/client.js';
 import { quotes, assets } from '../../db/schema.js';
-import { eq, gte, inArray } from 'drizzle-orm';
+import { desc, eq, gte, inArray } from 'drizzle-orm';
 import type { QuoteTable, NewQuote, AssetTable } from '../../db/schema.js';
 import type { AssetClass } from '@investy/domain';
 import { providerRegistry } from './quote-provider.js';
@@ -46,9 +46,14 @@ export async function getCachedQuotes(assetIds: string[]): Promise<CachedQuote[]
     })
     .from(quotes)
     .innerJoin(assets, eq(quotes.assetId, assets.id))
-    .where(inArray(quotes.assetId, assetIds));
+    .where(inArray(quotes.assetId, assetIds))
+    .orderBy(desc(quotes.fetchedAt));
 
-  return results.map(({ quote, asset }) => ({
+  const latest = new Map<string, (typeof results)[number]>();
+  for (const row of results) {
+    if (!latest.has(row.quote.assetId)) latest.set(row.quote.assetId, row);
+  }
+  return [...latest.values()].map(({ quote, asset }) => ({
     quote,
     asset,
     isFresh: quote.validUntil > now,
@@ -100,6 +105,7 @@ export async function fetchAndCacheQuote(
     id: crypto.randomUUID(),
     assetId: asset.id,
     priceCents: quoteResult.priceCents,
+    previousCloseCents: quoteResult.previousCloseCents ?? null,
     currency: quoteResult.currency,
     fxRateToBRL: null, // Set separately by FX service
     source: quoteResult.source,

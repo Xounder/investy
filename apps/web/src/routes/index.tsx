@@ -7,10 +7,13 @@
  * TASK-07 will edit the route table section only.
  */
 
-import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { RegisterDrawer } from '@/components/drawers/RegisterDrawer';
+import { AssetDrawer } from '@/components/drawers/AssetDrawer';
+import { useUiStore } from '@/stores/ui';
 
 /** Lazy-loaded page modules. */
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -38,6 +41,7 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 function PageLoader() {
   return (
     <div className="p-6">
+      <span className="font-display text-lg font-bold">Investy</span>
       <Skeleton variant="card" />
     </div>
   );
@@ -49,9 +53,13 @@ function PageLoader() {
  * without touching provider wiring.
  */
 export function AppRoutes() {
+  const location = useLocation();
+  const clearPrefill = useUiStore((s) => s.setRegisterPrefill);
+  useEffect(() => { if (location.pathname !== '/global-action') clearPrefill(null); }, [location.pathname, clearPrefill]);
+  const background = (location.state as { background?: Location } | null)?.background;
   return (
     <Suspense fallback={<PageLoader />}>
-      <Routes>
+      <Routes location={background || location}>
         {/* Auth routes (standalone, no layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -67,6 +75,7 @@ export function AppRoutes() {
           <Route path="holdings/:portfolioId" element={<HoldingsPortfolioPage />} />
           <Route path="assets" element={<AssetsPage />} />
           <Route path="assets/:symbol" element={<AssetPage />} />
+          <Route path="global-action" element={<RegisterDrawer />} />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/import" element={<TransactionsImportPage />} />
           <Route path="transactions/import/nota" element={<TransactionsImportNotaPage />} />
@@ -78,6 +87,7 @@ export function AppRoutes() {
         {/* Catch-all → dashboard */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {background && <Routes><Route path="/global-action" element={<RegisterDrawer />} /><Route path="/assets/:symbol" element={<AssetDrawer />} /></Routes>}
     </Suspense>
   );
 }

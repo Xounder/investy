@@ -13,6 +13,7 @@ interface BrapiQuoteResponse {
   results: Array<{
     symbol: string;
     regularMarketPrice: number;
+    regularMarketPreviousClose?: number;
     currency: string;
     shortName?: string;
   }>;
@@ -23,6 +24,7 @@ interface BrapiIndicatorsResponse {
     symbol: string;
     name: string;
     regularMarketPrice: number;
+    regularMarketPreviousClose?: number;
     currency: string;
   }>;
 }
@@ -74,16 +76,20 @@ export class BrapiProvider implements QuoteProvider {
     }
     const price = result.regularMarketPrice;
 
-    if (price === undefined || price === null) {
+    if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) {
       return null;
     }
 
     // Convert to cents (brapi returns price in the asset's currency)
     const priceCents = BigInt(Math.round(price * 100));
     const currency = result.currency ?? 'BRL';
+    const previous = result.regularMarketPreviousClose;
+    const previousCloseCents = typeof previous === 'number' && Number.isFinite(previous) && previous > 0
+      ? BigInt(Math.round(previous * 100)) : null;
 
     return {
       priceCents,
+      ...(previousCloseCents !== null && previousCloseCents > 0n ? { previousCloseCents } : {}),
       currency,
       source: this.name,
     };

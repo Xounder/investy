@@ -6,23 +6,15 @@
  */
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useUiStore } from '@/stores/ui';
-
-/** Mock portfolios for the selector (no API yet). */
-const mockPortfolios = [
-  { id: 'all', name: 'Todos os portfólios' },
-  { id: 'p1', name: 'Portfólio Principal' },
-  { id: 'p2', name: 'Renda Fixa' },
-];
+import { PortfolioSelector } from '@/components/selectors/PortfolioSelector';
 
 export function TopBar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
-  const activePortfolioId = useUiStore((s) => s.activePortfolioId);
-  const setActivePortfolioId = useUiStore((s) => s.setActivePortfolioId);
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
-
   return (
     <header className="sticky top-0 z-20 flex h-[var(--topbar-height)] items-center gap-4 border-b border-gray-200 bg-surface px-4 md:px-6">
       {/* Hamburger — mobile only */}
@@ -58,24 +50,12 @@ export function TopBar() {
       </div>
 
       {/* Portfolio selector */}
-      <select
-        value={activePortfolioId ?? 'all'}
-        onChange={(e) =>
-          setActivePortfolioId(e.target.value === 'all' ? null : e.target.value)
-        }
-        className="hidden rounded-lg border border-gray-200 bg-surface px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary focus:ring-1 focus:ring-primary sm:block"
-      >
-        {mockPortfolios.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </select>
+      <div className="hidden sm:block"><PortfolioSelector /></div>
 
       {/* + Registrar button: secondary → primary hover */}
       <button
         type="button"
-        onClick={() => navigate('/transactions/import')}
+        onClick={() => navigate('/global-action', { state: { background: location } })}
         className="shrink-0 rounded-lg border border-primary bg-transparent px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
       >
         + Registrar

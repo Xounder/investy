@@ -5,6 +5,7 @@
  * and blocks when quota is exceeded. Suitable for single-instance deployments.
  */
 import { QuoteProvider, QuoteResult } from './quote-provider.js';
+import type { DailyRateObservation, IndexObservation } from './quote-provider.js';
 import type { AssetClass } from '@investy/domain';
 
 interface QuotaEntry {
@@ -57,7 +58,7 @@ export const DEFAULT_PROVIDER_QUOTAS: Record<string, ProviderQuotaConfig> = {
  * Checks and consumes quota for a provider.
  * Returns true if quota available, false if exceeded.
  */
-export function checkProviderQuota(providerName: string, config?: ProviderQuotaConfig): boolean {
+export function checkProviderQuota(providerName: string, config?: ProviderQuotaConfig, cost = 1): boolean {
   const quotaConfig = config ?? DEFAULT_PROVIDER_QUOTAS[providerName] ?? { max: 30, windowMs: 60_000 };
   const now = Date.now();
   const key = `provider:${providerName}`;
@@ -69,9 +70,10 @@ export function checkProviderQuota(providerName: string, config?: ProviderQuotaC
     quotaStore.set(key, entry);
   }
 
-  entry.count += 1;
-
-  return entry.count <= quotaConfig.max;
+  // Reserve every upstream request atomically before initiating a multi-call read.
+  if (!Number.isSafeInteger(cost) || cost < 1 || entry.count + cost > quotaConfig.max) return false;
+  entry.count += cost;
+  return true;
 }
 
 /**
@@ -123,5 +125,16 @@ export class RateLimitedProvider implements QuoteProvider {
       return null;
     }
     return this.inner.fetchQuote(symbol, assetClass);
+  }
+
+  async fetchDailyRateHistory(start: string, end: string): Promise<DailyRateObservation[] | null> {
+    // BCB history performs two HTTP requests (SGS 12 and SGS 11 calendar).
+    if (!this.inner.fetchDailyRateHistory || !checkProviderQuota(this.name, this.config, 2)) return null;
+    return this.inner.fetchDailyRateHistory(start, end);
+  }
+
+  async fetchIndexHistory(symbol: string, start: string, end: string): Promise<IndexObservation[] | null> {
+    if (!this.inner.fetchIndexHistory || !checkProviderQuota(this.name, this.config)) return null;
+    return this.inner.fetchIndexHistory(symbol, start, end);
   }
 }

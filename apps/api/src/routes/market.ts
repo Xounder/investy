@@ -19,6 +19,7 @@ import { getBrlPrice } from '../services/market-data/fx.js';
 import { getUserOverridesByAssetIds } from '../services/market-data/overrides.js';
 import { optionalUser, getOptionalUserId } from '../middleware/auth.js';
 import type { AssetClass } from '@investy/domain';
+import { nativeDayChangePercent } from '../services/valuation.js';
 
 const app = new Hono();
 
@@ -37,6 +38,7 @@ const benchmarksQuerySchema = z.object({
 });
 
 const indicatorsQuerySchema = z.object({});
+
 
 // Helper for query validation
 async function validateQuery<T>(c: Context, schema: z.ZodSchema<T>): Promise<T> {
@@ -145,6 +147,7 @@ app.get('/quotes', async (c) => {
       name: asset.name,
       class: asset.class,
       priceCents: quote.priceCents.toString(),
+      dayChangePercent: override ? null : nativeDayChangePercent(quote.priceCents, quote.previousCloseCents),
       currency: quote.currency,
       priceCentsBRL: priceCentsBRL.toString(),
       fxRateUsed,

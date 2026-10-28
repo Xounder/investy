@@ -5,14 +5,17 @@
  * Temporais). Free, no API key required.
  */
 import { QuoteProvider, QuoteResult } from './quote-provider.js';
+import type { DailyRateObservation } from './quote-provider.js';
 import type { AssetClass } from '@investy/domain';
 
 const BCB_SGS_BASE_URL = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs';
 
 /** SGS series codes for macro indicators. */
 export const BCB_SERIES = {
-  SELIC: 11,    // Selic rate (% a.a.)
-  CDI: 12,      // CDI rate (% a.a.)
+  SELIC: 11,    // Selic rate (% per day)
+  // BCB SGS SOAP metadata: https://www3.bcb.gov.br/wssgs/services/FachadaWSSGS?method=getUltimoValorXML&in0=12
+  // <PERIODICIDADE>D</PERIODICIDADE><UNIDADE>% a.d.</UNIDADE> (daily percent).
+  CDI: 12,
   IPCA: 433,    // IPCA (% monthly)
   IBOV: 7858,   // IBOVESPA index (points)
 } as const;
@@ -24,6 +27,35 @@ interface BCBResponse {
 
 export class BcbSgsProvider implements QuoteProvider {
   readonly name = 'bcb';
+
+  /** SGS 12 daily CDI, cross-checked against SGS 11's business-day calendar. */
+  async fetchDailyRateHistory(start: string, end: string): Promise<DailyRateObservation[] | null> {
+    const from = start.split('-').reverse().join('/');
+    const to = end.split('-').reverse().join('/');
+    const get = async (code: number): Promise<BCBResponse[] | null> => {
+      const response = await this.fetchWithTimeout(`${BCB_SGS_BASE_URL}.${code}/dados?formato=json&dataInicial=${encodeURIComponent(from)}&dataFinal=${encodeURIComponent(to)}`);
+      if (!response.ok) return null;
+      const data: unknown = await response.json();
+      return Array.isArray(data) ? data as BCBResponse[] : null;
+    };
+    const cdi = await get(12);
+    const calendar = await get(11);
+    if (!cdi?.length || !calendar?.length) return null;
+    const parseDate = (date: string) => /^\d{2}\/\d{2}\/\d{4}$/.test(date)
+      ? date.split('/').reverse().join('-') : null;
+    const officialDates = calendar.map(row => parseDate(row.data));
+    const rows = cdi.map(row => ({ date: parseDate(row.data), percentPerDay: Number(row.valor) }));
+    const lastCdiDate = rows.reduce<string>((last, row) => row.date && row.date > last ? row.date : last, '');
+    if (officialDates.some(date => !date || date < start || date > end) ||
+        rows.some(row => !row.date || row.date < start || row.date > end ||
+          !Number.isFinite(row.percentPerDay) || row.percentPerDay < 0 || row.percentPerDay > 5) ||
+        new Set(officialDates).size !== officialDates.length ||
+        new Set(rows.map(row => row.date)).size !== rows.length ||
+        // SGS 11 can publish ahead of SGS 12. Only compare through CDI's last close.
+        officialDates.filter(date => date! <= lastCdiDate).length !== rows.length ||
+        rows.some(row => !officialDates.includes(row.date))) return null;
+    return rows as DailyRateObservation[];
+  }
 
   supports(assetClass: AssetClass): boolean {
     return assetClass === 'indice';
@@ -39,7 +71,7 @@ export class BcbSgsProvider implements QuoteProvider {
       return null;
     }
 
-    const url = `${BCB_SGS_BASE_URL}/${seriesCode}/ultimos/1?formato=json`;
+    const url = `${BCB_SGS_BASE_URL}.${seriesCode}/dados/ultimos/1?formato=json`;
     const response = await this.fetchWithTimeout(url);
 
     if (!response.ok) {

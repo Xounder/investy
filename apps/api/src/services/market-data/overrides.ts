@@ -6,7 +6,7 @@
  */
 import { getDb } from '../../db/client.js';
 import { quoteOverrides, assets } from '../../db/schema.js';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, getTableColumns } from 'drizzle-orm';
 import type { QuoteOverrideTable, NewQuoteOverride } from '../../db/schema.js';
 
 /**
@@ -115,6 +115,15 @@ export async function getUserOverrides(userId: string): Promise<QuoteOverrideTab
   return db
     .select()
     .from(quoteOverrides)
+    .where(eq(quoteOverrides.userId, userId));
+}
+
+/** Settings view: one owner-filtered join, including assets absent from catalog pages. */
+export async function getUserOverridesWithAssets(userId: string) {
+  return getDb()
+    .select({ ...getTableColumns(quoteOverrides), symbol: assets.symbol, assetName: assets.name })
+    .from(quoteOverrides)
+    .innerJoin(assets, eq(quoteOverrides.assetId, assets.id))
     .where(eq(quoteOverrides.userId, userId));
 }
 
