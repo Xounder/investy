@@ -14,6 +14,8 @@ import portfolioRoutes from './routes/portfolios.js';
 import brokerRoutes from './routes/brokers.js';
 import accountRoutes from './routes/accounts.js';
 import portfolioAggregateRoutes from './routes/portfolio-aggregates.js';
+import exportRoutes from './routes/export.js';
+import settingsRoutes from './routes/settings.js';
 import dividendRoutes from './routes/dividends.js';
 
 /**
@@ -82,6 +84,8 @@ app.route('/api/v1/accounts', accountRoutes);
 
 // Dashboard aggregate routes (TASK-05)
 app.route('/api/v1/portfolio', portfolioAggregateRoutes);
+app.route('/api/v1/export', exportRoutes);
+app.route('/api/v1/settings', settingsRoutes);
 app.route('/api/v1/dividends', dividendRoutes);
 
 export default app;
