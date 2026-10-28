@@ -1,10 +1,17 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 
 import authRoutes from './routes/auth.js';
 import onboardingRoutes from './routes/onboarding.js';
 import marketRoutes from './routes/market.js';
 import assetRoutes from './routes/assets.js';
+import transactionRoutes from './routes/transactions.js';
+import holdingRoutes from './routes/holdings.js';
+import portfolioRoutes from './routes/portfolios.js';
+import brokerRoutes from './routes/brokers.js';
+import accountRoutes from './routes/accounts.js';
+import portfolioAggregateRoutes from './routes/portfolio-aggregates.js';
 
 /**
  * Investy REST API (M3 — TASK-04).
@@ -14,6 +21,23 @@ import assetRoutes from './routes/assets.js';
  * Business routes are mounted under /api/v1 per resource module.
  */
 const app = new Hono();
+
+// Older route helpers put a JSON envelope in the exception message. Return it
+// as JSON rather than Hono's default text/plain response; leave other errors
+// (including authentication responses) unchanged.
+app.onError((error, c) => {
+  if (error instanceof HTTPException) {
+    try {
+      const payload: unknown = JSON.parse(error.message);
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        return c.json(payload, error.status);
+      }
+    } catch { /* Non-JSON exceptions retain their existing response. */ }
+    return error.getResponse();
+  }
+  console.error(error);
+  return c.text('Internal Server Error', 500);
+});
 
 // CORS configuration per ADR-010: locked to app origin, credentials included
 const appOrigin = process.env.APP_ORIGIN ?? 'http://localhost:5173';
@@ -39,5 +63,19 @@ app.route('/api/v1/market', marketRoutes);
 
 // Asset catalog routes (mounted under /api/v1/assets)
 app.route('/api/v1/assets', assetRoutes);
+
+// Journal / transactions routes (TASK-05)
+app.route('/api/v1/transactions', transactionRoutes);
+
+// Holdings read-model routes (TASK-05)
+app.route('/api/v1/holdings', holdingRoutes);
+
+// Portfolio structure routes (TASK-05)
+app.route('/api/v1/portfolios', portfolioRoutes);
+app.route('/api/v1/brokers', brokerRoutes);
+app.route('/api/v1/accounts', accountRoutes);
+
+// Dashboard aggregate routes (TASK-05)
+app.route('/api/v1/portfolio', portfolioAggregateRoutes);
 
 export default app;

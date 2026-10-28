@@ -46,6 +46,9 @@ export const transactions = pgTable(
     qty: bigint('qty', { mode: 'bigint' }).notNull(),
     unitPriceCents: bigint('unit_price_cents', { mode: 'bigint' }).notNull(),
     feeCents: bigint('fee_cents', { mode: 'bigint' }).notNull().default(0n),
+    // Input money stays in the transaction currency; replay converts at this historical rate.
+    currency: varchar('currency', { length: 3 }).notNull().default('BRL'),
+    fxRateToBRL: bigint('fx_rate_to_brl', { mode: 'bigint' }),
     realizedPnlCents: bigint('realized_pnl_cents', { mode: 'bigint' }).notNull().default(0n),
     factor: integer('factor'),
     amortRateCents: bigint('amort_rate_cents', { mode: 'bigint' }),

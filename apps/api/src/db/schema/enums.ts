@@ -25,6 +25,7 @@ export const transactionTypeEnum = pgEnum('transaction_type', [
   'sell',
   'split',
   'bonificacao',
+  'dividend',
   'jcp',
   'amortizacao',
   'adjustment',

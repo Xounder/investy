@@ -7,7 +7,7 @@
 import { getDb } from '../db/client.js';
 import type { InferSelectModel, InferInsertModel, SQL } from 'drizzle-orm';
 import type { PgTable, PgColumn } from 'drizzle-orm/pg-core';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, getTableColumns } from 'drizzle-orm';
 
 export interface ScopedRepository<TSelect> {
   /** Finds a single record by ID, scoped to the user. Returns null if not found or owned by another user. */
@@ -34,17 +34,16 @@ export function createScopedRepository<
   table: TTable,
   userIdColumn: PgColumn,
 ): ScopedRepository<TSelect> {
+  const idColumn = getTableColumns(table).id as PgColumn;
   return {
     async findById(id: string, userId: string): Promise<TSelect | null> {
       const db = getDb();
       const results = await db
         .select()
         .from(table)
-        .where(and(eq(userIdColumn, userId)))
+        .where(and(eq(userIdColumn, userId), eq(idColumn, id)))
         .limit(1);
-      // Filter by id manually since we can't type the id column generically
-      const filtered = (results as Array<Record<string, unknown>>).filter((r) => r.id === id);
-      return (filtered[0] as TSelect) ?? null;
+      return (results[0] as TSelect) ?? null;
     },
 
     async findAll(userId: string, ...conditions: SQL[]): Promise<TSelect[]> {
@@ -67,18 +66,16 @@ export function createScopedRepository<
       const results = await db
         .update(table)
         .set(data)
-        .where(and(eq(userIdColumn, userId)))
+        .where(and(eq(userIdColumn, userId), eq(idColumn, id)))
         .returning();
-      // Filter by id manually
-      const filtered = (results as Array<Record<string, unknown>>).filter((r) => r.id === id);
-      return (filtered[0] as TSelect) ?? null;
+      return ((results as TSelect[])[0]) ?? null;
     },
 
     async delete(id: string, userId: string): Promise<boolean> {
       const db = getDb();
       const result = await db
         .delete(table)
-        .where(and(eq(userIdColumn, userId)));
+        .where(and(eq(userIdColumn, userId), eq(idColumn, id)));
       return (result.rowCount ?? 0) > 0;
     },
   };

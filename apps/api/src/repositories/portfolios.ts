@@ -51,4 +51,13 @@ export const portfolioRepository = {
       .where(eq(portfolios.userId, userId))
       .orderBy(desc(portfolios.isDefault), portfolios.createdAt);
   },
+
+  /** Unsets the default flag on all of the user's portfolios. */
+  async clearDefault(userId: string): Promise<void> {
+    const db = getDb();
+    await db
+      .update(portfolios)
+      .set({ isDefault: false })
+      .where(and(eq(portfolios.userId, userId), eq(portfolios.isDefault, true)));
+  },
 };
