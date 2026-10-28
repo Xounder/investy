@@ -26,6 +26,8 @@ import { users, sessions } from '../db/schema.js';
 import { and, eq } from 'drizzle-orm';
 import { authRateLimit } from '../middleware/rate-limit.js';
 import { authMiddleware, extractCookie, requireUser } from '../middleware/auth.js';
+import { validateBody as validateProfileBody } from '../lib/validation.js';
+import { isDuplicateEmail, updateProfile } from '../services/profile.js';
 import { persistSession } from '../services/auth-session.js';
 
 const app = new Hono();
@@ -41,6 +43,11 @@ const loginSchema = z.object({
   email: z.string().email().max(255),
   password: z.string().min(1).max(128),
 });
+
+const profileSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(255),
+}).strict();
 
 const passwordResetRequestSchema = z.object({
   email: z.string().email().max(255),
@@ -224,6 +231,21 @@ app.get('/me', authMiddleware, async (c) => {
   }
 
   return c.json(user);
+});
+
+app.patch('/me', authMiddleware, async (c) => {
+  const userId = requireUser(c);
+  const { name, email } = await validateProfileBody(c, profileSchema);
+  try {
+    const [user] = await updateProfile(userId, name, email);
+    if (!user) return c.json({ error: { code: 'NOT_FOUND', message: 'User not found' } }, 404);
+    return c.json(user);
+  } catch (error) {
+    if (isDuplicateEmail(error)) {
+      return c.json({ error: { code: 'EMAIL_EXISTS', message: 'Email already registered' } }, 409);
+    }
+    throw error;
+  }
 });
 
 /**
