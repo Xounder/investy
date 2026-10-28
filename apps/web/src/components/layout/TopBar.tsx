@@ -6,15 +6,38 @@
  */
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useUiStore } from '@/stores/ui';
 import { PortfolioSelector } from '@/components/selectors/PortfolioSelector';
+import { authApi, authError, clearOwnerState } from '@/lib/auth';
+import { rotateSessionEpoch } from '@/lib/session-boundary';
 
 export function TopBar() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar);
   const navigate = useNavigate();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [logoutError, setLogoutError] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
+  const client = useQueryClient();
+  async function logout() {
+    if (loggingOut) return;
+    setLogoutError(''); setLoggingOut(true);
+    try {
+      await authApi.logout();
+      rotateSessionEpoch();
+      navigate('/login', { replace: true });
+      await clearOwnerState(client);
+    } catch (reason) {
+      if ((reason as { status?: number })?.status === 401) {
+        rotateSessionEpoch();
+        navigate('/login', { replace: true });
+        await clearOwnerState(client);
+      } else setLogoutError(authError(reason));
+    } finally { setLoggingOut(false); }
+  }
+
   return (
     <header className="sticky top-0 z-20 flex h-[var(--topbar-height)] items-center gap-4 border-b border-gray-200 bg-surface px-4 md:px-6">
       {/* Hamburger — mobile only */}
@@ -60,6 +83,8 @@ export function TopBar() {
       >
         + Registrar
       </button>
+      <button type="button" onClick={() => void logout()} disabled={loggingOut} className="shrink-0 text-sm text-primary disabled:opacity-50">{loggingOut ? 'Saindo…' : 'Sair'}</button>
+      {logoutError && <p role="alert" className="absolute right-4 top-full rounded bg-white p-2 text-sm text-red-700 shadow">{logoutError}</p>}
     </header>
   );
 }

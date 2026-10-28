@@ -7,13 +7,16 @@
  * TASK-07 will edit the route table section only.
  */
 
-import { lazy, Suspense, useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { RegisterDrawer } from '@/components/drawers/RegisterDrawer';
 import { AssetDrawer } from '@/components/drawers/AssetDrawer';
 import { useUiStore } from '@/stores/ui';
+import { clearOwnerState } from '@/lib/auth';
+import { subscribeSessionExpiry } from '@/lib/session-boundary';
 
 /** Lazy-loaded page modules. */
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -54,9 +57,19 @@ function PageLoader() {
  */
 export function AppRoutes() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const client = useQueryClient();
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => subscribeSessionExpiry(() => {
+    setBlocked(true);
+    navigate('/login', { replace: true, state: { from: location.pathname } });
+    void clearOwnerState(client);
+  }), [client, navigate, location.pathname]);
+  useEffect(() => { if (location.pathname === '/login') setBlocked(false); }, [location.pathname]);
   const clearPrefill = useUiStore((s) => s.setRegisterPrefill);
   useEffect(() => { if (location.pathname !== '/global-action') clearPrefill(null); }, [location.pathname, clearPrefill]);
   const background = (location.state as { background?: Location } | null)?.background;
+  if (blocked && location.pathname !== '/login') return <PageLoader />;
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes location={background || location}>

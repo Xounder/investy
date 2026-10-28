@@ -4,6 +4,7 @@
  * Shared fetch/error helpers for JSON API requests.
  */
 
+import { assertSessionEpoch, checkProtectedResponse, sessionEpoch } from './session-boundary';
 
 const API_BASE = '/api';
 
@@ -45,6 +46,7 @@ export async function apiFetch<T>(
   options?: RequestInit,
 ): Promise<T> {
   const url = `${API_BASE}${path}`;
+  const startedAt = sessionEpoch();
 
   const response = await fetch(url, {
     credentials: 'include',
@@ -56,15 +58,24 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
+    // Login/register failures are form errors, not expiry of a protected session.
+    // /auth/me is handled by the protected layout; it is also used to verify
+    // credentials on the public login/signup pages.
+    if (!['/v1/auth/register', '/v1/auth/login', '/v1/auth/logout', '/v1/auth/me'].includes(path)) {
+      checkProtectedResponse(response, startedAt);
+    }
+    assertSessionEpoch(startedAt);
     let body: unknown;
     try {
       body = await response.json();
     } catch {
       body = undefined;
     }
+    assertSessionEpoch(startedAt);
     throw normalizeError(response, body);
   }
 
+  assertSessionEpoch(startedAt);
 
   // 204 No Content
   if (response.status === 204) {
@@ -72,6 +83,7 @@ export async function apiFetch<T>(
   }
 
   const body = await response.json() as T;
+  assertSessionEpoch(startedAt);
   return body;
 }
 

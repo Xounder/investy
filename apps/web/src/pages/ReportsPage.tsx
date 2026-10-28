@@ -42,7 +42,7 @@ export default function ReportsPage() {
   const classes = [...new Set(months.flatMap((m) => [...m.byClass.keys()]))].sort();
   const bars = months.map((m) => ({ key: m.key, ...Object.fromEntries(classes.map((key) => [key, Number(m.byClass.get(key) ?? 0n) / 100])) }));
   return <div className="space-y-5">
-    <header className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="font-display text-2xl font-bold">Relatórios e análises</h1><p className="text-sm text-tertiary">Dados observados da carteira {selected?.name ?? ''}</p></div><PortfolioSelector /></header>
+    <header className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="font-display text-2xl font-bold">Relatórios e análises</h1><p className="text-sm text-tertiary">Dados observados da carteira {selected?.name ?? ''}</p><Link to="/settings#exportar-dados" className="text-sm text-primary underline">Exportar dados nas Configurações</Link></div><PortfolioSelector /></header>
     {portfolios.isError && <div role="alert">{errorText(portfolios.error)} <button className="text-primary" onClick={() => void portfolios.refetch()}>Tentar novamente</button></div>}
     {!portfolios.isPending && !portfolios.isError && !id && <p className="rounded-xl border bg-white p-6">Crie uma carteira para começar. <Link to="/onboarding" className="text-primary">Criar carteira</Link></p>}
     {id && <>

@@ -1,20 +1,34 @@
-/**
- * Signup page skeleton.
- * Basic form wired to future API — no real auth yet.
- */
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { Link, useNavigate } from 'react-router-dom';
+import { adoptSession, authApi, authError } from '@/lib/auth';
+import { rotateSessionEpoch } from '@/lib/session-boundary';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
+  const client = useQueryClient();
+  const navigate = useNavigate();
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: wire to API (TASK-09)
+    if (pending) return;
+    if (!name.trim() || name.trim().length > 120 || !email.trim() || password.length < 8 || password.length > 128 || password !== confirmPassword) {
+      setError('Informe nome, e-mail e senha de 8 a 128 caracteres; as senhas devem coincidir.'); return;
+    }
+    setError(''); setPending(true);
+    rotateSessionEpoch();
+    try {
+      await authApi.register({ name: name.trim(), email: email.trim(), password });
+      const user = await authApi.me();
+      await adoptSession(client, user);
+      navigate('/onboarding', { replace: true });
+    } catch (reason) { setError(authError(reason)); }
+    finally { setPending(false); }
   }
 
   return (
@@ -37,7 +51,7 @@ export default function SignupPage() {
               type="text"
               required
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); setError(''); }}
               className="w-full rounded-lg border border-gray-200 bg-surface px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               placeholder="Seu nome"
             />
@@ -51,7 +65,7 @@ export default function SignupPage() {
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setError(''); }}
               className="w-full rounded-lg border border-gray-200 bg-surface px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               placeholder="voce@email.com"
             />
@@ -65,7 +79,7 @@ export default function SignupPage() {
               type="password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
               className="w-full rounded-lg border border-gray-200 bg-surface px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               placeholder="••••••••"
             />
@@ -79,17 +93,19 @@ export default function SignupPage() {
               type="password"
               required
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => { setConfirmPassword(e.target.value); setError(''); }}
               className="w-full rounded-lg border border-gray-200 bg-surface px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               placeholder="••••••••"
             />
           </div>
 
+          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
           <button
             type="submit"
+            disabled={pending}
             className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
           >
-            Criar conta
+            {pending ? 'Criando conta…' : 'Criar conta'}
           </button>
         </form>
 

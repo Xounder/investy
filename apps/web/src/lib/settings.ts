@@ -1,4 +1,5 @@
 import { api, apiFetch } from './api';
+import { assertSessionEpoch, checkProtectedResponse, sessionEpoch } from './session-boundary';
 
 export interface Profile { id: string; name: string | null; email: string }
 export interface Portfolio { id: string; name: string; isDefault: boolean }
@@ -35,10 +36,14 @@ export const settingsApi = {
 
 // Binary exports must not pass through apiFetch, which always parses JSON.
 export async function downloadExport(format: 'json' | 'csv'): Promise<void> {
+  const startedAt = sessionEpoch();
   const response = await fetch(`/api/v1/export?format=${format}`, { method: 'POST', credentials: 'include' });
+  checkProtectedResponse(response, startedAt);
+  assertSessionEpoch(startedAt);
   if (!response.ok) {
     let body: { error?: { message?: string }; message?: string } | undefined;
     try { body = await response.json(); } catch { /* Non-JSON server error. */ }
+    assertSessionEpoch(startedAt);
     throw { status: response.status, message: body?.error?.message ?? body?.message ?? `Erro ${response.status}` };
   }
   const contentType = response.headers.get('Content-Type') ?? '';
@@ -47,6 +52,7 @@ export async function downloadExport(format: 'json' | 'csv'): Promise<void> {
   const disposition = response.headers.get('Content-Disposition') ?? '';
   const filename = disposition.match(/filename="?([^";]+)"?/i)?.[1] ?? `investy-export.${format === 'json' ? 'json' : 'zip'}`;
   const blob = await response.blob();
+  assertSessionEpoch(startedAt);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

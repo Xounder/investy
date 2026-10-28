@@ -1,4 +1,5 @@
 import { api } from './api';
+import { assertSessionEpoch, checkProtectedResponse, sessionEpoch } from './session-boundary';
 
 export interface ImportWarning { type: 'UNKNOWN_ASSET' | 'DATE_MISMATCH' | 'DUPLICATE'; message: string; details?: string }
 export interface NotaItem {
@@ -15,14 +16,19 @@ export interface ReturnedHolding { id: string; accountId: string; assetId: strin
 export interface ImportResult { created: number; holdings?: (ReturnedHolding | null)[]; errors?: { line: number; message: string }[] }
 
 async function upload<T>(path: string, form: FormData): Promise<T> {
+  const startedAt = sessionEpoch();
   const response = await fetch(`/api/v1/transactions/import/${path}`, {
     method: 'POST', credentials: 'include', body: form,
   });
+  checkProtectedResponse(response, startedAt);
+  assertSessionEpoch(startedAt);
   let body: Record<string, unknown>;
   try { body = await response.json() as Record<string, unknown>; }
   catch {
+    assertSessionEpoch(startedAt);
     throw { status: response.status, message: `Resposta inválida do servidor (${response.status}).` };
   }
+  assertSessionEpoch(startedAt);
   if (!response.ok) {
     const error = body.error && typeof body.error === 'object' && !Array.isArray(body.error)
       ? body.error as { message?: string; code?: string } : undefined;

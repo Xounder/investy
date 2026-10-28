@@ -1,0 +1,81 @@
+import { expect, test } from '@playwright/test';
+
+test('daily check writes a native USD price, refreshes holdings and dashboard, resets to provider and reaches real export', async ({ page }) => {
+  const portfolioId = '11111111-1111-4111-8111-111111111111';
+  const assetId = '44444444-4444-4444-8444-444444444444';
+  const asset = { id: assetId, symbol: 'AAPL', name: 'Apple', class: 'etf_us', currency: 'USD' };
+  let manual: number | null = null;
+  let summaryReads = 0;
+  let holdingsReads = 0;
+  let patches = 0;
+  let deletes = 0;
+  await page.route('**/api/v1/**', async (route) => {
+    const url = new URL(route.request().url());
+    const path = url.pathname;
+    const method = route.request().method();
+    let body: unknown = {};
+    if (path === '/api/v1/assets/AAPL/override' && method === 'PATCH') {
+      const payload = route.request().postDataJSON() as { priceCents: number; currency: string };
+      expect(payload).toEqual({ priceCents: 123456, currency: 'USD' });
+      manual = payload.priceCents;
+      patches++;
+      body = { symbol: 'AAPL', priceCents: String(manual), currency: 'USD' };
+    } else if (path === '/api/v1/assets/AAPL/override' && method === 'DELETE') {
+      manual = null;
+      deletes++;
+      body = { ok: true };
+    } else if (path === '/api/v1/portfolios') body = { portfolios: [{ id: portfolioId, name: 'Principal', isDefault: true }] };
+    else if (path === '/api/v1/portfolio/summary') {
+      summaryReads++;
+      body = { totalMarketValueCents: String(manual ?? 10000), totalCostBasisCents: '5000', unrealizedPnlCents: String((manual ?? 10000) - 5000), unpricedCostBasisCents: '0', holdingsCount: 1, currency: 'BRL', comparison: { kind: 'observed_value_including_cash_flows', currency: 'BRL', timezone: 'America/Sao_Paulo', currentAt: new Date().toISOString(), previousAt: null, previousDate: null, period: null, reason: 'NO_SNAPSHOT', hasStaleQuotes: !manual, total: null, cost: null, unrealized: null, dayMainChange: null } };
+    } else if (path === '/api/v1/holdings') {
+      holdingsReads++;
+      body = { holdings: [{ id: 'h1', accountId: 'acc', assetId, symbol: 'AAPL', assetName: 'Apple', assetClass: 'etf_us', assetCurrency: 'USD', qty: '1', avgPriceCents: '5000', costBasisCents: '5000', priceCents: String(manual ?? 10000), marketValueCentsBRL: String(manual ?? 10000), unrealizedPnlCentsBRL: String((manual ?? 10000) - 5000), dayChangePercent: null, isStale: !manual }] };
+    } else if (path === '/api/v1/assets/AAPL') body = { asset, lastQuote: { priceCents: '10000', currency: 'USD', isStale: true, priceCentsBRL: '50000' }, userOverride: manual == null ? null : { priceCents: String(manual), currency: 'USD', createdAt: new Date().toISOString() } };
+    else if (path === `/api/v1/holdings/${assetId}`) body = { summary: { qty: '1', priceCentsBRL: String(manual ?? 50000), dayChangePercent: null }, quote: { isStale: !manual }, lots: [], events: [] };
+    else if (path === '/api/v1/portfolio/allocation') body = { byClass: [], bySector: [] };
+    else if (path === '/api/v1/portfolio/snapshots') body = { snapshots: [] };
+    else if (path === '/api/v1/transactions') body = { items: [], page: 1, hasMore: false };
+    else if (path === '/api/v1/assets') body = { items: [asset], totalPages: 1 };
+    else if (path === '/api/v1/dividends/agenda') body = { items: [], projections: [] };
+    else if (path === '/api/v1/dividends/history') body = { months: [] };
+    else if (path === '/api/v1/market/benchmarks') body = { benchmarks: [] };
+    else if (path === '/api/v1/market/benchmarks/cdi-index') body = { cdiIndex: { coverage: 'UNAVAILABLE', indexSeries: [] } };
+    else if (path === '/api/v1/market/indicators') body = { indicators: [] };
+    await route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
+  });
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Indicadores da carteira' }).getByText('R$ 100,00')).toBeVisible();
+  await page.goto('/holdings');
+  await expect(page.getByRole('button', { name: 'AAPL' })).toBeVisible();
+  await page.getByRole('button', { name: 'AAPL' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Cotação do provedor desatualizada')).toBeVisible();
+  await dialog.getByLabel('Preço por unidade (USD)').fill('1.234,56');
+  await dialog.getByRole('button', { name: 'Salvar preço manual' }).click();
+  await expect(dialog.getByRole('status')).toHaveText('Preço manual salvo.');
+  await expect(dialog.getByText('Preço manual ativo (USD): US$ 1.234,56')).toBeVisible();
+  expect(patches).toBe(1);
+  await expect.poll(() => holdingsReads).toBeGreaterThan(1);
+  await expect(page.getByRole('row', { name: /AAPL/ })).toContainText('R$ 1.234,56');
+  await dialog.getByRole('button', { name: 'Fechar' }).click();
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Indicadores da carteira' }).getByText('R$ 1.234,56')).toBeVisible();
+  await page.goto('/assets/AAPL');
+  await expect(dialog.getByText('Preço manual ativo (USD): US$ 1.234,56')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Remover preço manual' }).click();
+  expect(deletes).toBe(0);
+  await dialog.getByRole('button', { name: 'Confirmar remoção' }).click();
+  await expect(dialog.getByRole('status')).toHaveText('Preço manual removido.');
+  await expect(dialog.getByText('Cotação do provedor: US$ 100,00')).toBeVisible();
+  expect(deletes).toBe(1);
+  await page.goto('/holdings');
+  await expect(page.getByRole('row', { name: /AAPL/ })).toContainText('R$ 100,00');
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Indicadores da carteira' }).getByText('R$ 100,00')).toBeVisible();
+  expect(summaryReads).toBeGreaterThan(1);
+  await page.goto('/reports');
+  await page.getByRole('link', { name: 'Exportar dados nas Configurações' }).click();
+  await expect(page).toHaveURL(/\/settings#exportar-dados$/);
+  await expect(page.getByRole('button', { name: 'Exportar JSON' })).toBeVisible();
+});
