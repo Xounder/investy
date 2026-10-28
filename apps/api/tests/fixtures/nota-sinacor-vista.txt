@@ -1,0 +1,15 @@
+Corretora: XP
+Número Nota: 2026-984
+Data Pregão: 18/10/2026
+Negócios realizados
+C/V Especificação Quantidade Preço
+1-BOVESPA C VISTA PETR4 2 10,50 21,00 D
+2-BOVESPA C VISTA VALE3 1 10,50 10,50
+Resumo financeiro
+Liquidação: 0,02
+Corretagem: 0,03
+Emolumentos: 0,01
+ISS: 0,00
+IRRF: 0,00
+Total Negócios: 31,50
+Total de Taxas: 0,06

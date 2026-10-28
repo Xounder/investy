@@ -7,6 +7,8 @@ import onboardingRoutes from './routes/onboarding.js';
 import marketRoutes from './routes/market.js';
 import assetRoutes from './routes/assets.js';
 import transactionRoutes from './routes/transactions.js';
+import csvImportRoutes from './routes/import-csv.js';
+import notaImportRoutes from './routes/import-nota.js';
 import holdingRoutes from './routes/holdings.js';
 import portfolioRoutes from './routes/portfolios.js';
 import brokerRoutes from './routes/brokers.js';
@@ -66,6 +68,8 @@ app.route('/api/v1/assets', assetRoutes);
 
 // Journal / transactions routes (TASK-05)
 app.route('/api/v1/transactions', transactionRoutes);
+app.route('/api/v1/transactions/import/csv', csvImportRoutes);
+app.route('/api/v1/transactions/import/nota', notaImportRoutes);
 
 // Holdings read-model routes (TASK-05)
 app.route('/api/v1/holdings', holdingRoutes);

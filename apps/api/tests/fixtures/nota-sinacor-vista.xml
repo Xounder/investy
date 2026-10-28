@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notaCorretagem>
+  <corretora>XP</corretora><numero>2026-984</numero><dataPregao>2026-10-18</dataPregao>
+  <negocios>
+    <operacao><compraVenda>C</compraVenda><codigoAtivo>PETR4</codigoAtivo><quantidade>2</quantidade><precoUnitario>10,50</precoUnitario><valorTotal>21,00</valorTotal></operacao>
+    <operacao><compraVenda>C</compraVenda><codigoAtivo>VALE3</codigoAtivo><quantidade>1</quantidade><precoUnitario>10,50</precoUnitario><valorTotal>10,50</valorTotal></operacao>
+  </negocios>
+  <taxaLiquidacao>0,02</taxaLiquidacao><valorCorretagem>0,03</valorCorretagem><taxaEmolumentos>0,01</taxaEmolumentos>
+  <totalNegocios>31,50</totalNegocios><totalTaxas>0,06</totalTaxas>
+</notaCorretagem>
