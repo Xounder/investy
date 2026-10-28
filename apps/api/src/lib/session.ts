@@ -9,7 +9,7 @@
  * production; a random ephemeral secret is used as a development fallback so
  * the API boots without configuration.
  */
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 export const SESSION_COOKIE_NAME = 'session';
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -17,6 +17,7 @@ export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 export interface SessionPayload {
   userId: string;
   expiresAt: number;
+  nonce?: string;
 }
 
 let devSecret: string | null = null;
@@ -45,14 +46,25 @@ function base64UrlDecode(value: string): string {
 }
 
 /** Creates a signed session token for a user. */
-export function createSessionToken(userId: string, ttlMs = SESSION_TTL_MS): string {
+export function createSessionToken(userId: string, ttlMs = SESSION_TTL_MS, nonce?: string): string {
   const payload: SessionPayload = {
     userId,
     expiresAt: Date.now() + ttlMs,
+    ...(nonce === undefined ? {} : { nonce }),
   };
   const encoded = base64UrlEncode(JSON.stringify(payload));
   const signature = hmacSign(encoded);
   return `${encoded}.${signature}`;
+}
+
+/** Only the digest is persisted; the signed bearer token stays in the cookie. */
+export function hashSessionToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+/** Unlike the pure factory, every persisted session has a unique random nonce. */
+export function createPersistedSessionToken(userId: string): string {
+  return createSessionToken(userId, SESSION_TTL_MS, randomBytes(32).toString('hex'));
 }
 
 /**
@@ -82,9 +94,13 @@ export function verifySessionToken(token: string): SessionPayload | null {
   try {
     const payload = JSON.parse(base64UrlDecode(encoded)) as SessionPayload;
     if (
+      !payload || typeof payload !== 'object' ||
+      Object.keys(payload).some((key) => !['userId', 'expiresAt', 'nonce'].includes(key)) ||
       typeof payload.userId !== 'string' ||
+      payload.userId.length === 0 ||
       typeof payload.expiresAt !== 'number' ||
-      Number.isNaN(payload.expiresAt)
+      !Number.isFinite(payload.expiresAt) ||
+      (payload.nonce !== undefined && !/^[a-f0-9]{64}$/.test(payload.nonce))
     ) {
       return null;
     }

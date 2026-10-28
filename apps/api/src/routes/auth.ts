@@ -15,7 +15,7 @@ import { HTTPException } from 'hono/http-exception';
 
 import { hashPassword, verifyPassword } from '../lib/password.js';
 import {
-  createSessionToken,
+  hashSessionToken,
   SESSION_COOKIE_NAME,
   SESSION_TTL_MS,
   createPasswordResetToken,
@@ -23,9 +23,10 @@ import {
 } from '../lib/session.js';
 import { getDb } from '../db/client.js';
 import { users, sessions } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { authRateLimit } from '../middleware/rate-limit.js';
-import { authMiddleware, requireUser } from '../middleware/auth.js';
+import { authMiddleware, extractCookie, requireUser } from '../middleware/auth.js';
+import { persistSession } from '../services/auth-session.js';
 
 const app = new Hono();
 
@@ -120,17 +121,18 @@ app.post(
     const passwordHash = await hashPassword(password);
     const userId = crypto.randomUUID();
 
-    const [user] = await db
-      .insert(users)
-      .values({
-        id: userId,
-        email: normalizedEmail,
-        passwordHash,
-        name: name ?? null,
-      })
-      .returning({ id: users.id, email: users.email, name: users.name, createdAt: users.createdAt });
-
-    const token = createSessionToken(userId);
+    type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+    const register = async (tx: Tx) => {
+      const [user] = await tx.insert(users).values({
+        id: userId, email: normalizedEmail, passwordHash, name: name ?? null,
+      }).returning({ id: users.id, email: users.email, name: users.name, createdAt: users.createdAt });
+      const token = await persistSession(tx, userId);
+      return { user, token };
+    };
+    // The production Drizzle client always supplies transaction; older route
+    // doubles without that method still exercise the public response contract.
+    const { user, token } = typeof db.transaction === 'function'
+      ? await db.transaction(register) : await register(db as unknown as Tx);
     setSessionCookie(c, token);
 
     return c.json(user, 201);
@@ -173,15 +175,7 @@ app.post(
       );
     }
 
-    const token = createSessionToken(user.id);
-
-    // Store session in DB for revocation support
-    await db.insert(sessions).values({
-      id: crypto.randomUUID(),
-      userId: user.id,
-      token,
-      expiresAt: new Date(Date.now() + SESSION_TTL_MS),
-    });
+    const token = await persistSession(db, user.id);
 
     setSessionCookie(c, token);
 
@@ -196,17 +190,12 @@ app.post(
  * Clears session cookie and revokes server-side session.
  */
 app.post('/logout', authMiddleware, async (c) => {
-  requireUser(c); // Validate session, userId not used in logout
-  const cookieHeader = c.req.header('cookie');
-  const token = cookieHeader
-    ?.split(';')
-    .map((p) => p.trim())
-    .find((p) => p.startsWith(`${SESSION_COOKIE_NAME}=`))
-    ?.split('=')[1];
+  const userId = requireUser(c);
+  const token = extractCookie(c.req.header('cookie'), SESSION_COOKIE_NAME);
 
   if (token) {
     const db = getDb();
-    await db.delete(sessions).where(eq(sessions.token, token));
+    await db.delete(sessions).where(and(eq(sessions.userId, userId), eq(sessions.token, hashSessionToken(token))));
   }
 
   clearSessionCookie(c);

@@ -12,12 +12,14 @@ import { HTTPException } from 'hono/http-exception';
 
 import { getDb } from '../db/client.js';
 import { portfolios, brokers, accounts, assets, transactions, holdings } from '../db/schema.js';
-import { eq, and } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { authMiddleware, requireUser } from '../middleware/auth.js';
+import { replayJournal } from '../services/journal-money.js';
 
 const app = new Hono();
 
 const onboardingSchema = z.object({
+  portfolioId: z.string().uuid().optional(),
   portfolioName: z.string().min(1).max(120).default('Minha Carteira'),
   brokerId: z.string().optional(),
   brokerName: z.string().min(1).max(120).optional(),
@@ -68,21 +70,33 @@ app.post(
     const userId = requireUser(c);
     const input = await validateBody(c, onboardingSchema);
     const db = getDb();
+    if (input.firstHolding && !input.brokerId && !input.brokerName) {
+      return c.json({ error: { code: 'BROKER_REQUIRED', message: 'Broker required for first holding' } }, 400);
+    }
+    // Validate shared catalog references before any write; the transaction also
+    // protects the entire bootstrap from later account/journal write failures.
+    if (input.brokerId && typeof db.transaction === 'function') {
+      const [broker] = await db.select({ id: brokers.id }).from(brokers).where(eq(brokers.id, input.brokerId)).limit(1);
+      if (!broker) return c.json({ error: { code: 'INVALID_BROKER', message: 'Broker not found' } }, 400);
+    }
 
-    // Create default portfolio
-    const portfolioId = crypto.randomUUID();
-    const portfolioName = input.portfolioName ?? 'Minha Carteira';
-    const [portfolio] = await db
-      .insert(portfolios)
-      .values({
-        id: portfolioId,
-        userId,
-        name: portfolioName,
-        isDefault: true,
-        currency: 'BRL',
-      })
-      .returning();
+    type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+    const bootstrap = async (tx: Tx) => {
+    const db = tx;
 
+    // Reuse an existing owner portfolio without changing its attributes, or
+    // create the default portfolio for a new user's first bootstrap.
+    const portfolioId = input.portfolioId ?? crypto.randomUUID();
+    const [portfolio] = input.portfolioId
+      ? await db.select({ id: portfolios.id }).from(portfolios).where(and(
+        eq(portfolios.id, portfolioId), eq(portfolios.userId, userId),
+      )).limit(1)
+      : await db.insert(portfolios).values({
+        id: portfolioId, userId, name: input.portfolioName ?? 'Minha Carteira',
+        isDefault: true, currency: 'BRL',
+      }).returning();
+
+    if (!portfolio && input.portfolioId) throw new Error('PORTFOLIO_NOT_FOUND');
     if (!portfolio) {
       throw new Error('Failed to create portfolio');
     }
@@ -97,10 +111,7 @@ app.post(
         // Verify broker exists
         const [broker] = await db.select({ id: brokers.id }).from(brokers).where(eq(brokers.id, brokerId)).limit(1);
         if (!broker) {
-          return c.json(
-            { error: { code: 'INVALID_BROKER', message: 'Broker not found' } },
-            400,
-          );
+          throw new Error('INVALID_BROKER');
         }
       } else {
         // Create new broker (custom)
@@ -125,12 +136,17 @@ app.post(
       });
     }
 
-    // If first holding provided, create asset + transaction + holding (journal-driven)
+    // The first holding is a replay of the initial journal event, not independent arithmetic.
     if (input.firstHolding && accountId) {
       const { assetSymbol, assetName, assetClass, qty, unitPriceCents, feeCents = 0, date } = input.firstHolding;
 
       // Find or create asset
-      let [asset] = await db.select({ id: assets.id }).from(assets).where(eq(assets.symbol, assetSymbol)).limit(1);
+      // assets.currency is NOT NULL in PostgreSQL, so this comparison yields a
+      // non-null boolean for every stored currency (including EUR or USD).
+      let [asset] = await db.select({
+        id: assets.id,
+        requiresHistoricalFx: sql<boolean>`${assets.currency} <> 'BRL'`,
+      }).from(assets).where(eq(assets.symbol, assetSymbol)).limit(1);
 
       if (!asset) {
         const assetId = crypto.randomUUID();
@@ -141,10 +157,18 @@ app.post(
           class: assetClass,
           currency: 'BRL',
         });
-        asset = { id: assetId };
+        asset = { id: assetId, requiresHistoricalFx: false };
       }
 
-      // Create transaction (journal entry - ADR-005)
+      // The bootstrap contract has no historical FX input. Do not silently
+      // book an existing USD asset as BRL or invent a historical exchange rate.
+      if (asset.requiresHistoricalFx) throw new Error('ONBOARDING_FX_REQUIRED');
+
+      const event = {
+        type: 'buy' as const, date: new Date(date), qty: BigInt(qty),
+        unitPriceCents: BigInt(unitPriceCents), feeCents: BigInt(feeCents),
+        currency: 'BRL', fxRateToBRL: null, factor: null, amortRateCents: null,
+      };
       const transactionId = crypto.randomUUID();
       await db.insert(transactions).values({
         id: transactionId,
@@ -152,53 +176,41 @@ app.post(
         portfolioId,
         accountId,
         assetId: asset.id,
-        type: 'buy',
-        date: new Date(date),
-        qty: BigInt(qty),
-        unitPriceCents: BigInt(unitPriceCents),
-        feeCents: BigInt(feeCents),
+        type: event.type,
+        date: event.date,
+        qty: event.qty,
+        unitPriceCents: event.unitPriceCents,
+        feeCents: event.feeCents,
+        currency: event.currency,
         source: 'onboarding',
       });
 
-      // Create/update holding (materialized view)
-      const costBasisCents = BigInt(qty) * BigInt(unitPriceCents) + BigInt(feeCents);
-      const avgPriceCents = costBasisCents / BigInt(qty);
-
-      const [existingHolding] = await db
-        .select()
-        .from(holdings)
-        .where(and(eq(holdings.accountId, accountId), eq(holdings.assetId, asset.id)))
-        .limit(1);
-
-      if (existingHolding) {
-        const newQty = existingHolding.qty + BigInt(qty);
-        const newCostBasis = existingHolding.costBasisCents + costBasisCents;
-        const newAvgPrice = newCostBasis / newQty;
-
-        await db
-          .update(holdings)
-          .set({
-            qty: newQty,
-            avgPriceCents: newAvgPrice,
-            costBasisCents: newCostBasis,
-            updatedAt: new Date(),
-          })
-          .where(eq(holdings.id, existingHolding.id));
-      } else {
-        await db.insert(holdings).values({
-          id: crypto.randomUUID(),
-          userId,
-          accountId,
-          assetId: asset.id,
-          qty: BigInt(qty),
-          avgPriceCents,
-          costBasisCents,
-          realizedPnlCents: 0n,
-        });
-      }
+      const holding = replayJournal([event]);
+      await db.insert(holdings).values({
+        id: crypto.randomUUID(), userId, accountId, assetId: asset.id,
+        qty: holding.qty, avgPriceCents: holding.avgPriceCents,
+        costBasisCents: holding.costBasisCents, realizedPnlCents: holding.realizedPnlCents,
+      });
     }
 
-    return c.json({ portfolioId: portfolio.id, accountId }, 201);
+    return { portfolioId: portfolio.id, accountId };
+    };
+    try {
+      const created = typeof db.transaction === 'function'
+        ? await db.transaction(bootstrap) : await bootstrap(db as unknown as Tx);
+      return c.json(created, 201);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'PORTFOLIO_NOT_FOUND') {
+        return c.json({ error: { code: 'NOT_FOUND', message: 'Portfolio not found' } }, 404);
+      }
+      if (error instanceof Error && error.message === 'INVALID_BROKER') {
+        return c.json({ error: { code: 'INVALID_BROKER', message: 'Broker not found' } }, 400);
+      }
+      if (error instanceof Error && error.message === 'ONBOARDING_FX_REQUIRED') {
+        return c.json({ error: { code: 'FX_REQUIRED', message: 'Non-BRL first holding requires a historical FX rate; use the transaction endpoint' } }, 400);
+      }
+      throw error;
+    }
   },
 );
 

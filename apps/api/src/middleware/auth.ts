@@ -42,7 +42,7 @@ export async function authMiddleware(c: Context, next: Next): Promise<Response |
 
   // Check session exists in DB and is not expired (revocation check)
   const session = await sessionRepository.findByToken(token);
-  if (!session || session.expiresAt < new Date()) {
+  if (!session || session.expiresAt <= new Date()) {
     return c.json(
       { error: { code: 'UNAUTHORIZED', message: 'Session expired or revoked' } },
       401,
@@ -85,7 +85,7 @@ export async function optionalUser(c: Context, next: Next): Promise<void> {
       const sessionPayload = verifySessionToken(token);
       if (sessionPayload) {
         const session = await sessionRepository.findByToken(token);
-        if (session && session.expiresAt >= new Date()) {
+        if (session && session.expiresAt > new Date()) {
           c.set(USER_ID_CONTEXT_KEY, sessionPayload.userId);
         }
       }
