@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { JournalTable } from '@/components/tables/JournalTable';
 import { journalApi, errorText } from '@/lib/journal';
 import { typeLabels } from '@/lib/journal-format';
@@ -40,6 +40,7 @@ export default function TransactionsPage() {
   const query = useQuery({ queryKey: ['transactions', params.toString()], queryFn: () => journalApi.transactions(params) });
   const symbolMap = Object.fromEntries((catalog.data ?? []).map((a) => [a.id, a]));
   return <div className="space-y-5"><div className="flex justify-between"><h1 className="font-display text-2xl font-bold">Transações</h1><div className="sm:hidden"><PortfolioSelector /></div></div>
+    <Link to="/transactions/import" className="inline-block rounded-lg bg-primary px-4 py-2 text-sm text-white">Importar transações ou nota</Link>
     <div className="flex flex-wrap gap-3">
       <label className="text-sm">Conta <select className={input} value={eligibleAccountId} onChange={(e) => { setAccountId(e.target.value); setPage(1); }}><option value="">Todas</option>{accounts.data?.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}</select></label>
       {accounts.isError && <p role="alert">{errorText(accounts.error)}</p>}
