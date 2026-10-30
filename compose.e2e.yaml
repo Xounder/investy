@@ -1,0 +1,48 @@
+name: investy-local-e2e
+services:
+  postgres-e2e:
+    image: postgres:16-alpine
+    env_file: .env.e2e.postgres.local
+    environment:
+      POSTGRES_USER: investy_e2e
+      POSTGRES_DB: investy_e2e
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - e2e_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U investy_e2e -d investy_e2e"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate-e2e:
+    profiles: [browser]
+    build:
+      context: .
+      target: e2e
+    volumes:
+      - ./.env.e2e.local:/run/investy/e2e.env:ro
+    command: ["node", "/app/docker/run-e2e.js", "migrate"]
+    depends_on:
+      postgres-e2e:
+        condition: service_healthy
+    restart: "no"
+  browser-e2e:
+    profiles: [browser]
+    build:
+      context: .
+      target: e2e
+    volumes:
+      - ./.env.e2e.local:/run/investy/e2e.env:ro
+      - e2e_test_results:/app/apps/web/test-results
+      - e2e_playwright_report:/app/apps/web/playwright-report
+    command: ["node", "/app/docker/run-e2e.js", "test"]
+    shm_size: 1gb
+    init: true
+    depends_on:
+      migrate-e2e:
+        condition: service_completed_successfully
+volumes:
+  e2e_postgres_data:
+  e2e_test_results:
+  e2e_playwright_report:

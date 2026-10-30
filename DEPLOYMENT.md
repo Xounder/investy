@@ -1,5 +1,6 @@
 # Deployment and verification
 
+For the isolated, Docker-first **local** application stack, see `DOCKER.md`.
 
 Deploy the React web build and Hono API on the same origin (reverse-proxy
 `/api` to the API; SPA fallback serves `index.html`). Set `APP_ORIGIN` to the

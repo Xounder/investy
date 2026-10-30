@@ -18,6 +18,7 @@ import exportRoutes from './routes/export.js';
 import settingsRoutes from './routes/settings.js';
 import dividendRoutes from './routes/dividends.js';
 import reportRoutes from './routes/reports.js';
+import { readiness } from './routes/ready.js';
 
 /**
  * Investy REST API (M3 — TASK-04).
@@ -57,6 +58,7 @@ app.use('*', cors({
 
 // Health check (no auth)
 app.get('/api/health', (c) => c.json({ status: 'ok' }));
+app.get('/api/ready', readiness);
 
 // Auth routes (mounted under /api/v1/auth)
 app.route('/api/v1/auth', authRoutes);
