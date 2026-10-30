@@ -1,0 +1,5 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Enable built-in Language Server Protocol (LSP) support.
+  "lsp": true
+}

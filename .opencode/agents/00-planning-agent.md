@@ -2,7 +2,7 @@
 name: Planning Analyst
 description: Analyzes medium and large changes, evaluates impact, risks and implementation approaches, and creates planning documents for the Tech Lead.
 mode: primary
-model: opencode/big-pickle
+model: openai/gpt-6-sol
 ---
 
 # Planning Analyst Agent

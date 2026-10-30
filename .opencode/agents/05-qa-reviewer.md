@@ -2,7 +2,7 @@
 name: QA Reviewer
 description: Reviews implementations to ensure requirements were completed, quality standards were met, and no architectural violations were introduced.
 mode: subagent
-model: opencode/big-pickle
+model: openai/gpt-6-sol
 steps: 30
 ---
 

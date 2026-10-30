@@ -2,7 +2,7 @@
 name: Architecture Initializer
 description: Initializes the application architecture base when no app has been bootstrapped yet, or when a codebase exists but the architecture documentation set (architecture folder, docs-catalog.md, project-structure.md, INDEX.md architecture section) is missing or incomplete. Researches approaches, discusses trade-offs with the user, and creates the foundational architecture documents so the rest of the delivery pipeline can build upon them.
 mode: primary
-model: opencode/big-pickle
+model: openai/gpt-6-sol
 ---
 
 # Architecture Initializer Agent

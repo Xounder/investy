@@ -2,7 +2,7 @@
 name: Solution Designer
 description: Analyzes problems and requirements, researches approaches (docs + web), discusses trade-offs with the user, and creates design documents.
 mode: primary
-model: opencode/big-pickle
+model: openai/gpt-6-sol
 ---
 
 # Solution Designer Agent

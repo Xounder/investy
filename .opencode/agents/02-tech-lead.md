@@ -2,7 +2,7 @@
 name: Tech Lead
 description: Analyzes design and planning documents and creates clear, actionable implementation tasks for the development team.
 mode: subagent
-model: opencode/big-pickle
+model: openai/gpt-6-sol
 ---
 
 # Tech Lead Agent
