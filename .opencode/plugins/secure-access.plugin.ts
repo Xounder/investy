@@ -24,9 +24,14 @@ interface CommandRule {
 
 // --- Utilities ---
 
+const stripQuotedSegments = (cmd: string): string => cmd.replace(/(['"])(?:(?!\1|\\).|\\.)*\1/g, "")
+
+// "2>&1" e "&>" duplicam descritor de saída, não encadeiam comandos
+const stripFdDuplication = (cmd: string): string => cmd.replace(/&?\d?>&?\d?/g, "")
+
 const hasChaining = (cmd: string): boolean => {
-  const noQuotes = cmd.replace(/(['"])(?:(?!\1|\\).|\\.)*\1/g, "")
-  return /&&|\|\||;|\||`|\$\(|\$\{|\n|\r|%0A|%0D/.test(noQuotes)
+  const noQuotes = stripQuotedSegments(cmd)
+  return /&&|\|\||;|\||&|`|\$\(|\$\{|\n|\r|%0A|%0D/.test(stripFdDuplication(noQuotes))
 }
 
 const safeRealPath = (target: string): string | null => {
@@ -96,6 +101,179 @@ const classifyArg = (token: string): ClassifiedArg => {
   return { value: token, type: "path" }
 }
 
+// --- Scope extraction (comandos de leitura e argumentos de path do git) ---
+
+// "." e "" apontam para a pasta atual, que está dentro do escopo
+export const isCurrentDirToken = (token: string): boolean => token === "." || token === ""
+
+// Flags como "/F" não são paths, mas "/etc/passwd", "/" e UNC são caminhos absolutos
+export const isPathLikeArg = (token: string): boolean => {
+  const value = stripQuotes(token)
+  if (classifyArg(value).type !== "flag") return true
+  if (value === "/" || /^\\\\/.test(value)) return true
+  return /^\//.test(value) && /[\\/]/.test(value.slice(1))
+}
+
+// Flags cujo valor seguinte é texto livre (mensagem de commit), não caminho
+const freeTextValueFlags = new Set(["-m", "--message"])
+
+export const collectPathArgs = (tokens: string[]): string[] => {
+  const paths: string[] = []
+  for (let i = 0; i < tokens.length; i++) {
+    const token = stripQuotes(tokens[i])
+    if (freeTextValueFlags.has(token)) {
+      i++
+      continue
+    }
+    if (isPathLikeArg(token)) paths.push(token)
+  }
+  return paths
+}
+
+// Comandos de leitura que devem respeitar o escopo da pasta atual
+export const readCommandTypes = new Set(["cat", "type", "ls", "get-content", "get-childitem", "test-path"])
+
+// --- Redirecionamento, payloads entre aspas e comandos bloqueados ---
+
+// Metadados de redirecionamento: > >> < 2> 2>> &>
+const redirectPattern = /(?:^|[\s|(&])(?:\d|&)?(>>?|<<?)\s*("[^"]*"|'[^']*'|\S+)/g
+
+export const extractRedirectTargets = (cmd: string): string[] => {
+  const targets: string[] = []
+  for (const match of cmd.matchAll(redirectPattern)) {
+    const target = stripQuotes(match[2])
+    // "&1" é duplicação de descritor (ex.: 2>&1), não um caminho
+    if (!target || target.startsWith("&")) continue
+    targets.push(target)
+  }
+  return targets
+}
+
+// Caminho absoluto (Windows/UNC) ou travessia ".." escondida dentro de um payload entre aspas
+const embeddedPathPattern = /[A-Za-z]:\\[^\s"'`]+|\\\\[^\s"'`]+|(?:^|[\s"'`=])\.\.[\\/][^\s"'`]*/g
+const rootSlashPattern = /(^|[\s"'`])\/(?=[\s"'`]|$)/g
+
+// Valores de flags de texto livre (mensagem de commit) não são caminhos
+const freeTextValuePattern = /(?:^|\s)(?:-m|--message)(?:=|\s+)("[^"]*"|'[^']*'|\S+)/g
+
+export const stripFreeTextValues = (cmd: string): string => cmd.replace(freeTextValuePattern, " ")
+
+export const extractEmbeddedPaths = (cmd: string): string[] => {
+  const paths: string[] = []
+  const scannable = stripFreeTextValues(cmd)
+  for (const match of scannable.matchAll(embeddedPathPattern)) {
+    paths.push(match[0].replace(/^[\s"'`=]+/, ""))
+  }
+  for (const _ of scannable.matchAll(rootSlashPattern)) {
+    paths.push("/")
+  }
+  return paths
+}
+
+// Download de payloads, execução remota e mutação do estado do sistema
+export const blockedCommandTypes = new Set([
+  "wget",
+  "iwr",
+  "irm",
+  "iex",
+  "invoke-webrequest",
+  "invoke-restmethod",
+  "invoke-expression",
+  "invoke-command",
+  "start-bitstransfer",
+  "bitsadmin",
+  "certutil",
+  "mshta",
+  "rundll32",
+  "regsvr32",
+  "scp",
+  "reg",
+  "net",
+  "netsh",
+  "sc",
+  "taskkill",
+  "stop-process",
+  "start-process",
+  "set-service",
+  "restart-service",
+  "new-service",
+  "remove-service",
+  "takeown",
+  "icacls",
+  "attrib",
+  "cipher",
+  "bcdedit",
+  "diskpart",
+  "format",
+  "shutdown",
+  "restart-computer",
+  "stop-computer",
+  "clear-eventlog",
+  "wevtutil",
+])
+
+// Comandos que executam scripts/builds: os paths passados também respeitam o escopo.
+// "pnpm-pw-check" fica de fora: a regra já permite exatamente um caminho irmão do monorepo.
+export const scopedRunnerTypes = new Set([
+  "npx-playwright",
+  "vitest-run",
+  "pnpm-run",
+  "pnpm-exec",
+])
+
+// Tipos em que o scan de paths embutidos não se aplica:
+// "echo" apenas imprime texto; "pnpm-pw-check" permite um caminho irmão do monorepo por regra
+const embeddedScanExemptTypes = new Set(["echo", "pnpm-pw-check"])
+
+// Interpretadores com código inline (-c/-e/--eval) são shell disfarçado: o conteúdo não é inspecionável
+const inlineEvalTypes = new Set([
+  "bash",
+  "sh",
+  "zsh",
+  "pwsh",
+  "powershell",
+  "cmd",
+  "python",
+  "python3",
+  "py",
+  "ruby",
+  "perl",
+  "osascript",
+  "wscript",
+  "cscript",
+  "node",
+])
+
+const inlineEvalFlags = new Set(["-c", "-e", "--eval", "/c", "/k", "-command", "-encodedcommand"])
+
+// Normaliza o executável: remove aspas, diretório e extensão (.\wget.exe -> wget)
+export const baseCommandName = (token: string): string => {
+  const value = stripQuotes(token)
+  const base = value.split(/[\\/]/).pop() ?? ""
+  return base.replace(/\.(exe|cmd|bat|ps1|com)$/i, "").toLowerCase()
+}
+
+// npx/pnpx/bunx/dlx e `pnpm|npm exec` executam outro comando: o nome real está adiante
+const launcherTypes = new Set(["npx", "pnpx", "bunx", "bun", "dlx", "yarn", "yarnpkg"])
+const execWrapperSubcommands = new Set(["exec", "dlx"])
+
+export const resolveCommandSlice = (tokens: string[]): string[] => {
+  if (tokens.length === 0) return tokens
+  const name = baseCommandName(tokens[0])
+  if (launcherTypes.has(name)) return tokens.slice(1)
+  if ((name === "pnpm" || name === "npm") && execWrapperSubcommands.has((tokens[1] ?? "").toLowerCase())) {
+    return tokens.slice(2)
+  }
+  return tokens
+}
+
+export const hasInlineEval = (tokens: string[]): boolean => {
+  const resolved = resolveCommandSlice(tokens)
+  const commandType = resolved.length > 0 ? baseCommandName(resolved[0]) : ""
+  if (!inlineEvalTypes.has(commandType)) return false
+  return resolved.slice(1).some((t) => inlineEvalFlags.has(t.toLowerCase()))
+}
+
 // --- Git semantic validation (Fase 29) ---
 
 const gitHandlers: Record<string, (classified: ClassifiedArg[]) => boolean> = {
@@ -111,7 +289,7 @@ const gitHandlers: Record<string, (classified: ClassifiedArg[]) => boolean> = {
   checkout: (c) => c.some(a => a.type !== "flag"),
   restore: (c) => c.some(a => a.type === "path"),
   push: (c) => !c.some(a => a.value.includes("--exec")),
-  pull: (c) => !c.some(a => a.value.includes("--upload-pack")),
+  pull: () => false,
   branch: () => true,
   fetch: () => true,
   merge: (c) => !c.some(a => a.value.includes("--receive-pack")),
@@ -172,6 +350,8 @@ const commandRules: CommandRule[] = [
   { pattern: /^Remove-Item\s+(.+)$/i, type: "remove-item" },
   { pattern: /^Copy-Item\s+(.+)$/i, type: "copy-item" },
   { pattern: /^Move-Item\s+(.+)$/i, type: "move-item" },
+  // cp/mv do shell (git bash) usam a mesma validação de origem/destino
+  { pattern: /^(cp|mv)\s+(.+)$/i, type: "copy-item" },
   { pattern: /^Set-Content\s+(.+)$/i, type: "set-content" },
   { pattern: /^New-Item\s+(.+)$/i, type: "new-item" },
   { pattern: /^cat\s+\S+$/i, type: "cat" },
@@ -255,6 +435,18 @@ type PathValidator = ReturnType<typeof createPathValidator>
 export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
   const isPathInsideProject = createPathValidator(directory)
 
+  const scopeError = (detail: string): Error =>
+    new Error(
+      `[secure-access] Não permitido: esta ação é restrita ao escopo da pasta atual: ${directory}\n${detail}`
+    )
+
+  // allowCurrentDir: "." representa a pasta atual (ex.: git add ., ls .)
+  const assertInScope = (target: string, detail: string, allowCurrentDir = false): void => {
+    if (!target) return
+    if (allowCurrentDir && isCurrentDirToken(target)) return
+    if (!isPathInsideProject(target)) throw scopeError(detail)
+  }
+
   const fileToolArgs: Record<string, string[]> = {
     read: ["filePath", "path"],
     write: ["filePath", "path"],
@@ -275,11 +467,7 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
             if ((input.tool === "glob" || input.tool === "grep") && (val.includes("..") || val.startsWith("/"))) {
               throw new Error(`[secure-access] Blocked invalid ${input.tool} path:\n${val}`)
             }
-            if (!isPathInsideProject(val)) {
-              throw new Error(
-                `[secure-access] Blocked ${input.tool} outside project:\n${val}`
-              )
-            }
+            assertInScope(val, `Ferramenta: ${input.tool}\nCaminho: ${val}`, true)
           }
         }
       }
@@ -288,6 +476,7 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
 
       const command = (args.command as string ?? "").trim()
       if (!command) return
+      const detail = `Comando: ${command}`
 
       // Fase 28: Block chaining (with quote-aware detection)
       if (hasChaining(command)) {
@@ -313,8 +502,33 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
 
       // Parse command
       const parsed = parseCommand(normalized)
+      const tokens = tokenize(normalized)
+
+      // Comandos fora da allowlist: download, shells aninhadas e estado do sistema.
+// Só vale quando nenhuma regra os autorizou (regras estreitas como "taskkill /IM node.exe" seguem válidas).
+if (!parsed) {
+        const resolved = resolveCommandSlice(tokens)
+        const rawType = resolved.length > 0 ? baseCommandName(resolved[0]) : ""
+        if (blockedCommandTypes.has(rawType)) {
+          throw new Error(`[secure-access] Blocked command: ${rawType}\n${command}`)
+        }
+
+        if (hasInlineEval(tokens)) {
+          throw new Error(`[secure-access] Blocked inline code execution: ${command}`)
+        }
+      }
+
+      // Paths escondidos dentro de payloads entre aspas (ex.: powershell -c "Get-Content C:\...")
+      if (!embeddedScanExemptTypes.has(parsed?.type ?? "")) {
+        for (const p of extractEmbeddedPaths(normalized)) assertInScope(p, detail)
+      }
+
+      // Redirecionamento de saída escreve fora do escopo se o alvo estiver fora
+      for (const target of extractRedirectTargets(normalized)) assertInScope(target, detail)
+
       if (!parsed) {
-        throw new Error(`[secure-access] Blocked undocumented command:\n${command}`)
+        for (const p of collectPathArgs(tokens)) assertInScope(p, detail)
+        return
       }
 
       // --- Validators per type ---
@@ -324,33 +538,37 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
         return
       }
 
+      // Leitura de arquivos e paths do git também respeitam o escopo da pasta atual
+      if (readCommandTypes.has(parsed.type) || parsed.type === "git") {
+        for (const p of collectPathArgs(tokens)) assertInScope(p, detail, true)
+      }
+
+      // npx/vitest/pnpm run|exec: paths passados ao script também respeitam o escopo
+      if (scopedRunnerTypes.has(parsed.type)) {
+        for (const p of collectPathArgs(tokens)) assertInScope(p, detail, true)
+      }
+
       // Fase 27: node/tsx – validate script path, extension, and existence
       if (parsed.type === "exec") {
-        const resolveScript = (base: string) => {
-          const fullPath = resolve(directory, base, parsed.args[1])
+        const scriptArg = parsed.args[1]
+        const resolveScript = (base?: string) => {
+          const root = typeof base === "string" && base.length > 0 ? base : directory
+          const fullPath = resolve(directory, root, scriptArg)
           if (existsSync(fullPath)) return safeRealPath(fullPath)
           return null
         }
-        const real = resolveScript(directory) ?? resolveScript(args.workdir as string)
+        const workdir = typeof args.workdir === "string" ? args.workdir : undefined
+        const real = resolveScript(directory) ?? resolveScript(workdir)
         if (!real) {
           // File not found via directory or workdir; validate the path is within project boundary
-          const scriptPath = resolve(directory, parsed.args[1])
-          if (!isPathInsideProject(scriptPath)) {
+          assertInScope(resolve(directory, scriptArg), detail)
+          if (/\.(exe|com|bat|ps1|sh|dll)$/i.test(scriptArg)) {
             throw new Error(
-              `[secure-access] Blocked ${parsed.args[0]} outside project:\n${parsed.args[1]}`
-            )
-          }
-          if (/\.(exe|com|bat|ps1|sh|dll)$/i.test(parsed.args[1])) {
-            throw new Error(
-              `[secure-access] Blocked ${parsed.args[0]} with dangerous extension:\n${parsed.args[1]}`
+              `[secure-access] Blocked ${parsed.args[0]} with dangerous extension:\n${scriptArg}`
             )
           }
         } else {
-          if (!isPathInsideProject(real)) {
-            throw new Error(
-              `[secure-access] Blocked ${parsed.args[0]} outside project:\n${parsed.args[1]}`
-            )
-          }
+          assertInScope(real, detail)
           if (!/\.(ts|js|tsx|mjs|cjs)$/i.test(real)) {
             throw new Error(
               `[secure-access] Blocked ${parsed.args[0]} with invalid extension:\n${real}`
@@ -360,87 +578,36 @@ export const SecureAccessPlugin: Plugin = async ({ project, client, $, directory
       }
 
       if (parsed.type === "cd") {
-        const target = parsed.args[0]
-        if (!isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked cd outside project:\n${target}`)
-        }
+        assertInScope(parsed.args[0], detail)
       }
 
       if (parsed.type === "rm") {
         const target = parsed.args[1] ?? parsed.args[0]
-        if (target && target !== "node_modules" && !isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked rm outside project:\n${command}`)
-        }
+        if (target && target !== "node_modules") assertInScope(target, detail)
       }
 
       if (parsed.type === "del") {
-        const target = parsed.args[1] ?? parsed.args[0]
-        if (target && !isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked del outside project:\n${command}`)
-        }
+        assertInScope(parsed.args[1] ?? parsed.args[0], detail)
       }
 
       if (parsed.type === "remove-item") {
-        const tokens = tokenize(parsed.args[0])
-        const paths = tokens
-          .map(classifyArg)
-          .filter(a => a.type === "path")
-          .map(a => stripQuotes(a.value))
-        for (const p of paths) {
-          if (!isPathInsideProject(p)) {
-            throw new Error(`[secure-access] Blocked Remove-Item outside project:\n${command}`)
-          }
-        }
+        for (const p of collectPathArgs(tokenize(parsed.args[0]))) assertInScope(p, detail)
       }
 
       if (parsed.type === "mkdir") {
-        const target = parsed.args[1] ?? parsed.args[0]
-        if (target && !isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked mkdir outside project:\n${target}`)
-        }
+        assertInScope(parsed.args[1] ?? parsed.args[0], detail)
       }
 
-      // Fase 26: Copy-Item / Move-Item – positional parsing
+      // Fase 26: Copy-Item / Move-Item – source and destination
       if (parsed.type === "copy-item" || parsed.type === "move-item") {
-        const tokens = tokenize(parsed.args[0])
-        const paths = tokens
-          .map(classifyArg)
-          .filter(a => a.type === "path")
-          .map(a => stripQuotes(a.value))
-        if (paths.length > 0 && !isPathInsideProject(paths[0])) {
-          throw new Error(
-            `[secure-access] Blocked ${parsed.type} targeting outside project:\n${command}`
-          )
-        }
-        if (paths.length > 1 && !isPathInsideProject(paths[1])) {
-          throw new Error(
-            `[secure-access] Blocked ${parsed.type} targeting outside project:\n${command}`
-          )
-        }
+        const paths = collectPathArgs(tokenize(parsed.args[0]))
+        for (const p of paths.slice(0, 2)) assertInScope(p, detail)
       }
 
-      // Fase 25 + 42: Set-Content – only first path-classified arg is target
-      if (parsed.type === "set-content") {
-        const tokens = tokenize(parsed.args[0])
-        const target = tokens
-          .map(classifyArg)
-          .filter(a => a.type === "path")
-          .map(a => stripQuotes(a.value))[0]
-        if (target && !isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked Set-Content outside project:\n${command}`)
-        }
-      }
-
-      // Fase 25 + 42: New-Item – only first path-classified arg is target
-      if (parsed.type === "new-item") {
-        const tokens = tokenize(parsed.args[0])
-        const target = tokens
-          .map(classifyArg)
-          .filter(a => a.type === "path")
-          .map(a => stripQuotes(a.value))[0]
-        if (target && !isPathInsideProject(target)) {
-          throw new Error(`[secure-access] Blocked New-Item outside project:\n${command}`)
-        }
+      // Fase 25 + 42: Set-Content / New-Item – only first path-classified arg is target
+      if (parsed.type === "set-content" || parsed.type === "new-item") {
+        const target = collectPathArgs(tokenize(parsed.args[0]))[0]
+        assertInScope(target, detail)
       }
     }
   }
@@ -544,6 +711,135 @@ export function runPluginTests(): TestResult[] {
 
   test("blocks root path", () => {
     if (validator("C:\\")) throw new Error("should block root path")
+  })
+
+  // --- Scope extraction (read commands + git path args) ---
+
+  test("treats the current folder marker as in scope", () => {
+    if (!isCurrentDirToken(".")) throw new Error("'.' should be the current folder")
+    if (isCurrentDirToken("..")) throw new Error("'..' must not be the current folder")
+  })
+
+  test("collectPathArgs keeps relative paths", () => {
+    const r = collectPathArgs(tokenize("cat src/file.ts"))
+    if (!r.includes("src/file.ts")) throw new Error("should collect relative path")
+  })
+
+  test("collectPathArgs treats slash absolute paths as paths", () => {
+    const r = collectPathArgs(["cat", "/etc/passwd"])
+    if (!r.includes("/etc/passwd")) throw new Error("should collect /etc/passwd")
+  })
+
+  test("collectPathArgs ignores single-segment slash flags", () => {
+    const r = collectPathArgs(["taskkill", "/F", "/IM", "node.exe"])
+    if (r.includes("/F") || r.includes("/IM")) throw new Error("slash flags are not paths")
+    if (!r.includes("node.exe")) throw new Error("should keep node.exe")
+  })
+
+  test("collectPathArgs keeps glob patterns", () => {
+    const r = collectPathArgs(tokenize("rm -rf src/**/*.ts"))
+    if (!r.includes("src/**/*.ts")) throw new Error("should keep pattern")
+  })
+
+  test("collectPathArgs skips the commit message value", () => {
+    const r = collectPathArgs(tokenize("git commit -m 'handle C:\\Windows paths'"))
+    if (r.includes("handle C:\\Windows paths")) throw new Error("commit message must not be a path")
+  })
+
+  test("read command types are scope validated", () => {
+    for (const t of ["cat", "type", "ls", "get-content", "get-childitem", "test-path"]) {
+      if (!readCommandTypes.has(t)) throw new Error(`${t} should be scope validated`)
+    }
+  })
+
+  test("collectPathArgs finds out-of-scope read targets", () => {
+    const r = collectPathArgs(tokenize("cat C:\\Windows\\System32\\drivers\\etc\\hosts"))
+    if (!r.some(p => !validator(p))) throw new Error("system path should be out of scope")
+  })
+
+  test("collectPathArgs finds out-of-scope git targets", () => {
+    const r = collectPathArgs(tokenize("git add ../../outside/file.ts"))
+    if (!r.some(p => !validator(p))) throw new Error("git path outside scope should be detected")
+  })
+
+  test("collectPathArgs keeps current folder and project refs", () => {
+    const a = collectPathArgs(tokenize("ls ."))
+    if (!a.includes(".")) throw new Error("should keep '.'")
+    const b = collectPathArgs(tokenize("git checkout main"))
+    if (b.some(p => !validator(p))) throw new Error("branch names must stay in scope")
+  })
+
+  // --- Redirect / quoted payloads / blocked commands ---
+
+  test("extracts redirect targets", () => {
+    if (!extractRedirectTargets("echo hi > out.txt").includes("out.txt")) throw new Error("should find >")
+    if (!extractRedirectTargets("cmd 2> err.log").includes("err.log")) throw new Error("should find 2>")
+    if (extractRedirectTargets("npm run build 2>&1").length !== 0) throw new Error("2>&1 is not a path")
+  })
+
+  test("redirect targets respect the project scope", () => {
+    const r = extractRedirectTargets("echo hi > C:\\outside.txt")
+    if (!r.some(p => !validator(p))) throw new Error("outside redirect should be detected")
+  })
+
+  test("finds paths hidden in quoted payloads", () => {
+    const r = extractEmbeddedPaths('powershell -c "Get-Content C:\\Windows\\win.ini"')
+    if (!r.includes("C:\\Windows\\win.ini")) throw new Error("should find absolute path")
+    if (!extractEmbeddedPaths('bash -c "rm -rf /"').includes("/")) throw new Error("should find root slash")
+    if (extractEmbeddedPaths("npx playwright test tests/e2e/login.spec.ts").length !== 0) {
+      throw new Error("relative paths are not embedded findings")
+    }
+  })
+
+  test("commit message is not scanned as a path", () => {
+    const r = extractEmbeddedPaths("git commit -m 'fix: handle C:\\Windows paths'")
+    if (r.length !== 0) throw new Error("free text value must be ignored")
+  })
+
+  test("blocks payload downloaders and system mutation", () => {
+    for (const t of ["wget", "certutil", "invoke-webrequest", "reg", "net", "taskkill", "stop-process"]) {
+      if (!blockedCommandTypes.has(t)) throw new Error(`${t} should be blocked`)
+    }
+    for (const t of ["curl", "git", "echo", "npm"]) {
+      if (blockedCommandTypes.has(t)) throw new Error(`${t} must stay usable`)
+    }
+  })
+
+  test("flags inline code in interpreters", () => {
+    if (!hasInlineEval(tokenize('bash -c "rm -rf /"'))) throw new Error("bash -c should be flagged")
+    if (!hasInlineEval(tokenize('python -c "import os"'))) throw new Error("python -c should be flagged")
+    if (hasInlineEval(tokenize("python scripts/x.py"))) throw new Error("script files are fine")
+  })
+
+  test("normalizes the executable name", () => {
+    if (baseCommandName(".\\wget.exe") !== "wget") throw new Error("path + extension should normalize")
+    if (baseCommandName('"C:\\tools\\python.exe"') !== "python") throw new Error("quoted path should normalize")
+    if (baseCommandName("TaskKill") !== "taskkill") throw new Error("case should normalize")
+  })
+
+  test("sees through launcher prefixes", () => {
+    if (!hasInlineEval(tokenize('npx python -c "import os"'))) throw new Error("npx prefix should not hide -c")
+    if (!hasInlineEval(tokenize('pnpm exec python -c "import os"'))) throw new Error("pnpm exec should not hide -c")
+    if (hasInlineEval(tokenize("npx tsc --noEmit"))) throw new Error("normal npx usage is fine")
+    const resolved = resolveCommandSlice(tokenize("pnpm exec python -c x"))
+    if (baseCommandName(resolved[0]) !== "python") throw new Error("should resolve through pnpm exec")
+  })
+
+  test("detects single ampersand chaining but not fd duplication", () => {
+    if (!hasChaining("echo a & echo b")) throw new Error("should detect &")
+    if (hasChaining("npm run build 2>&1")) throw new Error("2>&1 is not chaining")
+    if (hasChaining("npm run build &> out.txt")) throw new Error("&> is not chaining")
+  })
+
+  test("cp/mv are parsed as copy-item", () => {
+    if (!parseCommand("cp src/a.txt src/b.txt")) throw new Error("cp should parse")
+    if (parseCommand("cp src/a.txt src/b.txt")?.type !== "copy-item") throw new Error("cp should be copy-item")
+  })
+
+  test("script runners validate their paths", () => {
+    for (const t of ["npx-playwright", "vitest-run", "pnpm-run", "pnpm-exec"]) {
+      if (!scopedRunnerTypes.has(t)) throw new Error(`${t} should validate paths`)
+    }
   })
 
   // exec validation
