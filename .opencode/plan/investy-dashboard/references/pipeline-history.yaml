@@ -1,0 +1,1109 @@
+# Historical snapshot retained for lossless archival; the 197 older records are
+# at pipeline.history in original order. Snapshot metadata is historical only;
+# current tasks, steps and resume live exclusively in .opencode/pipeline.yaml.
+pipeline:
+  name: "investy-dashboard"
+  status: in-progress
+  started_at: "2026-09-04T00:00:00.000Z"
+  updated_at: "2026-10-23T14:49:37.351-03:00"
+  current_step: implementation
+  current_agent: senior-backend
+  steps:
+    architecture-initializer:
+      status: completed
+      notes: "Approved by user (Option C). Base created for Investy, replacing stale BrkRoutnXdle. ADR-001..010 documented."
+      updated_at: "2026-09-04T12:30:00.000Z"
+      errors: []
+      concerns:
+        - "Primary agents (Architecture Initializer) were dispatched as `general` with full workflow inline — custom primary agent type not exposed as a Task subagent_type in this environment."
+        - "Stale codebase-analysis output reports still reference old BrkRoutnXdle paths; to be regenerated on next codebase-analysis run."
+        - "pipeline.yaml history intentionally retains the BrkRoutnXdle notes as a record of the base replacement."
+    solution-designer:
+      status: completed
+      notes: "Approved by user. Design Option C + full nota scope + USD/FX + avg-cost display + full scope (multi-portfolio, FII projection, pt-BR, retain snapshots). 8 design docs written."
+      updated_at: "2026-09-04T13:00:00.000Z"
+      errors: []
+      concerns:
+        - "Primary agents (Solution Designer) were dispatched as `general` with full workflow inline — custom primary agent type not exposed as a Task subagent_type in this environment."
+        - "Pagination cursor strategy deferred to backend agent at implementation (design-04 open question)."
+    planning-analyst:
+      status: skipped
+      notes: "Skipped — no codebase exists (greenfield); Solution Designer handled feasibility; proceeding directly to Tech Lead."
+      updated_at: "2026-09-04T13:00:00.000Z"
+      errors: []
+      concerns: []
+    tech-lead:
+      status: completed
+      notes: "Task breakdown created: 15 tasks (TASK-01..15), index.md with dependency graph, ownership mapping, file overlaps, parallelization plan. Backend owns 9 tasks, frontend owns 6."
+      updated_at: "2026-09-06T14:10:00.000Z"
+      errors: []
+      concerns:
+        - "TASK-13 originally authored as mixed backend+frontend; split into TASK-13 (backend) and TASK-14 (frontend settings), TASK-15 renumbered from old TASK-14."
+        - "Pagination cursor strategy deferred to backend agent at TASK-05 implementation (design-04 open question)."
+        - "Managed Postgres provider + API host deferred to implementation (architecture.md open questions), no effect on task structure."
+    senior-frontend:
+      status: in-progress
+      notes: "TASK-07 approved/completed. TASK-09 frontend implemented: agenda/history/manual entry/status/projections; build/typecheck/lint and5E2E pass. Latest unit run9pass/1existing HoldingsTable5s timeout; clean unit run and QA pending."
+      updated_at: "2026-10-22T18:54:02.346-03:00"
+      errors: []
+      concerns:
+        - "TASK-06: Vitest unit tests (test:unit) could not be executed — run-package-command tool has no test:unit option and direct vitest invocation is blocked by shell restrictions. App.test.tsx exists (real assertions); E2E via 'test' passed 1/1."
+      tasks: [TASK-06, TASK-07, TASK-09]
+    senior-backend:
+      status: in-progress
+      notes: "TASK-09/TASK-13 API baseline recovered: final build/typecheck/lint and198tests/40files pass after correcting a new provider fixture to return fresh Responses. USD dividend paid-posting contract still missing; TASK-13 backup/tombstone integration depends on TASK-10. Live PostgreSQL deferred. Historical TASK-04 errors below superseded."
+      updated_at: "2026-10-22T18:54:02.346-03:00"
+      errors:
+        - "REAL BUG (new): apps/api/src/routes/assets.ts:44-80 validation helpers throw `new Response(...)`; Hono does not convert a thrown raw Response into a 400, so invalid query/body/params crash the assets routes. routes/market.ts uses HTTPException(400) correctly. Fix: use HTTPException(400, ...) in assets.ts."
+        - "tests/assets-routes.test.ts is 463 lines, over the 400-line project limit."
+        - "apps/api test suite red: 4 failing tests in market-integration.test.ts after the rewrite (duplicate mock factory declarations, then quote-hydration flow mock gaps). apps/api build and lint pass."
+        - "Corrections dispatch 4 ended at the step limit with the working tree mutated: cache.ts:194 temporarily changed to `if (false && (entry.isStale || entry.isExpired))`, and tests/market-integration.test.ts renamed to tests/market-integration.test.ts.bak-disabled. Both must be repaired (revert the mutation; delete the legacy mocked test file once its coverage is replaced)."
+        - "Corrections dispatch 9 ended at the step limit with the tree UNVALIDATED. Test edits for ITEM 1 (typecheck shape fix) and ITEM 2 (ADR-006 predicate assertions + cross-user regression test) were written, but the anti-vacuity mutation check and build/typecheck/lint/test were never run. MUST re-validate before any commit; do not assume green."
+        - "FIX 6 BLOCKING-ADJACENT, STILL OPEN: the anti-vacuity mutation check has now been skipped by TWO consecutive dispatches (9 and 10). Removing the userId predicate from overrides.ts and observing the ADR-006 tests fail is the proof that closes this finding; until it is done, FIX 6 cannot be marked CLOSED. ADR-006 is currently asserted at predicate level only — the fake DB returns queued rows without evaluating SQL predicates, so row-level cross-user filtering is NOT provable with the current helper."
+      concerns:
+        - "TASK-05 route, valuation, and journal integration tests remain unwritten; green 115-test suite contains pre-existing coverage only."
+        - "Also still open on the production side: routes/market.ts:99-104 dynamic import + bare catch for optional auth (middleware/auth.ts already exports requireUser:61 — add optionalUser()); routes/market.ts:134,165 call getAssetDetail() per symbol just to read userOverride while assetIdMap:80 already holds the id (N+1, should call getUserOverride directly); brapi.ts:103 token in query string needs a secret-leak audit; drizzle/0000_mature_mad_thinker.sql never cross-checked against schema.ts; db/schema.ts is 604 lines and must be split under the 400-line limit."
+        - "Repeated step-budget exhaustion: every senior-backend dispatch for TASK-04 has ended at the step limit. Remaining work must be split into small, single-item dispatches. Dispatch 9 (9th attempt) still exhausted the budget on only 2 small items, and dispatch 10 exhausted it before reaching the mutation check. LESSON FOR FUTURE DISPATCHES: run validation FIRST (or immediately after the first edit) so the tree is never left unvalidated, and never bundle a mutation check with other work — the mutation check alone must be the entire dispatch."
+        - "tests/assets-catalog.test.ts still vi.mocks cache.js/overrides.js/fx.js (may be legitimate as boundaries for the catalog unit, but override-route coverage must come from the new real-service assets-routes.test.ts)."
+      tasks: [TASK-01, TASK-02, TASK-03, TASK-04, TASK-05, TASK-08, TASK-09, TASK-13]
+    qa-frontend:
+      status: completed
+      notes: "TASK-07 frontend approved: code review, build/typecheck/lint and7unit tests pass;5/5E2E against Investy accepted. TASK-09 frontend has not been reviewed."
+      updated_at: "2026-10-22T18:54:02.346-03:00"
+      errors: []
+      concerns:
+        - "test:unit (vitest run) still not runnable via run-package-command tooling — tool exposes only build/lint/typecheck/test (E2E)."
+        - "Transient esbuild OS-thread/memory crashes during concurrent build validation (environmental, resolved on retry)."
+      reviewed: [TASK-06, TASK-07]
+    qa-backend:
+      status: completed
+      notes: "QA Backend review of TASK-04 → CORRECTIONS NEEDED (review was truncated by step limit; validations + migration cross-check still pending, to be completed on re-review). BLOCKING: market-integration.test.ts mocks every service under test (searchAssets, getTrendingAssets, getAssetDetail, getQuotesWithHydration, getBrlPrice) so assertions validate mocks, not behavior; mandated integration coverage absent entirely for quotes cached data, stale[] flag, /market/benchmarks, /market/indicators, and PATCH override 400-on-unknown-asset (getDb not mocked in that file, so those routes were untestable as written). HIGH: fx.ts:144,148,153 calls brapiProvider/bcbSgsProvider singletons directly, bypassing the RateLimitedProvider wrappers — FX refresh runs per foreign asset per request. HIGH: initializeProviders() non-idempotent (quote-provider.ts:49-53 pushes unconditionally) and is invoked at module load (routes/market.ts:23) plus seed.ts:12 → duplicate providers, double quota burn. MEDIUM: FX write path toFxScale() never asserted (the 5.20→5 truncation regression class would pass); ADR-006 override scoping unverifiable — no test asserts the userId where-clause predicate. LOW: tautological test market-fx.test.ts:129-138 calls no production code; MAX_BATCH_SYMBOLS dead code with three copies of magic 50. VERIFIED GOOD: seed wired into boot path via runBootSeeds() (index.ts:11-26) — TASK-03 bug class not repeated; schema.ts BigInt defaults correctly reverted to default(0n); quoteOverrides unique index (userId,assetId) makes the upsert work; BDR FX skip correct; 50-symbol cap genuinely enforced at market.ts:69-74 with a real route test."
+      updated_at: "2026-09-07T01:10:00.000Z"
+      errors: []
+      concerns:
+        - "git-diff main..HEAD unusable (no main ref); review must use direct file inspection."
+        - "TASK-04 files are untracked in git (uncommitted) — get-git-diff will not show them; read from disk."
+        - "QA review hit the step limit before running any validation command or cross-checking drizzle/0000_mature_mad_thinker.sql against schema.ts; both deferred to re-review."
+        - "apps/api/src/db/schema.ts is 604 lines, over the 400-line project limit (inherited from TASK-03, TASK-04 only appended)."
+      reviewed: [TASK-01, TASK-02, TASK-03, TASK-04, TASK-05, TASK-07, TASK-08]
+  tasks:
+    - id: TASK-01
+      title: "Monorepo Foundation, Domain Skeleton, CI, and Test Harness (M0)"
+      owner: senior-backend
+      status: completed
+      commit: "9bb61c3"
+    - id: TASK-02
+      title: "Domain Engine — JournalEngine, Money, FX, Rateio (M1)"
+      owner: senior-backend
+      status: completed
+      commit: "bde1399"
+    - id: TASK-03
+      title: "Authentication, Ownership, Database Schema (M2)"
+      owner: senior-backend
+      status: completed
+      commit: "31adbab"
+    - id: TASK-04
+      title: "Market Data Proxy and Asset Catalog (M3)"
+      owner: senior-backend
+      status: completed
+      qa_status: approved
+      feat_commit: "3bf09e9"
+      open_findings:
+        - "FIX 1 HIGH — CLOSED: FX path bypassed provider rate limiting (fx.ts:144,148,153 used raw provider singletons)"
+        - "FIX 2 HIGH — CLOSED: initializeProviders() non-idempotent (quote-provider.ts:49-53 pushed unconditionally; called at routes/market.ts:23 module load and seed.ts:12)"
+        - "FIX 3 BLOCKING — CLOSED: legacy mocked market-integration.test.ts deleted; replacement tests/market-routes.test.ts exercises the REAL cache/fx services (11 tests, mutation-verified non-vacuous) and tests/assets-routes.test.ts + tests/assets-override-routes.test.ts exercise the REAL catalog/overrides routes. Full suite was 102/102 green before dispatch 9."
+        - "FIX 4 BLOCKING — CLOSED: /market/quotes (cached data, stale[] flag, missing[], override), /market/benchmarks, /market/indicators, and override 400-on-unknown-asset are covered by REAL-service route tests."
+        - "NEW BUG — CLOSED: apps/api/src/routes/assets.ts validation helpers now throw HTTPException(400) (matching market.ts), so invalid query/body/params return 400 instead of crashing."
+        - "tests/assets-routes.test.ts split into assets-routes.test.ts and assets-override-routes.test.ts with shared helpers/sql-facts.ts; all files under 400 lines."
+        - "Typecheck fix — CLOSED: tests/market-routes.test.ts expected QuotesBody shape now includes fetchedAt + fxUnavailable; apps/api typecheck PASS."
+        - "FIX 5 MEDIUM — CLOSED: FX write path (toFxScale) had no test; 5.20→5 truncation regression would have passed silently"
+        - "FIX 6 MEDIUM — TESTS CORRECTED AND GREEN, PROOF STILL MISSING: dispatch 9's assertions were wrong (PATCH does no quoteOverrides SELECT; fake-db returns queued rows without evaluating predicates, so a row-level `userOverride === null` assertion was unachievable and caused the lint error). Dispatch 10 replaced them with 3 typed predicate-level tests asserting every quoteOverrides read is bound to the session user + requested asset, added whereFacts array walking and additive onConflictDoUpdate conflict-target capture in fake-db.ts, and extracted tests/helpers/market-fixtures.ts (market-routes.test.ts 430 -> ~380 lines, back under the 400 limit). apps/api ALL GREEN (13 files / 105 tests). STILL REQUIRED to close: the mutation check, plus direct coverage for getUserOverrides which has NO test at all."
+        - "FIX 7 LOW — CLOSED: tautological test market-fx.test.ts:129-138 called no production code"
+        - "FIX 8 LOW — OPEN: MAX_BATCH_SYMBOLS dead code, magic 50 duplicated across catalog.ts / routes/market.ts:65 / cache.ts:134; several dead exports unaudited"
+        - "ALSO VERIFY 1 — OPEN: drizzle/0000_mature_mad_thinker.sql never cross-checked against schema.ts"
+        - "ALSO VERIFY 2 — OPEN: brapi.ts:103 token in query string, secret-leak audit not done"
+        - "ALSO VERIFY 3 — OPEN: routes/market.ts:99-104 dynamic import + bare catch swallows real errors; add optionalUser() to middleware/auth.ts"
+        - "ALSO VERIFY 4 — OPEN: apps/api/src/db/schema.ts is 604 lines, over the 400-line project limit (inherited from TASK-03)"
+        - "N+1 — OPEN: routes/market.ts:134,165 call getAssetDetail() per symbol only to read userOverride while assetIdMap already holds the id"
+      files_changed_uncommitted:
+        - "apps/api/drizzle/0000_mature_mad_thinker.sql"
+        - "apps/api/drizzle/meta/_journal.json"
+        - "apps/api/src/app.ts"
+        - "apps/api/src/index.ts"
+        - "apps/api/src/seed.ts"
+        - "apps/api/src/routes/assets.ts"
+        - "apps/api/src/routes/market.ts"
+        - "apps/api/src/services/market-data/rate-limited-providers.ts"
+        - "apps/api/src/services/market-data/{quote-provider,fx,index}.ts"
+        - "apps/api/src/services/assets/{catalog,index}.ts"
+        - "apps/api/tests/{market-fx,market-overrides,assets-catalog}.test.ts"
+        - "apps/api/tests/helpers/fake-db.ts (rewritten: identity-based dispatch)"
+        - "apps/api/tests/market-routes.test.ts (new: real-service market route integration)"
+        - "apps/api/tests/assets-override-routes.test.ts (new: override lifecycle + ADR-006 cross-user scoping)"
+        - "apps/api/tests/helpers/sql-facts.ts (shared where-clause fact extraction)"
+        - "apps/api/src/routes/assets.ts (HTTPException 400 validation fix)"
+        - "apps/api/tests/helpers/sql-facts.ts (whereFacts now walks arrays for onConflictDoUpdate conflict targets)"
+        - "apps/api/tests/helpers/fake-db.ts (additive onConflictDoUpdate conflict-target capture)"
+        - "apps/api/tests/helpers/market-fixtures.ts (new: shared PETR4/VALE3/quoteRow/benchmarkRow fixtures)"
+      qa_re_review_required: false
+    - id: TASK-05
+      title: "REST API Endpoints — Journals, Holdings, Portfolios (M4 API)"
+      owner: senior-backend
+      status: in-progress
+      qa_status: approved
+      implementation_status: completed
+      # Deferred by user: continue downstream implementation using the QA-approved API.
+      # Once DATABASE_URL is available, apply migrations and validate concurrent
+      # same-account journal writes and FX repair against live PostgreSQL.
+      # This check remains pending; it has not been reported as passed.
+      validation_status: deferred-live-postgresql
+      downstream_unblocked: true
+      open_findings:
+        - "DATABASE_URL absent: apply migration and verify concurrent same-account journal/FX-repair behavior against PostgreSQL before full task completion."
+    - id: TASK-06
+      title: "UI Foundation — Tailwind Theme, Design System, Layout, Routing (M0 FE)"
+      owner: senior-frontend
+      status: completed
+      commit: "481eb28"
+    - id: TASK-07
+      title: "Register Drawer, Journal Screen, Holdings Table (M4 FE)"
+      owner: senior-frontend
+      status: completed
+      qa_status: approved
+      implementation_status: completed
+      validation_status: passed
+      open_findings: []
+    - id: TASK-08
+      title: "CSV Template Import and B3 Nota Import (M5)"
+      owner: senior-backend
+      status: in-progress
+      qa_status: approved
+      implementation_status: completed
+      validation_status: deferred-live-postgresql
+      open_findings:
+        - "Live PostgreSQL rollback and duplicate-concurrency validation deferred: DATABASE_URL unavailable."
+        - "Real broker exports not available; fixtures are synthetic supported layouts. Tokens process-local."
+    - id: TASK-09
+      title: "Dividend Tracking — Agenda, Projection, Income History (M6)"
+      owner: senior-backend
+      status: in-progress
+      implementation_status: completed
+      qa_status: approved
+      validation_status: deferred-live-postgresql-provider
+      downstream_unblocked: true
+      open_findings:
+        - "Live PostgreSQL migration/transaction/concurrency and real provider response validation deferred."
+        - "Provider sync callable; scheduling belongs to TASK-10."
+    - id: TASK-10
+      title: "Scheduled Worker — Quotes, Snapshots, Dividend Sync, Backups (M7 Worker)"
+      owner: senior-backend
+      status: in-progress
+      implementation_status: completed-pending-calendar-verification
+      qa_status: calendar-verification-blocked
+      validation_status: deferred-live-postgresql-provider-worker
+      downstream_unblocked: true
+      open_findings:
+        - "Complete official2026B3equity-sessioncalendarverificationrequired; currentlimitedrulesnotfullapproved."
+        - "Otherworker/snapshot/FX/backupcodefixesQAverified; API256tests pass."
+        - "LivePostgreSQL migrations/locks/concurrency, realproviders and independentworker execution deferred."
+    - id: TASK-11
+      title: "Dashboard Hub — KPIs, Indicators, Allocation, Performance (M7 FE)"
+      owner: senior-frontend
+      status: completed
+      implementation_status: completed
+      qa_status: approved
+      validation_status: passed
+      open_findings:
+        - "Import-nota destination placeholder remains a separately tracked route dependency."
+    - id: TASK-12
+      title: "Reports & Analytics Screen (M8 FE)"
+      owner: senior-frontend
+      status: in-progress
+    - id: TASK-13
+      title: "Export, Backup Status, and Account Erasure API (M8 BE)"
+      owner: senior-backend
+      status: in-progress
+      implementation_status: completed
+      qa_status: approved
+      validation_status: deferred-live-postgresql-worker-storage
+      downstream_unblocked: true
+      open_findings:
+        - "Worker-backedbackup/status/verificationanddurabletombstones/restoreguardsimplementedandcodeQAapproved; localstorageoperationaldurabilitydependsdeployment."
+        - "Live PostgreSQL migration/transaction/lock/cascade validation deferred."
+    - id: TASK-14
+      title: "Settings Screen — Profile, Portfolios, Export, Danger Zone (M8/M9 FE)"
+      owner: senior-frontend
+      status: completed
+      implementation_status: completed
+      qa_status: approved
+      validation_status: passed
+    - id: TASK-15
+      title: "E2E Testing, Isolation, Security, Deploy Config (M9)"
+      owner: senior-frontend
+      status: pending
+  history:
+    - step: pipeline-init
+      agent: orchestrator
+      action: created
+      notes: "New pipeline: investy-dashboard. New product — investment portfolio dashboard (Brazilian market focus) inspired by Investidor10 portfolio manager and Organizze. Design base: DocuForge design system (blue-purple-gray palette, Plus Jakarta Sans + Inter, generous whitespace, sidebar navigation). Existing architecture base documents a different product (BrkRoutnXdle) and will be replaced via Architecture Initializer."
+      timestamp: "2026-09-04T00:00:00.000Z"
+    - step: architecture-initializer
+      agent: architecture-initializer
+      action: completed
+      notes: "User approved Option C (full-stack + Postgres + auth) with both entry methods (manual + CSV and transaction journal + B3 nota import) and Tailwind+Recharts design. Base files created; 10 ADRs; old docs replaced."
+      timestamp: "2026-09-04T12:30:00.000Z"
+    - step: solution-designer
+      agent: solution-designer
+      action: completed
+      notes: "User approved design: Option C IA/UX, full nota scope (PDF+text/CSV/XML + rateio), USD quote + FX, avg-cost display only, full scope (multi-portfolio, FII projection, pt-BR, retain snapshots). 8 design docs in plan/investy-dashboard/design-docs."
+      timestamp: "2026-09-04T13:00:00.000Z"
+    - step: tech-lead
+      agent: tech-lead
+      action: completed
+      notes: "15 tasks created: TASK-01..15. Backend: TASK-01..05, 08, 09, 10, 13 (≈30d). Frontend: TASK-06, 07, 11, 12, 14, 15 (≈21d). Dependencies + file overlaps documented."
+      timestamp: "2026-09-06T14:10:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-01 completed: M0 monorepo scaffold. pnpm workspace (apps/web, apps/api, packages/domain), Vite+React+Tailwind v4, Hono+Drizzle+Postgres, domain skeleton, Vitest+Playwright. All 11 validations green (build/typecheck/lint/test × 3 packages). Playwright pinned to ~1.60.0 for browser cache compatibility."
+      timestamp: "2026-09-06T14:15:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-02 completed: domain engine (M1). JournalEngine 8 event types, Money BigInt, Fx, Rateio largest-remainder. 57 tests + 4 property tests green. Zero runtime deps."
+      timestamp: "2026-09-06T14:40:00.000Z"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-06 completed: UI foundation (M0 FE). Tailwind v4 DocuForge tokens, design system composites, layout, routing, auth pages, onboarding skeleton. Build/typecheck/lint/E2E green. Vitest unit tests not runnable via tooling (concern)."
+      timestamp: "2026-09-06T14:40:00.000Z"
+    - step: qa
+      agent: qa-frontend
+      action: completed
+      notes: "TASK-06 (UI foundation) APPROVED. All runnable validations green. Minor cosmetic fixes flagged for TASK-07 (BTG option stray space; ReportsPage 'allocção' typo)."
+      timestamp: "2026-09-06T15:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-03 first dispatch hit max steps. Rate limiter + auth/onboarding routes + scoped repositories (incl. broker seed) implemented. app.ts route registration, CORS verify, Drizzle migrations, tests, and validation pending. Re-dispatching to complete."
+      timestamp: "2026-09-06T15:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-03 COMPLETED (5 incrementally-landed dispatches): auth/onboarding routes, scoped repositories + broker seed, rate limiting, CORS, inline zod validation. Build/typecheck/lint green; 34 tests/7 files pass. Concern: Drizzle db:generate requires live Postgres DATABASE_URL."
+      timestamp: "2026-09-06T17:00:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 partial: market-data services (QuoteProvider registry, 4 providers, TTL cache, FX, overrides), asset catalog + 50-asset seed, market/assets routes, app.ts registration. Seed-boot hook, provider rate limiting, tests, validation pending."
+      timestamp: "2026-09-06T18:30:00.000Z"
+    - step: qa
+      agent: qa-backend
+      action: reviewed
+      notes: "QA Backend review of TASK-01/02/03: CORRECTIONS NEEDED. Blocking D1-D4 (base.ts TS2769 build/typecheck fail; no migrations; weak/missing AC tests; broker seed never invoked) + high-risk C1 (domain dist ESM incompatible) and C2-C8. Feed into combined remediation dispatch."
+      timestamp: "2026-09-06T18:45:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "QA corrections progress: D1+C1+C3+C5 CLOSED. apps/api build/typecheck/lint/test ALL GREEN (34 tests). packages/domain ALL GREEN (57 tests). ~8 incremental dispatches due to step-budget limits."
+      timestamp: "2026-09-06T20:15:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "QA corrections CLOSED D1/C1/C2/C3/C4/C5/D3/D4. apps/api ALL GREEN (51 tests). packages/domain ALL GREEN (57 tests). Only D2 (drizzle-kit 0.30.6 BigInt bug) remains for migrations."
+      timestamp: "2026-09-06T23:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 COMPLETE (4 incremental dispatches). D2 CLOSED: drizzle/0000_mature_mad_thinker.sql generated with all 14 tables via documented temp default(0n)->default(0) workaround; schema reverted to BigInt defaults. Provider rate limiting wired to all 4 providers with quota degradation to stale cache. 4 test files created (market-fx, market-overrides, market-integration, assets-catalog) and mock-chain bugs fixed (count query await semantics, limit(1) terminal, 400-on-unknown-asset override now exercises the real route). apps/api build/typecheck/lint/test GREEN (87 tests); packages/domain ALL GREEN (57 tests)."
+      timestamp: "2026-09-07T00:40:00.000Z"
+    - step: qa
+      agent: qa-backend
+      action: reviewed
+      notes: "TASK-04 review → CORRECTIONS NEEDED. BLOCKING: market-integration.test.ts mocks every service it asserts on, so the tests validate mocks; mandated coverage absent for quotes cached data, stale[] flag, /market/benchmarks, /market/indicators, and override 400-on-unknown-asset. HIGH: FX path bypasses rate limiter (fx.ts:144,148,153); initializeProviders() non-idempotent + invoked at module load. MEDIUM: FX write path toFxScale() untested; ADR-006 override scoping unasserted. LOW: tautological test; MAX_BATCH_SYMBOLS dead code / magic 50 duplicated. Review truncated by step limit — validations and migration cross-check deferred to re-review."
+      timestamp: "2026-09-07T01:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 1/3 (step limit). CLOSED FIX 1 (new rate-limited-providers.ts with lazy wrappers; fx.ts now consumes limited providers), FIX 2 (idempotent register + module-level guard; provider init moved from routes/market.ts module load to src/index.ts boot). Found the new lazy providers broke vi.mock hoisting in the integration tests."
+      timestamp: "2026-09-07T01:35:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 2/3 (step limit). CLOSED FIX 5 (FX write-path round-trip + 5.20 precision tests) and FIX 7 (tautological test rewritten). Integration test rewrite hit mock problems: duplicate factory declarations, then db.insert chain missing for fetchAndCacheFxRate."
+      timestamp: "2026-09-07T01:50:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 3/3 (step limit). apps/api build PASS, lint PASS, test 92/96 (4 failing in market-integration.test.ts). Orchestrator diagnosed the root problem: the rewrite re-mocked cache.js, fx.js, catalog.js and overrides.js with in-memory stand-ins, so it reproduced the exact defect QA flagged (BLOCKING FIX 3/4 still open) and pushed the file to 759 lines. Corrective approach specified — table-aware fake DB helper dispatching on the real Drizzle table object, split into market-routes/assets-routes test files. That dispatch was CANCELLED before execution; TASK-04 remains corrections-in-progress."
+      timestamp: "2026-09-07T02:05:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 4 (step limit). Rewrote tests/helpers/fake-db.ts to dispatch by Drizzle table object identity (fixing the all-tables-collide String() bug), built tests/market-routes.test.ts (11 tests) using REAL cache/fx services with only db client, sessions and rate-limited-providers mocked, and mutation-tested the new stale assertion. Left the tree mutated: cache.ts:194 `false &&` stale guard and market-integration.test.ts renamed .bak-disabled. Repair dispatch required."
+      timestamp: "2026-09-07T02:35:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 corrections dispatch 5 (repair): reverted cache.ts:194 `false &&` stale-guard mutation, deleted the disabled legacy market-integration.test.ts.bak-disabled, and validated apps/api build/lint/test ALL GREEN (11 test files / 90 tests, 0 failed)."
+      timestamp: "2026-09-07T02:50:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 6 (step limit). Created tests/assets-routes.test.ts exercising REAL catalog/overrides routes (12 tests; mocks only db client + sessions). build/lint PASS, test 98/102 (4 failing in the new file, 463 lines). Surfaced a real bug: routes/assets.ts validation helpers throw raw Response instead of HTTPException, so invalid input crashes. Re-dispatch needed to fix production + assertions and split the file."
+      timestamp: "2026-09-07T03:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 corrections dispatch 7: fixed routes/assets.ts validation (HTTPException(400)) and assets-routes.test.ts whereFacts (ilike literals + snake_case). build/lint/test GREEN (102/102)."
+      timestamp: "2026-09-07T03:25:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 8: split tests/assets-routes.test.ts (473→~273) into assets-routes.test.ts and assets-override-routes.test.ts, extracted shared helpers/sql-facts.ts. build/lint/test ALL GREEN (13 files / 102 tests). Typecheck fails at tests/market-routes.test.ts:219 due to asserting fetchedAt in the wrong place."
+      timestamp: "2026-09-07T03:40:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections progress: build PASS, lint PASS, test PASS (13 files / 102 tests). Typecheck minor type issue in tests/market-routes.test.ts remains. Real-service market/assets coverage is in place with files under 400 lines."
+      timestamp: "2026-09-07T03:50:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 9 (step limit). ITEM 1 landed: tests/market-routes.test.ts expected QuotesBody shape now includes fetchedAt + fxUnavailable, fixing the typecheck error. ITEM 2 edits landed: assets-override-routes.test.ts asserts user_id + asset_id on the delete predicate and on every override select capture, plus a new cross-user ADR-006 regression test (user-2's override invisible to user-1); market-routes.test.ts asserts every override select capture carries user_id + asset_id. NOT DONE: the anti-vacuity mutation check and build/typecheck/lint/test — the tree is left UNVALIDATED. Next dispatch must validate first, then complete the mutation check."
+      timestamp: "2026-09-07T04:35:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-04 corrections dispatch 10 (step limit). Validated the previously unverified tree and found it was NOT green: build PASS, typecheck PASS, but lint RED (assets-override-routes.test.ts:234 no-explicit-any) and test RED (101/103). Both dispatch-9 ADR-006 assertions were factually wrong — PATCH performs no quoteOverrides SELECT (it is insert().onConflictDoUpdate().returning()), and the fake DB returns queued rows without evaluating SQL predicates so the row-level userOverride===null assertion was unachievable. Fixed: sql-facts.ts whereFacts walks arrays, fake-db.ts gained additive onConflictDoUpdate conflict-target capture, NEW tests/helpers/market-fixtures.ts (market-routes.test.ts 430 -> ~380 lines, back under 400), and the ADR-006 block rewritten as 3 typed predicate-level tests. apps/api build/typecheck/lint/test ALL GREEN (13 files / 105 tests). Mutation check NOT done — overrides.ts confirmed intact (162 lines, predicates at 24-27, 101-104, 118); getUserOverrides still has no direct coverage."
+      timestamp: "2026-09-07T05:20:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 FIX 6 mutation proof: six ADR-006 assertions failed without the getUserOverride userId predicate; it was restored and apps/api build/typecheck/lint/test passed (14 files / 108 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 FIX 8: centralized MAX_BATCH_SYMBOLS in market-data/cache.ts for route validation and quote hydration, removed the dead catalog export and unused STALE_GRACE_MS. apps/api build/typecheck/lint/test passed (14 files / 108 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 VERIFY 3: added optionalUser()/getOptionalUserId(), replaced dynamic auth catch, and batched user override reads to remove per-symbol getAssetDetail N+1. Follow-up validation passed apps/api build/typecheck/lint/test (14 files / 108 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 VERIFY 1: cross-checked all 13 schema tables, enums, indexes, columns, types, defaults, nullability, and foreign keys against the initial migration; no discrepancies. apps/api tests 108/108 pass."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 VERIFY 2: moved BRAPI credential out of URL query parameter into Authorization header; added 4 real provider tests asserting URL/header and log secrecy. apps/api build/typecheck/lint/test pass (15 files / 112 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 VERIFY 4: split 604-line db/schema.ts into eight coherent schema modules plus a thin 15-line barrel; every module is under 400 lines. apps/api build/typecheck/lint/test pass (15 files / 112 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-04 QA correction: applied optionalUser to the assets router and replaced swallowed requireUser with getOptionalUserId; added real-app session-cookie tests for asset-detail override, anonymous access, and revoked sessions. apps/api build/typecheck/lint/test pass (16 files / 115 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-04 approved after final re-review: production app session-cookie coverage closes the assets detail override gap; build/typecheck/lint/test pass (16 files / 115 tests)."
+      timestamp: "2026-10-17T23:10:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-05 dispatch 1 hit the step limit in discovery only; no source changes. It mapped schema/auth/repository/domain/test patterns. Re-dispatching with discovered context and a bounded implementation slice."
+      timestamp: "2026-10-18T00:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-05 dispatch 2 hit the step limit after foundation slice: added lib/validation.ts, services/journal.ts (atomic event write + domain replay/holding recompute), repositories/holdings.ts and snapshots.ts, and paged transaction listing. Routes not wired; no validations run. Next dispatch must validate first."
+      timestamp: "2026-10-18T00:45:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-05 validation dispatch fixed journal build/type errors and reached typecheck green; lint exposed a remaining no-explicit-any in transactions.ts. Tests not run; next action is complete lint correction and run tests plus final validations."
+      timestamp: "2026-10-18T01:00:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-05 resume dispatch found the previous lint issue already fixed; baseline build/lint/typecheck/test passed (115 tests). Implemented and wired core API routes plus valuation/summary services. Current build fails with five reported TypeScript errors; route/service tests remain pending."
+      timestamp: "2026-10-18T01:10:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-05 compile-fix dispatch fixed broker ID, holdings index narrowing, snapshot range typing, and fee default typing. apps/api build/typecheck/lint/test all pass (16 files, 115 tests); TASK-05-specific tests remain pending."
+      timestamp: "2026-10-18T01:20:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "Added journal-service tests for replay, recompute, and append rollback; build/typecheck/lint pass. The test runner failed twice with memory allocation before completing, so tests remain unverified. Route-level and valuation tests still pending."
+      timestamp: "2026-10-18T01:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "Retried apps/api tests; suite again hit Node/Vitest memory exhaustion. Some tests started, including four errors in existing password.test.ts, so the new journal tests remain unverified. No files modified. Route-level and valuation coverage remain pending."
+      timestamp: "2026-10-18T01:40:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "Investigated journal test mocks; no recursion or unbounded behavior found. apps/api build/typecheck/lint/test pass (17 files, 119 tests). Memory blocker not reproduced; route and valuation tests next."
+      timestamp: "2026-10-18T02:00:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "Added task05-journal-flow, task05-routes, task05-valuation tests and fixed SQL ownership predicates, bigint serialization, missing-FX valuation. API build/typecheck/lint/test pass (127 tests, 20 files). CRUD lifecycle/populated snapshots still need coverage; database concurrency not validated."
+      timestamp: "2026-10-18T02:10:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "Added task05-structure-flow.test.ts covering portfolio/broker/account lifecycles, guards, populated aggregates, snapshots and ownership. API build/typecheck/lint/test pass (130 tests, 21 files). Ready for full QA; live PostgreSQL not exercised."
+      timestamp: "2026-10-18T02:20:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "All API checks pass (130 tests), but QA found mixed-currency P&L, unpopulated sale realized P&L, unsafe integer coercion, loose date/non-JSON error contracts, missing lots. Replay ordering/pagination and live PostgreSQL concurrency coverage insufficient."
+      timestamp: "2026-10-18T02:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "Implemented bounded bigint input, strict ISO/UUID validation, and actual JSON errors; build/typecheck/lint pass, 4 new regression tests pass. Full suite 129 pass/5 fail: TASK-05 new fixtures use non-UUID IDs; fixture corrections required without weakening assertions."
+      timestamp: "2026-10-18T02:40:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Corrected UUID fixtures in newly created TASK-05 tests without weakening behavior assertions. All API checks pass (134 tests, 22 files). FX basis, sale realized P&L, lots and replay/concurrency remain pending."
+      timestamp: "2026-10-18T02:50:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Historical acquisition FX schema/migration and BRL basis implemented; replay persists sale realized P&L after inserts/edits/deletes. USD regression added. API build/typecheck/lint/test pass (135 tests); transient parallel OOM cleared on standalone test run. Existing USD rows require historical FX remediation; migration not applied to live DB."
+      timestamp: "2026-10-18T03:00:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "Added holding-lots cohorts, detail lots/quote/events, ordering and pagination tests. Build passed; typecheck/test fixes applied but final checks not rerun due to step limit. Live PG concurrency unavailable (DATABASE_URL absent). Next run all checks sequentially then QA."
+      timestamp: "2026-10-18T03:10:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Validated final lots/replay changes: API build/typecheck/lint/test pass (138 tests, 24 files). Reviewed files under 400 lines. Live PG concurrency/migration not verified because DATABASE_URL absent."
+      timestamp: "2026-10-18T03:20:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "Re-review: earlier money/input/lots findings addressed; all checks pass 138 tests. Two migration blockers: historical multi-event foreign journals become uneditable without FX backfill/staged repair, and 0001 schema snapshot missing. Live PG prerequisite remains."
+      timestamp: "2026-10-18T03:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Added atomic owner-scoped POST /transactions/repair-fx to repair all original historical rates per account/asset, regression for migrated two-event journal, and matching 0001_snapshot.json. All API checks pass (139 tests). Generated snapshot 1889 lines conflicts with authored-file size rule; live DB still unavailable."
+      timestamp: "2026-10-18T03:40:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "FX migration/repair behavior blockers closed; all checks pass (139 tests). Only confirmed code blocker is 1889-line 0001_snapshot.json; lossless compaction under 400 resolves. Live PG validation pending separately; repair cross-user/error route coverage recommended."
+      timestamp: "2026-10-18T03:50:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Compacted 0001_snapshot.json from 1889 to 321 lines retaining Drizzle metadata; JSON parses, manual content inspection complete. All API checks pass (139 tests). Awaiting final QA."
+      timestamp: "2026-10-18T04:00:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-05 code QA approved: snapshot compacted to 321 lines, correct predecessor/schema retained; build passes, prior lint/typecheck and 139 tests pass. Live PostgreSQL migration/concurrency checks remain explicitly pending due absent DATABASE_URL; task remains in-progress for full validation."
+      timestamp: "2026-10-18T04:10:00.000Z"
+    - step: implementation
+      agent: orchestrator
+      action: resumed
+      notes: "User requested continuing downstream work and leaving live PostgreSQL checks commented in pipeline YAML. TASK-05 remains code-QA-approved with deferred live validation; TASK-07 and TASK-08 unblocked for parallel implementation."
+      timestamp: "2026-10-18T04:20:00.000Z"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "Resumed TASK-07: journal and holdings UI plus route-backed drawers implemented. Build/typecheck/lint and 3 E2E tests passed before final patch; revalidation and remaining acceptance gaps required before QA."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "Resumed TASK-08: imports and nota routes/parser/PDF extraction implemented; API build/typecheck/lint/test pass (146 tests, 26 files). Integration tests, PDF fixture and parser completeness remain; live PostgreSQL deferred."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: implementation
+      agent: senior-frontend
+      action: blocked
+      notes: "TASK-07 final build/typecheck/lint pass. E2E attempts reach unrelated BrkRoutnXdle at localhost:5173; no process management attempted. Daily-change API contract missing."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-08 behavioral coverage added including real PDF path and atomic/ownership regressions; API checks pass (154 tests, 27 files). Sinacor/corporate-action completeness requires review."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-08 all API checks pass (154 tests, 27 files). Blockers: incomplete Sinacor/corporate-action parser, silently skipped trades/fees, multipart limits only after buffering. Process-local token deployment concern and live PostgreSQL deferral retained."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-08 upload stream limit and known malformed record rejection implemented, fee summation corrected, VISTA/XML and split/JCP added. All API checks pass (159 tests). Unknown financial structures and corporate-action confirm coverage still need work."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-07 build/typecheck/lint pass; E2E environmentally blocked. Code findings: day delta placeholder, all-portfolio account filtering, dividend/JCP distinction, nested API errors and coverage gaps."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-07 account source and nested API errors fixed; checks and 3 unit tests pass. Distinct dividend requires backend/domain support and day delta requires quote contract; E2E still blocked."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-08 fail-closed parsing and synthetic Sinacor fixtures plus corporate-action replay coverage implemented. 163 tests passed before final guards; final tree unvalidated, validate first."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-08 final post-edit validation complete: build/typecheck/lint/test pass, 163 tests across 30 files. Ready for QA rereview."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-08 rereview verified 163 tests and upload/fee/corporate-action fixes. Remaining blocker: mixed recognized trade plus unknown numbered exchange line outside known section can partially import; reject regardless of heading and cover preview/confirm."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-08 unknown numbered exchange/trade records now reject regardless heading; mixed valid/unsupported preview regression returns 400 without DB access or confirm token. All API checks pass (165 tests)."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-08 code QA approved; exact partial-import repro safely rejected; build/typecheck/lint and 165 tests pass. Full validation remains deferred for live PostgreSQL."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-07 dividend contract added end-to-end (domain 59 tests, API 168 tests; all checks pass). 0002 migration snapshot still missing. Daily change unavailable in provider/cache contract; broader quote schema support required."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-07 dividend migration metadata completed: 0002 snapshot 321 lines, valid predecessor and enum order. API build/typecheck/lint/test pass (168 tests). Drizzle generation cannot resolve schema/enums.js, snapshot built manually; live migration deferred. Previous backend/frontend dispatches hit usage limit; backend resumed successfully."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-07 canonical dividend payload with zero fees/historical USD FX wired; JCP distinct, label/filter updated. Build/typecheck/lint and 5 unit tests pass. E2E still blocked; daily change API contract missing."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-07 frontend fixes verified; only daily-change contract and blocked E2E remain. API error-helper deviation coordinated for nested envelope compatibility. Backend dividend review found per-unit FX rounding bug (3 x USD1 cent x1.5 =>6 instead of5 BRL cents), and needs actual mutation/recompute/CSV regression coverage. Domain59/API168 tests pass; migration metadata consistent."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-07 dividend FX now rounds aggregate income once; native fee validation retained. Actual POST/PATCH/DELETE/CSV journal recompute regressions added. Domain61/API171 tests and all checks pass; ready for QA rereview."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-07 bounded dividend backend/domain correction approved: aggregate FX rounding, zero-rounded income, trusted internal derived field and real mutation/CSV recompute validated. Domain61/API171 tests and builds/lint pass. Live PostgreSQL pending; day change outside review."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-07 daily-change contract implemented: BRAPI/Yahoo native previous-close parsed and cached; holdings/detail/market expose nullable dayChangePercent (percentage points), null for missing close/manual override. API checks pass (175 tests). 0003 matching snapshot still missing after existing Drizzle module-resolution failure; live PG deferred."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-07 previous-close migration0003 snapshot completed (322 lines) and checked for predecessor/schema parity; API build/typecheck/lint/test pass (176 tests,36 files). Ready for QA, live PostgreSQL deferred."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-07 signed native-currency daily quote change wired, null unavailable, accessible FX exclusion; positive/negative/zero/null unit coverage. Web checks and6 unit tests pass; E2E port conflict persists."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-07 frontend code QA approved; all reviewed code criteria satisfied, checks/6unit tests pass. Full acceptance blocked pending E2E against Investy."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-07 daily-change backend checks/176tests pass after2 OOM retries. Coverage blockers: real cache persists previous-close/provider fallback null/stale matching pair; market and holdings detail contracts including authenticated override null. Live PG deferred."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-07 real cache provider-close persistence/fallback-null/stale-pair and real-service market/detail override route coverage added. No production defects uncovered. API build/typecheck/lint/test pass (180tests,37files). Ready for final backend QA."
+      timestamp: "2026-10-18T18:30:00.000Z"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-07 backend daily-change final QA approved: actual cache/valuation/routes covered, build/typecheck/lint and180tests pass. Migration0003 live PostgreSQL validation deferred."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-07 E2E now reaches Investy:4pass/1fail exposed StrictMode prefill cleanup. Fixed in drawer/router with persistent regression; build/typecheck/lint and7unit tests pass. Post-fix browser run Node OOM, no E2E approval yet."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: validation
+      agent: senior-frontend
+      action: failed
+      notes: "TASK-07 browser retry2:0/5 pass; worker exit3221226505, missing Investy UI and drawer timeout. Output does not explicitly confirm OOM. No code changed; prior build/typecheck/lint and7unit tests pass. Inspect artifacts before final retry."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: validation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-07 browser retry3 PASSED5/5 against Investy. Artifacts show retry2 reached unrelated app. StrictMode fix now passes all unit/build checks and browser suite; ready for final QA."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-07 frontend fully approved: final StrictMode/back/dismiss/navigation behavior reviewed; build/typecheck/lint and7unit tests independently pass,5/5browser tests reported against Investy accepted. Live PostgreSQL remains separate backend deferral."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-09 backend dividend routes/services/projection/sync implemented; build/typecheck/lint and6task tests pass. Full suite190/192 existing PDF/ordering5s timeouts under parallel workload after3attempts. Paid posting BRL-only; service/sync behavioral coverage pending. Frontend contract available."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-13 streaming JSON/CSV ZIP export, settings, atomic password-confirmed erasure implemented; checks/6new tests pass, suite190/192 existing timeout failures. Backup status not-configured truthful; durable tombstone/backup integration needs TASK-10. No live PostgreSQL validation."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-09 service/sync corrected for account historical eligibility, capital-return exdate and documented provider endpoint; real service workflow tests added. Build/typecheck/lint pass; tests failed3consecutive attempts (existing5s timeout, new test fixture fixed, then heap OOM). New tests unverified; USD paid posting unsupported without historical FX contract; live PG/provider validation pending."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-09 dividend UI implemented with agenda/history/status/manual form/projections and tests. Web build/typecheck/lint pass;5E2E pass; unit9pass/1existing HoldingsTable5s timeout. Needs clean unit run and QA."
+      timestamp: "2026-10-19T21:59:42.038-03:00"
+    - step: implementation
+      agent: orchestrator
+      action: blocked
+      notes: "Recovery checkpoint: TASK-07 completed/approved, TASK-08 code-approved with live PG deferred. TASK-09 frontend/backend and TASK-13 implemented partially, not approved; final API tests repeatedly hit existing5s timeouts/heap OOM, web unit table timeout. Resume by validating latest service tests and web unit suite without concurrent heavy workloads; never change existing tests/config. Then QA and TASK-10 backup/tombstone integration. No task completion assumed from partial checks."
+      timestamp: "2026-10-22T18:54:02.346-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "Recovery API checks pass:198/198tests40files, build/typecheck/lint. New provider fixture reused consumed Response; corrected without production/old test changes. USD paid posting and worker backup/tombstone integration remain."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-09 USD paid receipts accept historical fxRateToBRL (micro-BRL perUSD), persist on journal rows, compute aggregate cash once for dividend/JCP/amortization and reread stable BRL totals. Item currency/nativeAmountCents/amountCurrency/amountCentsBRL added; unpaid USD BRL null. API202/domain63 tests and all checks pass. No new migration needed; frontend integration/QA pending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-09 historicalUSD workflow integrated with native-vsBRL labels, exact micro-BRL rate entry and booked history. Web build/typecheck/lint,11unit tests and6E2E pass."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-09 backend API202/domain63 checks pass. Blockers: paid receipts identified by mutable/forgeable notes and public journal mutations can corrupt paid income; provider fractional-cent rates silently rounded. Sort account locks for deterministic order. Live PG/provider deferred."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-09 trusted dividend receipt FK/unique association, public immutable receipts, sorted locks and subcent-provider rejection implemented; checks and12service tests pass. Fullsuite204/205 fails newly-authored TASK07 snapshot test assuming0003alwayslast;0004snapshot missing. Legacy note-only paid rows flag reconciliationRequired/totalsIncomplete instead of trusting notes."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "Author corrected newly-created TASK07 snapshot test (introduced during this delivery, not original acceptance test): verify unique0003entry/predecessor/index without forbidding subsequentmigrations. All actual snapshot/schema/SQL assertions retained; build/typecheck/lint pass. Final suite pending0004metadata completion."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-09 receipt migration0004snapshot completed losslessly with predecessor/FK/uniqueindex parity; API build/typecheck/lint and206/206tests41files pass. Ready for QA rereview. Legacy reconciliation flags needfrontend visibility; livePG deferred."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-09 backend code QA approved: trusted receipts/public journal guards, precision rejection, sorted locks and migration0004 verified; API206tests/build/lint pass, domain63previouslyverified. LivePG/provider/concurrency stilldeferred; workerTASK10pending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: interrupted
+      notes: "TASK-09 reconciliation-warning UI dispatch cancelled when user continued; recover partial edits before resuming, do not assume validation."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-09 legacy reconciliationRequired warning and totalsIncomplete year/monthpartial labels implemented and tested. Web build/typecheck/lint,12unit and7browser tests pass. Frontend QA pending; backendcodeQAapproved."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-09 frontend checks/7E2E pass; last acceptancegap paydate plainparagraph ratherthan status-associatedchip. TASK-13 QA checks/206tests pass but blockers durableerasuretombstone/restoreguard, provenlosslessrestorecontract, consistentexportview and strongerowner/cascade/rollback tests; totalZIP32offsetboundalso needed. Backupstatusworker integration remainsTASK10dependency."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-09 accessiblepaydate/statuschip completed inclmissingdate andexpected/confirmed/paid assertions; webbuild/typecheck/lint13unit7E2Epass. FinalQAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-13 tombstoneschema/migration0005, atomicuserlock/delete, repeatablereadstream/cancellation/ZIP32bound andinternalrestorecontract added. Missing0005snapshot; finaltesteditunvalidated. Intermediate208pass1fail newly-authoredTASK09snapshot assumes0004last; newtestdefectneedsauthorcorrection. Restore/cascade/rollbackcoverage stillpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "OriginalauthorcorrectednewTASK09snapshot test tofindunique0004after0003ratherthanforbidlatermigrations; allrealFK/SQL/snapshotassertionsretained. APIbuild/typecheck/lintpass; nooriginalpreexistingtestschanged."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-09 frontendfinalQAapproved: paydate/statuschipverified, webbuild/typecheck/lint7E2Eindependentlypass,13unitreported. BackendcodeQAalreadyapproved; onlylivePG/providerdeferralsremain, downstreamunblocked."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-13 recoverybaselinecomplete:0005snapshotlosslesspredecessor/erasuretableadded; APIbuild/typecheck/lint210/210tests41filespass. Strengthenrestorewriteordering/owner/sessioncascade/rollbackcoveragebeforeQA."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-13 transactionalrowstoretestsadded for2ownerisolation, centexactexportrestore/linkedreferences/writeorder/rollback, erasecascade/sessions/sharedcatalog/tombstonerace, snapshots/cancellation. APIbuild/typecheck/lint215/215tests42filespass. QAneeded; livePGdeferred; backupworkerintegrationpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-11 dashboardwidgets/aggregateclients/testsimplemented. Webbuild/typecheck/lint17unit7E2Epass. BRLportfoliodailychangeAPIabsent; showsunavailable. Performanceindexedobservedvalueexplicitlynotcashflowadjusted. Dedicatedbrowserchart/deeplinkvalidationandQAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-13 codeQAstillblocked: restoremustvalidateownednotaRefId andverifyholdingsviajournalreplay. Otherexportconsistency/tombstonefixesaccepted,215testschecks pass. TASK-11 QAfindings: missingallKPIdeltas/BRLdaycontract, CDIrate-ratioperformancewrong, startupKPIskeletonmissing, palette/stalechipstyles, dedicatedbrowsercoverage. Importnotarouteplaceholdertrackeddependency."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: completed
+      notes: "TASK-13 restorevalidatesownednotaRefIdandproductionjournal/FXreplayholdingsintegritybeforewrites, actualexportroundtripretained; APIbuild/typecheck/lint216/216tests42filespass. QA rereviewpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-11 startupKPIskeleton, localdesignpalettes, stalechipstylesanddedicatedresponsivebrowsercoveragefixed; invalidCDIrate-ratioline removedpendingunitdefinedaccumulatedAPI. Webchecks18unit9E2Epass. GenuineallKPIdeltas/BRLdaycomparisonandCDIindexbackendcontractremaining."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-13 nota/replaychecksverified216tests pass but realjournalrecomputeHoldingupdateomitscostBasisCents; genuinebuy/sellarchivecanfailrestore. Mustpersistreplayedbasisandtestactualjournalwrite/export/restorewithoutrelaxingintegrity. Workerstatusstillpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-11 summarycomparisoncontractadded: signedBRLtotal/cost/unrealized/dayvaluevsactualcommonsnapshot, nullunavailable/reasons, since_snapshotdisclosureincludesflows/FXtiming. Allportfoliooptionowner-scoped. APIchecks220tests43filespass. CDIaccumulatedindexsliceoutstanding."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-13 actualjournalbuy/sell/export/restoretestadded; agentfoundcostBasisCentsalreadyinbothproductionwritepathsso noproductionchange. NewDBdoubleleavessalerealizedPnl0vs450; suite220pass1failafterretries, finalstaticchecksnotrun. MustfixnewtestboundarywithoutweakeningassertionsandvalidatebeforeQA."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-13 realbuy/sell/export/restoreflowpasses: newfakeDBfixedawaitedupdateexecutionmatchingDrizzle; productionbasisupdatealreadypresent. Persistedbasis3000->2000, salePnl450, strictrestoreacceptsgenuineexport. APIbuild/typecheck/lint221/221tests44filespass. ReadyQA."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-13 export/erase/restorecodeQAapproved, priorcostbasisfindingretracted(existingproductionpathcorrect), genuinejournalroundtripverified221tests/staticchecks. Fulltaskbackupstatus/verificationdependsTASK10; livePGdeferred. Downstreamunblocked."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-11 CDIindexendpointadded withSGS12dailyhistory/SGS11coverage, ratelimit/TTL, dailycompoundingbase100andhonestcoverage; APIbuild/typecheck/lint225tests45filespass. OfficialmetadataURL502(unitneedsindependentconfirmation), frontendintegration/contractQAoutstanding."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-11 comparison/CDIfrontendwired, chartsplitandrawratesexcluded; finalbuild/typecheck/lintpass. Lastunit19passbeforefinalchartfix; E2E9/10failedemptyCDIpathnowfixunvalidated. Posteditunit/E2Erequired."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-11 backend225testspass; summarycomparisonreviewedgood. CDIblockers: twoBCBrequestschargeonequota; coveragecomparesenddatesnotlastCDIobservation(publicationlagfalseunavailable); officialSGS12unitmetadatastillunverified. Needbase-closefirst-rateexcludedwindowtest/disclosure."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-11 CDIquotareserved2upstreamcalls/publicationlagcoveragefixed/baseConventionexplicit; APIbuild/typecheck/lint227tests45filespass. OfficialSGS12unitstillunverified(502metadata/CKANnomatch); externalQAblockerremainsexplicit."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-11 finalcomparison/CDIchartfixvalidated: webbuild/typecheck/lint19unit10E2Eallpass incl3dashboardbrowsertests. Basefirstobservationclose/rateexclusiondisclosurepresent; QA separate."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-11 frontendallpriorfixesverified10E2E/checkspass; lastblockerindependentlytruncatedallocationpercentagescan99.99%. Deterministicinteger-centlargest-remainderroundingneededclass/sector/Outros. Importnotaplaceholderseparatedependency."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: research
+      agent: senior-backend
+      action: completed
+      notes: "OfficialSGS12unitblockerRESOLVED: BCB SOAPgetUltimoValorXML&in0=12 returnsnomeTaxadejuros-CDI,codigo12,periodicidadeD,unidade%a.d.; sourcecommentadded/APIbuildpass. Notliveapplicationvalidation."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-11 exactallocation10000basispointsdeterministiclargest-remainderforclass/sector/Outros, uneven/tie/zeroUItestcases. Webbuild/typecheck/lint20unit10E2Epass; lastfrontendQAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-11 backendcodeQAapproved: APIbuild/lint227tests, quotas/lastobservationcoverage/baseconventionverified. OfficialBCBSOAPSGS12dailypercentconfirmedindependently. LivePG/providerapplicationintegrationdeferralsnonblocking."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-11 frontendfullyapproved: allKPIdeltas/periods, CDIindex, skeleton/palette/stale/responsive/deeplinks/exactallocationreviewed; build/typecheck/lint10E2Epass20unitreported. Backendalsoapproved. Taskcompleted; import-notadestinationplaceholderseparatedependency."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-10 scheduler/processentryquoterefresh/current-dayclosesnapshot/dividendsyncimplemented; APIchecks231testspass. Historicaltruthfulbackfill, benchmarksync, durableverifiedbackups/erasuresafepublish/persistedstatusandsettingsintegrationoutstanding. No livePG/runtimeapproval."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-10 backupstorage/schema0006/job/status/publishverificationand erasurefilecleanupadded;235testsbeforefinalpathhardeningpassedbutlasteditunvalidated.0006snapshotmissing. Backfill/benchmarkshistorysyncstillpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: partial
+      notes: "TASK-14 allsettingssections/APIclient/unitstestsimplemented. Finalbuild/typecheckpass; lint/unit25passbeforelasttypingeditnotrerun, noE2E. GapsPATCHauth/meabsent, overrideslackdirectsymbols, backupstatuscontractcompatibilityneedsreview."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-10 backup0006snapshotcompletedlosslesspredecessorparity/pathcleanupreview; APIbuild/typecheck/lint236tests47filespass. GETbackupsowner-scopedlastBackup{verifiedAt,bytes,sha256}|null,status/workerStatus/retentionNote. 32MiBverifycap/localstorageinstance-durabilitylimitationexplicit; backfill/benchsyncpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-14 APIgapsclosed: PATCHauth/meowner-scopedvalidatedname/normalizedemail/publicresponse/409, overridesGETdirectsymbol/namejoin. Backupscontractuntouched; APIbuild/typecheck/lint239tests48filespass. Frontendfinalintegration/QAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-14 allsettingssectionsintegratedrealprofile/overrides/backupmetadata/export/confirmederasure; webbuild/typecheck/lint26unit12E2Epassinclsettingsbrowsercoverage. QAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-10 backfill/asofreplay/jobschedule/cursor/migration0007snapshotadded; historicalcoverageonlyrecordedrawquotes/FXvalidat18:00,no current/substitutedoverrides. Cap5attempts/portfolio/cursoradvancesunavailabledates(notautomaticallyrevisited).243testsintermediatepass; finalconcurrency/retry/pricebasiseditsUNVALIDATED. Benchsyncnext."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-10 backfillfinalchecks245tests49filespass;17:59refreshnowrefreshesquoteexpiringat18:00. Historicalsourceindependentlypersistedtimestampedquotefetchrows(TTLcache,noguaranteeddailyarchive), rawsame-dayquotevalidatclose+recordedFX+asofjournalonly. Cap5cursorunavailabledatesnotautomaticallyrevisited. Benchsyncnext/QAandlivePGpending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-10 benchmarkhistoryjob20:00Saopaulo/90dayproviderdatedobservations/quota/idempotence/precisionendpointreadbackimplemented; rawCDIrateunitsseparateaccumulatedindex. APIbuild/typecheck/lint248tests50filespass. Wholeworker+TASK13integrationQAneeded; livePG/provider/runtimeandlocalstorageconstraintsremain."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-14 frontend12E2E/staticcheckspassbutaccountmutationmissessharedaccounts/journalqueries, overrideclearmissesvaluations/dashboardcaches, mutationerrorslackretry, oldsuccesssurvivesnextfailedaction. Fix/testnavigation+retrydestructiveconfirmationpreservation."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-14 sharedaccount/overridevaluationcacheinvalidation, guardedmutationretriesandfeedbackresetcorrected; webbuild/typecheck/lint30unit13E2Epass. Newfixtureduplicate-keywarningneedsminorcleanup/QA."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-10/13integrationQA248testscheckspassbutclosejobrequeriesdifferentquotes/FX; FXbackfillrejectsvalidweeklycachedrates; B3calendarapproxunverified; erasuredeletesfilesbeforeDBcommitrollbackunsafe; backupverifiedrunskipdoesn'tverifyartifactexists/hash. TASK14backendprofile/overridecontractsapprovedboundedreview. LivePG/provider/runtimepending."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-14 newretrytestfixtureusesdistinctactualcreatedIDs; retryassertionsunchanged, duplicatekeywarningsgone. Webbuild/typecheck/lint30unitpass; unchangedbrowserlast13/13pass. ReadyfrontendQA. Workerfixdispatchusage-limitfailedbeforeexecution; retry samenamedagent."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-10 capturedcloseinputset/repeatablereadcurrentjob, seven-dayvalidrecordedFXasofclose andcalendarhelpersimplemented; APIbuild/typecheck/lint252tests51filespass. OfficialB3examples2021/2022verifiedbut2026stilllimitedrule-setnotcompleteauditedcalendar. Backupconsistencyissuesnext."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-14 priorcache/retry/successgatefindingsfixed30unit13E2Epass; remainingacceptancegapsmutationerrorsplaintextnotErrorCard, emptybrokerslistnomessage. Unchangedbrowserrerunpassedafter2intermittentdashboardtimeouts."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-backend
+      action: partial
+      notes: "TASK-10/13 filecleanupmovedpostcommitwithdurablecleanup_pendingtombstone/migration0008snapshot; verifieddedupandGETstatuscheckboundedartifacthash/availability,repairloss/corruption. Latest256testspassbutfinalsequentialstaticchecks/diffreviewnotdone. Newbackupstatusunavailable/reasonartifact_missing_or_corrupt,lastBackupnullifbad."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-14 mutationErrorCard-equivalentandexplicitbrokerempty-stateadded, realfailure/retrycoverage. Webbuild/typecheck/lint31unit13E2Epassonunchangedrerun; dashboardintermittenttimeoutsnotattributedsettings. NewbackupunavailablestatusneedsintegrationbeforefinalQA."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-10/13 backupconsistencyfinalreview/sequentialAPIbuild/typecheck/lint256tests52filespass. Unusableartifactstatusunavailable/reason/artifactnullhonest; postcommitpendingcleanupreviewed. ReadyQA; completeofficial2026calendarseparate."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-14 unavailablebackupartifactcontracttypedandptBRrecoverywarning,noverified/never-createdmislabel. Webbuild/typecheck/lint32unit13E2Epass. FinalQAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-13 backupintegrationcodeQAapproved256tests/staticchecks; erasurepostcommitpendingcleanup, artifacthash/status/repairverified. TASK-10 onlycalendar2026officialfullcoverageblockerremains(otherfixesverified). ReportsUIcanconsumeexistingtruthfuldataindependentlywhilecalendarresearchcontinues. LivePG/provider/runtime/storagedeferralsexplicit."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-14 frontendfullyapprovedwebbuild/typecheck/lint32unit13E2Eindependentlypass. Errorcards/emptybroker/cache/retry/confirmation/unavailablebackupsallverified; taskcompleted."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-12 reportsscreen/readmodels/mobileperiodtoggles/PnL/incomereconciliationsimplementedfromexistingmountedAPIs; approveddesign/reports endpointsnotmountedso sourceadaptersused. Webbuild/typecheck/lint35unit14E2Epass. Observedvalueindexnotcashflowadjusted, disclosed3mCDIwindow,10ksalescapmarkedpartial. QAneeded."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: research
+      agent: senior-backend
+      action: blocked
+      notes: "TASK-10 completeofficial2026calendarunretrievedafterB3pages/circularPDF/BoraInvestirfamilies. Sourcecommentsnowexplicitunverifiedhypotheses; no fabricatedfixture/closures. APIallchecks256testspassbutcalendarQAblocked. Officialfull2026equitysessioncalendarneeded; livePG/runtimealsodeferred."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-12 webchecks14E2Epass; benchmarklinesneedactualcommonobservedbaseorunavailable, individualavailability/lastcomparableobservationnotimpliedallavailable. Addmissingbase/paginationcoverage. ExistingmountedAPIadapteracceptablefrontendarchitecturebutcanonicalreportsendpointsremainseparateTASK05contractgap."
+      timestamp: "2026-10-23T14:49:37.351-03:00"
+    - step: implementation
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-12 commonobservedbenchmarkbase/individualavailability/lastdatesandpaginationcoveragecorrected; webbuild/typecheck/lint38unit14E2Epass. ReadyfinalQA."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: tech-lead
+      agent: tech-lead
+      action: completed
+      notes: "TASK-16canonicalreportsAPI/TASK-17operativeimportUIaddedwithinapprovedscope,TASK-15depsupdated.147orderedhistoryrecordsarchivedlosslessly,5retainedinline,canonicalpipeline305linesbeforethisupdate;17tasksparse."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-12 commonbasefixverified14E2E/checkspassbutperiodlastsnapshotcaneraseearlierrealwithin-periodbenchmarkoverlapwhilemetadataclaimsavailable; samples/metadata/tablemustagree, addregression."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: implementation
+      agent: senior-backend
+      action: partial
+      notes: "TASK-16 authenticatedcanonicalreportsroutes/repositories/performance/income/readmodels+testsimplemented. Finalbuild/typecheckpass; lint/262tests55filespassedbeforelastmetadataeditsofinalrerunrequired. No livePG/providerapproval."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: corrections
+      agent: senior-frontend
+      action: completed
+      notes: "TASK-12 month/quarterdisplayretainsunionactualportfolioandbenchmark-overlapobservations, metadatafromdisplayedrows; within-periodregressionsadded. Webbuild/typecheck/lint40unit14E2Epass. ReadyQA."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: validation
+      agent: senior-backend
+      action: completed
+      notes: "TASK-16 canonicalreports8filesreviewed/finalbuild/typecheck/lint263tests55filespass; sampledbenchmarkmetadatareferstodisplayedpoints, observed-value-indexnotinvestmentreturn, trustedBRLincome/PnL/amortseparate. ReadyQA; livePG/providerdeferred."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: approved
+      notes: "TASK-12 frontendfullyapproved: periodsretainactualobservedoverlaps/metadatadisplayedrows, build/typecheck/lint14E2Epass40unitreported. CanonicalAPIindependentTASK16."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - step: qa
+      agent: qa-reviewer
+      action: corrections-needed
+      notes: "TASK-16 APIchecks263testspassbutrepositorypagesbufferallrows, base+bucketduplicateperiodcontract, testdoubleignoresdatepredicates. Mustboundedaggregate/process/datebound andproveexclusions; originaltestsnotmodified."
+      timestamp: "2026-10-26T19:06:28.662-03:00"
+    - {step: corrections, agent: senior-backend, action: partial, notes: "TASK-16 bounded performancewindow/density and income-pagefold/paginateddetails/uniquebaseperiodcontract/datefiltertests implemented.267tests55files/staticcheckspassedbeforelastcatalog-retentionedit; lasteditbuildonly, finalchecksneeded.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: implementation, agent: senior-frontend, action: partial, notes: "TASK-17 operativeCSVtemplate/errorsandnotaPDF/text/CSV/XMLpreview/confirm/historyimplemented withAPIfixturebrowsercoverage.43unit16E2E/staticcheckspassedbeforelast2UIedits; finalposteditchecks/scope reviewneeded.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: validation, agent: senior-frontend, action: completed, notes: "TASK-17 scope7filesreviewed/finalwebbuild/typecheck/lint43unit16E2Epass. Confirmcounts/linkpresentbutreturnedholdingchangesnotitemized; closeownacceptancegapbeforeQA. API-fixturetestsnotrealDBjourney.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: validation, agent: senior-backend, action: completed, notes: "TASK-16 finalcatalogeditvalidatedAPIbuild/typecheck/lint267tests55filespass. Bounded500rowinput/receiptpages,5000aggregate/performancegroupsguard400notpartial; uniqueperiods/separatebase, fulldatefilteredtotals/paginated100detailscounts. ReadyQA.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: qa, agent: qa-reviewer, action: approved, notes: "TASK-16 canonicalreportsAPIapproved: boundedpagefold/densityguards, uniquebase/periodcontract, effectiveinclusive-date/owner tests; build/typecheck/lint267tests55filespass. LivePG/providerdeferralsremain.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: implementation, agent: senior-frontend, action: completed, notes: "TASK-17 confirmnowshowsreturnedpositioncount/asset/account/exactqty; createdcount/link/cacheupdatesretained. Webbuild/typecheck/lint43unit16E2Epass; finalQAneeded.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-17 checks43unit16E2EpassbutCSVfilecanchangeinflightoldresponseswronglybindnewfile; rawEnglisherrors/historystatusneedptBR. Addbehavioralcomponenttestsformat/token/races/warnings/history/actualqueryinvalidationnotstaticlists.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: corrections, agent: senior-frontend, action: completed, notes: "TASK-17 CSVinflightcontextguard/ptBRerrorsandhistorystatus, realcomponentformat/context/latepreview/warnings/history/downstreamobserverrefetchtestsadded; finalwebbuild/typecheck/lint48unit17E2Epass. FinalQAneeded.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-17 guard/componentrefetchverified48unit17E2Epass; remainingCSVEnglishparsermessagesnotlocalizedallactualcases, late-previewtestvacuous(absencealreadytrue/sametokens). MustdistinctA/B+awaitAsettlementandproveonlyBconfirmable.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: corrections, agent: senior-frontend, action: completed, notes: "TASK-17 auditedCSVEnglishmessageslocalizedactionableptBR+originaltechnicaldetails; distinctA/BasyncpreviewproofonlyBconfirmed, realcomponent/browsertests. Finalwebbuild/typecheck/lint49unit17E2Epass. FinalQAneeded.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: qa, agent: qa-reviewer, action: approved, notes: "TASK-17 fullyapproved: CSVptBR/guard, settleddistinctA/Btokenproof, realcomponentqueryobserverrefresh, allpriorimportcriteria; webbuild/typecheck/lint49unit17E2Epass. RealDBnotaDayseparateTASK15.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: implementation, agent: senior-frontend, action: blocked, notes: "TASK-15 readinessfoundSignup/Onboardinglocal-only, noassetoverridewriteUI, noReports-exportentry; potentialauthregistersessionDBpersistencegaprequiresBEverification. Noapplicationchangesundertestingtask; baselinewebbuild/lint17fixtureE2Epass. Planapproved-scopeintegrationfollowupbeforeharness.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: implementation, agent: senior-backend, action: partial, notes: "TASK-03 preflightfindingCONFIRMEDregistersetsCookiewithoutDBsession; loginalreadypersisted. Persisthelper/digest/nonce/logout/expiryandboundarytestsadded; onlyfinalbuildgreen, cookieassertioncorrectednotrerun. Needlegacyraw-tokencompatibilityandatomicregistrationreview; onboardinginvalidbrokercurrentlyinsertsportfoliobeforevalidation.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: tech-lead, agent: tech-lead, action: completed, notes: "TASK-18 FEapproved-scopeauth/onboard/manualquote/Reports-exportintegrationcreated,TASK15depsupdated.167archived+5inlinehistorypreserved,canonical299linesbeforeupdates;18tasksparse. Noexistingstatusesreset.", timestamp: "2026-10-26T19:32:56.805-03:00"}
+    - {step: corrections, agent: senior-backend, action: completed, notes: "TASK-03 registrationuser+sessiontransaction/cookieaftercommit, nonce+digestedpersistedsessions/legacyrawlazyupgrade/logout/expiryfixed. Onboardingvalidatesbrokerbeforewrites/txbootstrap. FinalAPIbuild/typecheck/lint273tests57filespass; reviewtest-doublecompatibilityfallback/productionatomicpathinQA. TASK18FEfirstdispatchusage-limitfailedbeforeexecution.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-03 sessionfixes273testscheckspass; onboardingfirstHoldingstillhandwritesmaterializedpositioninsteadreplay, missingasset/journal/holdingfailure/newbrokerrollbackproof. ProductionDrizzletransactionpathverified; legacydoublefallbackisnotatomicandmustnotbeclaimedasguarantee.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: implementation, agent: senior-frontend, action: partial, notes: "TASK-18 manualnative-currencyquoteedit/reset/pending/retry/cache+fixtureDailyCheck andReportsSettings-exportCTAimplemented; finalwebbuild/typecheck/lint60unit18E2Epass. Auth/onboarding/session-switchslicenext.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-backend, action: partial, notes: "TASK-03 onboardingfirstHoldingnowusesproductionreplaywithasset/journal/holding/newbrokerrollbackcoverage. Staticcheckspass277tests/1originalmockfailure: fixtureassetidhasnocurrencywhileDBcurrencyisnon-nullBRL/USD. NeedpreserveBRL-onlycontractwithouttest-onlyfallbackandvalidate.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: implementation, agent: senior-frontend, action: partial, notes: "TASK-18 signup/login/server-sessionverification/logout/ownercacheclearandpersistedreload-safeonboarding+existingRegisterfirstpurchasewired. Finalbuildpass;61unit20E2E/typecheck/lintpassedBEFORElasteditsofinalrerunneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-backend, action: blocked, notes: "TASK-03 oldmockcurrencyconflictremains277/278: schemaactuallynon-nullvarchar3NOT2-valueenum, so USD-onlyrejectionwouldmisclassifyEUR. Agentcorrectlyrefusedassumedconstraint/nofallback; needequivalentdatabaseforeign-currencygatewithoutweakeningrealdata.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: validation, agent: senior-frontend, action: completed, notes: "TASK-18 finalauth/onboardeditsvalidatedwebbuild/typecheck/lint61unit21E2Epass. Confirmed401clearsownerstate/login, failedsessioncheckhidesprivatecontentwithretry; manualquote/exportsliceintact. ReadyfrontendQA.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-backend, action: completed, notes: "TASK-03 BRL-onlyfirstHoldingusesDBcomputedcurrency<>BRLgate(validforANYnon-nullcurrency), replayliteralBRLaftergate; realisticBRL/USD/EURnewtestsandoriginalmockunchanged. FinalAPIbuild/typecheck/lint280tests57filespass. BackendQAneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-18 web61unit21E2Echeckspass; remainingfrontendgapsglobalprotected401aftercachedprofile, custombrokeronboardingpath, loginportfolio-without-accountresumerouting. Mustowner-safecentralclear/redirectandpersistedresumewithoutduplicates.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-backend, action: completed, notes: "TASK-03 onboardingoptionalownedportfolioIdreuseadded:404foreign/missingbeforewrites, custombroker/accountatomicrollback/existingportfoliopreserved, responseunchanged. FinalAPIbuild/typecheck/lint283tests57filespass. Agreedfrontendcontractready.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-frontend, action: completed, notes: "TASK-18 centralprotected401requestepochs+privatecacheclear/redirect acrossJSON/multipart/download, custombrokerandno-accountlogin/resumewired. Webbuild/typecheck/lint62unit23E2Epass; backendportfolioIdnowimplementeddespiteearlierinspectiondependencywarning. FinalQAneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: approved, notes: "TASK-03 backendauth/session/onboardingcodeapproved: productionTX/cookieaftercommit, legacycompat, sharedBRLjournalreplay/rollback, DBcurrencygate/reuseportfolio. APIbuild/typecheck/lint283tests57filespass; livePGseparate.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-18 3priorgapsfixed23E2E/checkspass; delayedresponsebodiescanoutliveheaderepochcheck(JSON/multipart/binaryexport). MustrecheckAFTERawaitbodyandbeforedatareturn/download; deterministicpostheaderowner-switchtestsneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-frontend, action: completed, notes: "TASK-18 post-bodyepochchecksnowcoverJSONsuccess/error,multipartparsefailures, exporterrorJSON/blobBEFOREURL/download. Deterministicheaders/body-owner-switchtestspreventolddata. Finalwebbuild/typecheck/lint69unit23E2Epass. FinalQAneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: approved, notes: "TASK-18 fullyapproved: owner-safepost-bodyepochs/JSONmultipartblobdiscardverified, priorauth/onboard/custombroker/manualquote/ReportsExportfixesintact. Webbuild/typecheck/lint69unit23E2Epass. RealDBjourneysseparateTASK15.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: implementation, agent: senior-frontend, action: partial, notes: "TASK-15 gatedreal-PostgreSQLproject/APIlauncher+sameoriginproxy,sixjourneys/isolation/securityhelpers,productionbundle-scan/envexamples/deployrunbooksadded. Allproductionbuilds/domain63/API283passed; finallauncherNodeimports/testMatchfixesUNVALIDATED afterlint/discoveryerrors. RealDB0verified; finalchecksneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: validation, agent: senior-frontend, action: completed, notes: "TASK-15 finalAPIlint/webbuild/typecheck/lint69unitpass. Playwright23originalfixture+1productionbundle-scanPASS,10real-postgresSKIP,0realpasses/failures. Helpersnotdiscovered, originalChromeunchanged, extraownedserversonlywithdedicatedE2E_DATABASE_URL. ReadyharnessQA; realDB/calendarstillblocked.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-15 scaffoldreview: real10SKIP/0pass,23fixtures+bundlescanpass,API283/domain63green. FixactualBRAPI_API_KEY/envvalue scan(redacted), realreportseededvalueasserts, idempotentnon-overwritingbenchmarkseed/quotefixtures, signupcleanupregisteredbeforeassertions, productioncompiledworker/32MiBdocs, deterministicexternalmarketdata. FulltaskstillDB/calendarblocked.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-frontend, action: partial, notes: "TASK-15 QAcodefixesactualkey/redactedscan,seededreportvalueassertions/repeatableseeds/signupcleanup,external-onlyproviderfixtures,compiledworker/32MiBdocsimplemented. Staticchecks pass; latest67/69units,22/23oldfixtures+1bundlescanpass/10realskip.3browserretriesfailed,noorigtests/appsourcechanged; diagnoseartifactsratherthanweakenchecks.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: validation, agent: senior-frontend, action: partial, notes: "TASK-15 diagnosisno newharnessinterferencefound: E2Eisolated23fixtures+1bundlescanPASS/10realskip. Unit68/69failsnotaCorretora1whileDOMmetadataquerypending; assignoriginalimportauthor(rootunknownnotproventiming). PriorExportartifactshowedReportsnotSettings; browserfailureunreproduced.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: validation, agent: senior-frontend, action: completed, notes: "NewTask17late-previewunitfixturepreloadsONLYunrelatedportfolio/broker/accountmetadata; othercasesstillfetch, raceA/Bassertionsunchanged. Target4/4 andfullwebbuild/typecheck/lint69/69unitsPASS,23fixture+bundlescanPASS/10realSkip. No productionbugestablished/sourceororiginaltests/configchanged. FinalTASK15scaffoldQAready.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: qa, agent: qa-reviewer, action: corrections-needed, notes: "TASK-15 sixpriorstaticfixesaccepted; oneactualscaffoldissueResponse.headersomitSet-Cookie, so signupcleanupmustawaitheaderValue/allHeadersbeforeasserts. Web24pass10realskip; independentAPI282/283hitoldPDF5stimeout, prior283green—notrecordedpassingthisrun. Prefetchedracefixtureacceptedlegitimate.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+    - {step: corrections, agent: senior-frontend, action: completed, notes: "TASK-15 signupteardownusesawaitResponse.headerValue(set-cookie) beforeassertions. IsolatedAPI283/283+lintPASS; sequentialwebbuild/typecheck/lint69units/23fixtures+1bundlescanPASS,10realSkip0verified. Noappsource/originaltests/configchanged; lastscaffoldQAneeded.", timestamp: "2026-10-27T13:16:50.974-03:00"}
+  handoff:
+    context: investy-dashboard
+    architecture_summary: |
+      Product: Investy — multi-user investment portfolio dashboard for the Brazilian retail market.
+      Stack: React 18 + Vite + TypeScript SPA; Tailwind CSS v4 theme on DocuForge tokens; Recharts; TanStack Query + Zustand; Node.js + Hono API; zod; PostgreSQL (managed) + Drizzle ORM; email/password auth with httpOnly cookie sessions (OAuth2-ready); scheduled worker process; Vitest + Playwright.
+      Core principles: transaction journal as source of truth; user data ownership; multi-user isolation at API layer; provider-agnostic market data proxy with caching + manual override; no secrets in browser; DocuForge design system extended as data-dense dashboard language; multi-device from day one.
+      Key decisions (ADR-001..010): full-stack Option C; pnpm monorepo (apps/web, apps/api, packages/domain, worker in apps/api); market-data proxy (brapi.dev + BCB SGS + Yahoo + CoinGecko, TTL cache, manual override); Postgres system of record with integer-cent money; transaction journal + B3 nota import (V1); auth & multi-user isolation; scheduled worker (quotes, snapshots, dividend agenda, backups); hosting/deployment (managed Postgres, no secrets in frontend); design system + Recharts; security foundation.
+      Entry files: .opencode/architecture/index.md, architecture.md, architecture-folder-schema.md, commit-pattern.md, docs/adrs/ADR-001..ADR-010.
+    selected_approach: "Option C full-stack (ADR-001); IA Option C module-first drawer-amplified; nota full scope with rateio; USD quote + FX; avg-cost display only; full scope remaining items."
+    design_summary: |
+      Approved design decisions (docs: .opencode/plan/investy-dashboard/design-docs/index.md + design-01..07):
+      D1 scope — 9 modules V1 (Auth/Onboarding, Dashboard, Holdings, Transactions/Journal, Nota import, Dividends, Assets Catalog, Reports, Settings); V1/V2/non-goals explicit, reconciled with success criteria + ADR-005.
+      D2 IA/UX — Option C module-first + drawer-amplified; global '+ Registrar'; inline holdings row actions; deep-link widgets; tabular numerals; pt-BR only.
+      D3 domain/data — journal-first + materialized holdings; integer cents; average-cost realized P&L (display only); USD quote + FX to BRL on read; amortização as capital-return event; rateio de custos (largest-remainder).
+      D4 API — resource-oriented REST + aggregates (summary/allocation/snapshots/agenda/benchmarks); nota preview→confirm with importToken; ownership scoping; zod; rate limits.
+      D5 design system — DocuForge tokens to dashboard composites (KPI, tables, chips, strips) + Recharts theme; light baseline; skeleton/empty/error states; responsive.
+      D6 import/export — lossless journal round-trip (JSON/CSV); nota PDF/text/CSV/XML; verified backups; account erasure; retain all snapshots.
+      D7 effort — ~40 dev-days across milestones M0..M9; domain engine first; parallel tracks after M3; matches ADR-001 4-6 wk MVP.
+    planning_summary: null
+    task_summary: null
+    acceptance_criteria: []
+    dependencies: []
+    additional_context: []
+  resume:
+    last_completed_agent: senior-frontend
+    last_completed_step: implementation
+    recovery_required: true
+    recovery_notes: "TASK-09/13 tests resource-blocked; see per-task findings and last history. TASK-07 approved; TASK-08 code QA approved with live PostgreSQL deferred."
