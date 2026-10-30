@@ -172,7 +172,7 @@ Repeat until approved.
 
 ## Task Commit
 
-Commit each task immediately after QA approval — do not wait for pipeline completion.
+Apply the authorization and code-QA timing rules in the [commit pattern](../../../architecture/commit-pattern.md) at every QA handoff; do not wait for pipeline completion.
 
 The orchestrator creates the commits following the [commit pattern](../../../architecture/commit-pattern.md):
 
@@ -189,7 +189,15 @@ The orchestrator creates the commits following the [commit pattern](../../../arc
 
 Record both commit SHAs in the task metadata in `pipeline.yaml` as `feat_commit` and `docs_commit`.
 
-Only the finalized task's files are staged. Never re-commit previously committed task work.
+### Commit Checkpoint Before the Next Dispatch
+
+Before dispatching another implementation agent, verify that the approved task's authorized commits exist and their SHAs are recorded. A successful commit command without state persistence does not close this checkpoint.
+
+If authorization is absent or Git/checks prevent a commit, record the specific pending reason in task notes or concerns. Carry an explicit pending-commit handoff rather than silently collecting more approved work.
+
+Code/config/scaffold-only QA can support an authorized implementation commit while runtime acceptance remains deferred. Preserve the task's incomplete validation status and the outstanding environment checks; the commit does not satisfy the Completion phase below.
+
+Only the reviewed task's files are staged. Preserve unrelated user staging and never re-commit previously committed task work.
 
 ## Completion
 

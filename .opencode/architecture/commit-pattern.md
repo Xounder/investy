@@ -4,7 +4,7 @@
 
 All commits in this repository must follow the pattern defined here. The file is referenced by `AGENTS.md`; it is mandatory reading before any commit and whenever a commit fails validation.
 
-Commits happen **per task**, as soon as a task is finalized (QA approval). Each task produces **two commits**: one for the implementation, and a separate one for `.opencode/` documentation changes when the task touched them.
+Commits happen **per task** for QA-approved implementation when the user has authorized commits. Code approval and full runtime acceptance are separate gates: committing reviewed code does not complete outstanding environment validation. Each task produces one implementation commit and a separate documentation commit when it changed `.opencode/` documentation.
 
 ## General Format
 
@@ -18,9 +18,12 @@ Commits happen **per task**, as soon as a task is finalized (QA approval). Each 
 
 ## Commit Timing
 
-- A commit is created **as soon as a task is finalized** — immediately after QA approval.
-- Never batch multiple tasks into one commit; each finalized task gets its own commit.
+- Resolve commit authorization at workflow entry or resume. Authorization for per-task commits covers the current delivery scope; an implementation request alone is not authorization to commit.
+- Once authorized, commit the reviewed implementation immediately after code QA approval, before dispatching another implementation task. Never accumulate approved tasks for a later batch.
+- Never batch multiple tasks into one commit; each reviewed task scope gets its own commit.
 - The orchestrator creates the commits and records the resulting SHAs in `pipeline.yaml` task metadata.
+- If Docker, a database, or another external requirement prevents runtime validation, record the deferral in the task and commit body. Keep the task pending full acceptance; do not turn skipped checks into passes.
+- If a commit cannot be created, record the reason in the existing task notes or concerns before continuing. Missing authorization and unvalidated code must not become silent commit omissions.
 
 ## Implementation Commit (one per task)
 
@@ -102,7 +105,7 @@ chore(web): upgrade Tailwind to v4
 
 ## Rules of Thumb
 
-- Only commit files belonging to the finalized task: implementation commit = task files; docs commit = `.opencode/` files changed by the task.
+- Only commit reviewed files belonging to one task scope: implementation commit = task files; docs commit = `.opencode/` files changed by the task. Preserve unrelated user staging.
 - Never commit secrets, tokens, or local configuration.
 - Do not commit build output, `node_modules`, or generated artifacts.
 - Never re-commit previously committed task work.
