@@ -61,10 +61,14 @@ Implement end-to-end Playwright tests covering the six key user journeys (design
 - TASK-11
 - TASK-12
 - TASK-14
+- TASK-16
+- TASK-17
+- TASK-18
+- TASK-19
 
 ### Dependency Notes
 
-Requires all feature tasks to be complete (TASK-07, TASK-08, TASK-09, TASK-10, TASK-11, TASK-12) and the settings screen (TASK-14) since E2E covers the full application. TASK-13 (export API) is exercised through TASK-14's settings screen and the quarterly-reporting journey.
+Requires the feature tasks (TASK-07..12, TASK-14), canonical reports API (TASK-16), operative import UI (TASK-17), approved journey integration (TASK-18), and TASK-19's isolated Docker PostgreSQL/bootstrap path for final **real-DB** six-journey execution. TASK-15's scaffold is already code QA-approved; TASK-19 consumes that existing scaffold but must not depend on TASK-15's full completion (no cycle). Fixture passes or skipped real cases are not real-DB proof. TASK-08 remains the import API prerequisite; TASK-13 (export API) is exercised through TASK-14. TASK-12 does not retroactively depend on TASK-16. TASK-03 auth/session backend code is now QA-approved; live PostgreSQL, Docker runtime and remaining provider/worker validation must not be marked passed without execution. TASK-10 official B3 January 9/Bora worker 2026 sources and 365-day/14-closure/247-session targeted tests are recorded, with final full-package/calendar QA still pending.
 
 ---
 
