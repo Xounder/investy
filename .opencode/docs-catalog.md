@@ -48,7 +48,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `skills/doc-audit/SKILL.md` | Audits .md files for duplicates and intra-file prompt duplication (excludes /plan folder) | New audit rules; file similarity detection changes |
 | `skills/learning-improvement/references/stop-chain.md` | STOP hook chain definition — 3 skills in sequence | Chain order or skill names change |
 | `skills/codebase-analysis/SKILL.md` | Scans all TS/TSX files with tree-sitter — extracts imports, exports, declarations, React components, dependency maps | New scan targets; grammar changes; output format changes |
-| `skills/codebase-analysis/output/docs-report.md` | Generated analysis output from codebase-analysis skill | Output format changes |
+| `skills/codebase-analysis/output/` (local, Git-ignored) | Generated structural and documentation analysis reports; not versioned source | Regenerate with the codebase-analysis skill |
 
 ---
 
