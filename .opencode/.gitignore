@@ -1,0 +1,8 @@
+# .opencode dependencies
+node_modules
+
+# Delivery pipeline local artifacts
+plan
+sessions
+tmp
+pipeline.yaml
