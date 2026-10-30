@@ -16,7 +16,7 @@ Read in this order:
 - architecture/architecture.md — System architecture, principles, and ADRs
 - architecture/architecture-folder-schema.md — Folder purpose map
 - architecture/commit-pattern.md — Commit message convention
-- architecture/docs/adrs/ — Architecture Decision Records (ADR-001 through ADR-010)
+- architecture/docs/adrs/ — Architecture Decision Records (ADR-001 through ADR-011), including [Docker-first runtime and isolated E2E](architecture/docs/adrs/ADR-011-docker-first-runtime.md)
 - architecture/docs/backend/ — Backend/API documentation (planned)
 - architecture/docs/feature/ — Feature-level architecture (planned)
 - architecture/docs/frontend/ — Frontend/UI documentation (planned)
@@ -93,6 +93,7 @@ Generated artifacts:
 
 - plan/<context>/design-docs/
 - plan/<context>/tasks/
+- [plan/investy-dashboard/tasks/TASK-19-docker-first-stack-e2e.md](plan/investy-dashboard/tasks/TASK-19-docker-first-stack-e2e.md) — Docker-first main stack and isolated E2E delivery task
 
 ---
 

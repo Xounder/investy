@@ -72,7 +72,8 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `architecture/architecture.md` | System architecture, principles, stack, key decisions, success criteria | Architecture decisions change |
 | `architecture/architecture-folder-schema.md` | Folder purpose map | Folder structure changes |
 | `architecture/commit-pattern.md` | Commit message convention — per-task `feat(<feature>)[TASK-XX]` commits and separate `docs(<area>)` commits | Commit rules or formats change |
-| `architecture/docs/adrs/` | Architecture Decision Records (ADR-001 to ADR-010) | New ADRs accepted |
+| `architecture/docs/adrs/` | Architecture Decision Records (ADR-001 to ADR-011) | New ADRs accepted |
+| `architecture/docs/adrs/ADR-011-docker-first-runtime.md` | Docker-first main PostgreSQL/API/worker/web and isolated E2E; managed hosting option retained | Docker runtime/hosting decision changes |
 
 ---
 

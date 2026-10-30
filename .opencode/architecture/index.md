@@ -11,7 +11,7 @@ Investy is a multi-user investment portfolio dashboard for the Brazilian retail 
 | `architecture.md` | System architecture, principles, stack, key decisions, success criteria |
 | `architecture-folder-schema.md` | Purpose of every folder inside `architecture/` |
 | `commit-pattern.md` | Commit message convention |
-| `docs/adrs/` | Architecture Decision Records (ADR-001 to ADR-010) |
+| `docs/adrs/` | Architecture Decision Records (ADR-001 to ADR-011) |
 | `docs/backend/` | Backend/API documentation (planned) |
 | `docs/feature/` | Feature-level architecture (planned) |
 | `docs/frontend/` | Frontend/UI component architecture (planned) |
@@ -31,6 +31,7 @@ Investy is a multi-user investment portfolio dashboard for the Brazilian retail 
 | ADR-008 | Platform-hosted api+worker with managed Postgres; no secrets in frontend | Accepted |
 | ADR-009 | Tailwind v4 theme on DocuForge tokens + Recharts; data-dense dashboard UI | Accepted |
 | ADR-010 | Security foundation: server-side secrets, CORS lockdown, rate limits, zod | Accepted |
+| [ADR-011](docs/adrs/ADR-011-docker-first-runtime.md) | Docker-first principal PostgreSQL/API/worker/web and isolated real-DB E2E; managed deploy option retained | Accepted |
 
 ## Reference Mapping
 

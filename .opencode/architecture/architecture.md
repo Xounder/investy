@@ -8,7 +8,7 @@ Users consolidate holdings from multiple brokers across asset classes — açõe
 
 Market data is consumed from public providers (brapi.dev, BCB SGS, Yahoo Finance, CoinGecko) through a server-side proxy that caches quotes and degrades gracefully. The UI follows the DocuForge design system extended into a data-dense, chart-driven dashboard language.
 
-Investy is a full-stack application (Option C): React SPA + Node API + managed PostgreSQL + scheduled sync worker, with multi-user authentication and multi-device support from day one.
+Investy is a full-stack application (Option C): React SPA + Node API + PostgreSQL + scheduled sync worker, with multi-user authentication and multi-device support from day one. [ADR-011](docs/adrs/ADR-011-docker-first-runtime.md) makes Docker Compose the default main-stack and isolated E2E bootstrap, including the principal PostgreSQL database; [ADR-008](docs/adrs/ADR-008-hosting-deployment.md) preserves the managed deployment option.
 
 ---
 
@@ -59,7 +59,8 @@ All mutable state is server-side; the SPA is stateless. Users can log in from an
 └────────────────┬───────────────────┘
                  │ Drizzle ORM
 ┌────────────────▼───────────────────┐
-│  PostgreSQL (managed)              │
+│  PostgreSQL (Docker default;       │
+│  managed deployment optional)      │
 │  users · journal · positions ·     │
 │  dividends · quotes · snapshots    │
 └────────────────▲───────────────────┘
@@ -85,11 +86,11 @@ All mutable state is server-side; the SPA is stateless. Users can log in from an
 | Charts | Recharts | Declarative, themeable, covers line/area/donut/bar |
 | Backend | Node.js + Hono + TypeScript | Light, TS-first HTTP layer for API + proxy |
 | Validation | zod | Runtime validation at API and import boundaries |
-| Storage | PostgreSQL (managed) + Drizzle ORM | Multi-user OLTP, transactional journal, migrations |
+| Storage | PostgreSQL (Docker default; managed option) + Drizzle ORM | Multi-user OLTP, transactional journal, versioned migrations |
 | Auth | Email/password + httpOnly cookie sessions, OAuth2-ready | Secure defaults, extensible to Google/Open Finance |
 | Market data | brapi.dev (B3/FII/ETF/BDR/crypto + indicators), BCB SGS (Selic/CDI/IPCA), Yahoo chart (US/IE), CoinGecko (crypto fallback) | Redundancy + official macro source, server-side caching |
 | Worker | Node process in `apps/api`, scheduler (node-cron / platform cron) | Shares schema and domain code, single deploy unit |
-| Hosting | Web on Vercel/Netlify optional; api+worker on Railway/Fly/Render; managed Postgres on Neon/Supabase/Railway | Cheap multi-user deploy, secrets in env vars |
+| Hosting | Compose main stack and isolated E2E by default; deployable images may use managed Postgres and hosted TLS/storage | Docker-first bootstrap with portable hosting; production TLS/off-host backups must be supplied separately (ADR-011) |
 | Tests | Vitest (unit/domain/API) + Playwright (E2E) | Correctness of money math and key flows |
 | Money | Integer cents (BIGINT), BR formatting via Intl | No floating-point drift on BRL arithmetic |
 
@@ -109,6 +110,7 @@ All mutable state is server-side; the SPA is stateless. Users can log in from an
 | ADR-008 | Platform-hosted api+worker with managed Postgres; no secrets in frontend | Accepted | [ADR-008](docs/adrs/ADR-008-hosting-deployment.md) |
 | ADR-009 | Tailwind v4 theme on DocuForge tokens + Recharts; data-dense dashboard UI | Accepted | [ADR-009](docs/adrs/ADR-009-design-system-frontend.md) |
 | ADR-010 | Security foundation: server-side secrets, CORS lockdown, rate limits, zod | Accepted | [ADR-010](docs/adrs/ADR-010-security.md) |
+| ADR-011 | Docker-first principal PostgreSQL/API/worker/web and isolated real-DB E2E; managed deploy option retained | Accepted | [ADR-011](docs/adrs/ADR-011-docker-first-runtime.md) |
 
 ---
 
@@ -169,7 +171,7 @@ The system is considered functional when it can:
 | System architecture (this file) | `architecture.md` |
 | Architecture index | `index.md` |
 | Folder schema | `architecture-folder-schema.md` |
-| Decision records | `docs/adrs/ADR-001-*.md` … `ADR-010-*.md` |
+| Decision records | `docs/adrs/ADR-001-*.md` … `ADR-011-*.md` |
 | API specification | `docs/backend/api-specification.md` (planned) |
 | Frontend component architecture | `docs/frontend/component-architecture.md` (planned) |
 | Feature catalog | `docs/feature/` (planned) |
@@ -180,8 +182,8 @@ The system is considered functional when it can:
 
 # Open Questions
 
-- Managed Postgres provider preference (Neon vs Supabase vs Railway) — finalize at implementation.
-- Hosting platform preference for api+worker (Railway vs Fly.io vs Render).
+- Optional managed deployment provider preference (Neon vs Supabase vs Railway) — finalize only if deploying outside the Docker-first default.
+- Optional hosted platform preference for api+worker (Railway vs Fly.io vs Render); production TLS/off-host backups remain deployment decisions.
 - Auth scope: email/password only in V1, or also Google OAuth at launch.
 - Broker list must be extensible; acceptable to seed a preconfigured set (XP, Rico, Clear, Nu Invest, Inter) in V1.
 - Whether Tesouro Direto prices should be imported from an external source or manually entered in V1.
