@@ -1,3 +1,4 @@
 [submodule ".opencode"]
 	path = .opencode
 	url = https://github.com/Xounder/delivery-pipeline
+	branch = dlvr-ppln/investy
