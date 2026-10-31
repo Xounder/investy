@@ -2,7 +2,7 @@ name: investy-local-main
 services:
   db:
     image: postgres:16-alpine
-    env_file: .env.docker.postgres.local
+    env_file: ../.env.docker.postgres.local
     environment:
       POSTGRES_USER: investy_local
       POSTGRES_DB: investy_local
@@ -15,9 +15,10 @@ services:
       retries: 30
   migrate:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: api
-    env_file: .env.docker.local
+    env_file: ../.env.docker.local
     working_dir: /app/apps/api
     command: ["node", "dist/db/migrate.js"]
     environment:
@@ -28,9 +29,10 @@ services:
     restart: "no"
   api:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: api
-    env_file: .env.docker.local
+    env_file: ../.env.docker.local
     environment:
       APP_ORIGIN: http://localhost:8080
       PORT: "3000"
@@ -50,9 +52,10 @@ services:
     restart: unless-stopped
   worker:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: api
-    env_file: .env.docker.local
+    env_file: ../.env.docker.local
     environment:
       NODE_ENV: development
       BACKUP_DIR: /app/.data/backups
@@ -66,7 +69,8 @@ services:
     restart: unless-stopped
   web:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: web
     ports:
       - "127.0.0.1:8080:80"

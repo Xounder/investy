@@ -55,11 +55,11 @@ Only Docker Engine with Compose v2 is required on the host. From the
 repository root, execute these commands individually:
 
 ```text
-docker compose -f compose.bootstrap.yaml run --build --rm e2e-bootstrap
-docker compose -f compose.e2e.yaml --profile browser config --quiet
-docker compose -f compose.e2e.yaml --profile browser build migrate-e2e browser-e2e
-docker compose -f compose.e2e.yaml --profile browser run --rm browser-e2e
-docker compose -f compose.e2e.yaml stop
+docker compose -f docker/compose.bootstrap.yaml run --build --rm e2e-bootstrap
+docker compose -f docker/compose.e2e.yaml --profile browser config --quiet
+docker compose -f docker/compose.e2e.yaml --profile browser build migrate-e2e browser-e2e
+docker compose -f docker/compose.e2e.yaml --profile browser run --rm browser-e2e
+docker compose -f docker/compose.e2e.yaml stop
 ```
 
 The bootstrap creates or checks the ignored `.env.e2e.local` (host URL) and

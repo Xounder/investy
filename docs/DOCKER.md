@@ -4,10 +4,16 @@ The default local runtime requires Docker Engine with Compose v2, not a host
 Node.js or PostgreSQL installation. From the repository root, execute each
 command separately:
 
+Dockerfiles, Compose stacks, nginx configuration, and helpers live in `docker/`.
+Compose resolves its relative paths from that directory; build contexts and
+bootstrap mounts point back to the repository root. Private `.env.*.local`
+files and `.dockerignore` remain at the root. Existing Compose project names
+and named volumes are unchanged by this layout.
+
 ```text
-docker compose -f compose.bootstrap.yaml run --build --rm bootstrap
-docker compose -f compose.yaml config --quiet
-docker compose -f compose.yaml up --build -d --wait
+docker compose -f docker/compose.bootstrap.yaml run --build --rm bootstrap
+docker compose -f docker/compose.yaml config --quiet
+docker compose -f docker/compose.yaml up --build -d --wait
 ```
 
 Open `http://localhost:8080`. The web image serves compiled Vite assets with
@@ -24,8 +30,8 @@ start. The worker runs compiled JavaScript, not the development `tsx` command.
 For an explicit idempotent migration run and private operational diagnostics:
 
 ```text
-docker compose -f compose.yaml run --rm migrate
-docker compose -f compose.yaml logs migrate api worker
+docker compose -f docker/compose.yaml run --rm migrate
+docker compose -f docker/compose.yaml logs migrate api worker
 curl http://localhost:8080/api/ready
 ```
 
@@ -36,12 +42,12 @@ containers automatically; after database recovery, verify `/api/ready` and
 the worker logs. If they remain faulty, restart only these services:
 
 ```text
-docker compose -f compose.yaml restart api worker
+docker compose -f docker/compose.yaml restart api worker
 ```
 
 `restart` does not reload changed environment files. To rotate a session
 secret, use a new cryptographically random value in the ignored server file,
-then **recreate** API and worker (`docker compose -f compose.yaml up -d
+then **recreate** API and worker (`docker compose -f docker/compose.yaml up -d
 --force-recreate api worker`); this intentionally invalidates existing
 sessions. To rotate a PostgreSQL password on a **persisted** volume, first
 change the actual `investy_local` database role credential through an
@@ -51,7 +57,7 @@ Changing `POSTGRES_PASSWORD` alone does **not** update an initialized
 PostgreSQL role. Never paste passwords into shell commands, logs, or tickets.
 
 ```text
-docker compose -f compose.yaml stop
+docker compose -f docker/compose.yaml stop
 ```
 
 Stop the stack after validation. `stop` retains the database and backup named
@@ -84,7 +90,7 @@ erased users, overwrite other owners, or roll back erasure history. Arrange
 an audited recovery procedure and off-host storage before relying on backups.
 
 **Isolation:** For the Docker-only real-browser suite, see
-[the E2E runbook](../apps/web/e2e/real/README.md). `compose.e2e.yaml` uses the independent
+[the E2E runbook](../apps/web/e2e/real/README.md). `docker/compose.e2e.yaml` uses the independent
 `investy-local-e2e` project, `investy_e2e` database, and named PostgreSQL
 and artifact volumes. Its browser and migration containers connect to
 `postgres-e2e:5432` on their private network, while the optional host helper
@@ -113,7 +119,7 @@ and web/build images never receive the private file. After adding, changing,
 or removing it, recreate API and worker (a restart does not reload env files):
 
 ```text
-docker compose -f compose.yaml up -d --force-recreate api worker
+docker compose -f docker/compose.yaml up -d --force-recreate api worker
 ```
 
 ## Static checks without Docker (optional host Node/pnpm)

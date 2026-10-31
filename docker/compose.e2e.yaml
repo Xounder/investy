@@ -2,7 +2,7 @@ name: investy-local-e2e
 services:
   postgres-e2e:
     image: postgres:16-alpine
-    env_file: .env.e2e.postgres.local
+    env_file: ../.env.e2e.postgres.local
     environment:
       POSTGRES_USER: investy_e2e
       POSTGRES_DB: investy_e2e
@@ -18,10 +18,11 @@ services:
   migrate-e2e:
     profiles: [browser]
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: e2e
     volumes:
-      - ./.env.e2e.local:/run/investy/e2e.env:ro
+      - ../.env.e2e.local:/run/investy/e2e.env:ro
     command: ["node", "/app/docker/run-e2e.js", "migrate"]
     depends_on:
       postgres-e2e:
@@ -30,10 +31,11 @@ services:
   browser-e2e:
     profiles: [browser]
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: e2e
     volumes:
-      - ./.env.e2e.local:/run/investy/e2e.env:ro
+      - ../.env.e2e.local:/run/investy/e2e.env:ro
       - e2e_test_results:/app/apps/web/test-results
       - e2e_playwright_report:/app/apps/web/playwright-report
     command: ["node", "/app/docker/run-e2e.js", "test"]

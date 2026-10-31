@@ -64,7 +64,7 @@ apps/
   api/              HTTP API, persistence, market-data integration, and worker
 packages/
   domain/           Shared domain types and financial calculations
-docker/             Local bootstrap and E2E helpers
+docker/             Dockerfiles, Compose stacks, nginx, bootstrap and E2E helpers
 docs/               Local operation and production deployment guides
 .opencode/          Delivery Pipeline submodule and project documentation
 ```
@@ -76,9 +76,9 @@ This is a pnpm workspace. Optional host-based development and static checks requ
 Install Docker Engine with Compose v2. From the repository root, run each command separately:
 
 ```bash
-docker compose -f compose.bootstrap.yaml run --build --rm bootstrap
-docker compose -f compose.yaml config --quiet
-docker compose -f compose.yaml up --build -d --wait
+docker compose -f docker/compose.bootstrap.yaml run --build --rm bootstrap
+docker compose -f docker/compose.yaml config --quiet
+docker compose -f docker/compose.yaml up --build -d --wait
 ```
 
 Open **http://localhost:8080**. The stack includes PostgreSQL, migrations, the API, worker, and web application. Bootstrap generates the ignored local settings; the detailed setup and optional provider-token configuration are documented in the [Docker guide](docs/DOCKER.md).
@@ -86,7 +86,7 @@ Open **http://localhost:8080**. The stack includes PostgreSQL, migrations, the A
 Stop the local stack when finished:
 
 ```bash
-docker compose -f compose.yaml stop
+docker compose -f docker/compose.yaml stop
 ```
 
 Database and backup volumes persist across stops. The local stack uses HTTP; production deployment is covered separately in the [deployment guide](docs/DEPLOYMENT.md).

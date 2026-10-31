@@ -2,17 +2,17 @@ name: investy-local-bootstrap
 services:
   bootstrap:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.bootstrap
     working_dir: /workspace
     volumes:
-      - .:/workspace
+      - ..:/workspace
     command: ["node", "docker/init-local.js"]
   e2e-bootstrap:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.bootstrap
     working_dir: /workspace
     volumes:
-      - .:/workspace
+      - ..:/workspace
     command: ["node", "docker/init-e2e.js"]
