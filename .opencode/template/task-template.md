@@ -31,7 +31,7 @@ Pending
 - Planned session batch: [BATCH-XX; distinguish from parallel execution wave]
 - Deliverable boundary and explicitly out of scope: [Independently reviewable result; follow-up task IDs]
 - Candidate files / shared-file owner and merge strategy: [Paths; sequential or disjoint sections, or none]
-- Principal-context estimate: [Dispatch/context + condensed return + QA/corrections + commit/state handoffs; closure share accounted for within the batch's configured `dispatchReserve` in `.opencode/context-budget.json`, not added twice; size/uncertainty labels and assumptions, not measured telemetry]
+- Principal-context estimate: [Dispatch/context + condensed return + QA/corrections + commit/state handoffs; closure share accounted for within the current model's effective `limits.dispatchReserve` returned by `read-context-budget`, not added twice; size/uncertainty labels and assumptions, not measured telemetry]
 - Validation and closeout boundary: [Checks and QA evidence required; deferred runtime checks or pending approvals, if any]
 
 ---

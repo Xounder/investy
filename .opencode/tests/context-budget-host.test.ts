@@ -17,6 +17,12 @@ function message(session = sessionID) {
     }, parts: [],
   }
 }
+function user(modelID = "model") {
+  return { info: { role: "user", id: "caller", sessionID, time: { created: Date.now() - 2_000 }, model: { providerID: "provider", modelID } }, parts: [] }
+}
+const providerResponse = () => Response.json({ providers: [{ id: "provider", models: { model: { limit: { context: 200_000, output: 8_000 } } } }] })
+const sessionResponse = (session = sessionID) => Response.json([user(), message(session)])
+const routed = (request: Request) => new URL(request.url).pathname === "/config/providers" ? providerResponse() : sessionResponse()
 
 const ctx = (dir = directory, signal = new AbortController().signal) => ({
   sessionID, directory: dir, worktree, abort: signal,
@@ -27,26 +33,26 @@ afterEach(async () => { await dispose?.(); dispose = undefined; vi.useRealTimers
 
 describe("host-injected context budget transport", () => {
   it("uses the real SDK host fetch without a localhost listener; scopes the directory and caller session", async () => {
-    const fetch = vi.fn(async (request: Request) => {
-      return Response.json([message()])
-    })
+    const fetch = vi.fn(async (request: Request) => routed(request))
     const client = createOpencodeClient({ baseUrl: "http://localhost:4096", directory,
       headers: { authorization: "Basic host-only" }, fetch })
     const hooks = await ContextBudgetPlugin({ client, directory, worktree } as Parameters<typeof ContextBudgetPlugin>[0])
     dispose = hooks.dispose
     const result = JSON.parse(await budgetTool.execute({}, ctx()) as string)
     expect(result).toMatchObject({ status: "measured", sessionID, inputContextTokens: 50 })
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledTimes(2)
     const request = fetch.mock.calls[0][0]
     const url = new URL(request.url)
     expect(url.pathname).toBe("/session/principal/message")
     expect(url.searchParams.get("directory")).toBe(directory)
     expect(url.searchParams.get("limit")).toBe("20")
     expect(request.headers.get("authorization")).toBe("Basic host-only")
+    expect(new URL(fetch.mock.calls[1][0].url).pathname).toBe("/config/providers")
+    expect(new URL(fetch.mock.calls[1][0].url).searchParams.get("directory")).toBe(directory)
   })
 
   it("does not borrow a client for another directory or worktree, and disposes only its own registration", async () => {
-    const fetch = vi.fn(async () => Response.json([message()]))
+    const fetch = vi.fn(async (request: Request) => routed(request))
     const client = createOpencodeClient({ baseUrl: "http://localhost:4096", directory, fetch })
     const hooks = await ContextBudgetPlugin({ client, directory, worktree } as Parameters<typeof ContextBudgetPlugin>[0])
     dispose = hooks.dispose
@@ -60,12 +66,13 @@ describe("host-injected context budget transport", () => {
     expect(JSON.parse(await budgetTool.execute({}, ctx()) as string).status).toBe("measured")
     await hooks.dispose?.()
     dispose = undefined
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledTimes(2)
   })
 
   it("rejects foreign session messages and a failed SDK response without leaking error text", async () => {
     const fetch = vi.fn()
-      .mockResolvedValueOnce(Response.json([message("another-session")]))
+      .mockResolvedValueOnce(sessionResponse("another-session"))
+      .mockResolvedValueOnce(providerResponse())
       .mockResolvedValueOnce(new Response(JSON.stringify({ name: "NotFoundError", data: { message: "secret" } }), { status: 404 }))
     const client = createOpencodeClient({ baseUrl: "http://localhost:4096", directory, fetch })
     const hooks = await ContextBudgetPlugin({ client, directory, worktree } as Parameters<typeof ContextBudgetPlugin>[0])
@@ -89,10 +96,10 @@ describe("host-injected context budget transport", () => {
   })
 
   it("uses the explicit loopback override instead of the host client", async () => {
-    const hostFetch = vi.fn(async () => Response.json([message("foreign")]))
+    const hostFetch = vi.fn(async () => sessionResponse("foreign"))
     const overrideFetch = vi.fn(async (request: Request) => {
       expect(new URL(request.url).host).toBe("127.0.0.1:5000")
-      return Response.json([message()])
+      return routed(request)
     })
     vi.stubGlobal("fetch", overrideFetch)
     const client = createOpencodeClient({ baseUrl: "http://localhost:4096", directory, fetch: hostFetch })
@@ -101,14 +108,14 @@ describe("host-injected context budget transport", () => {
     const result = JSON.parse(await budgetTool.execute({ serverUrl: "http://127.0.0.1:5000" }, ctx()) as string)
     expect(result).toMatchObject({ status: "measured", inputContextTokens: 50 })
     expect(hostFetch).not.toHaveBeenCalled()
-    expect(overrideFetch).toHaveBeenCalledTimes(1)
+    expect(overrideFetch).toHaveBeenCalledTimes(2)
   })
 
   it("treats a stale observation as unknown even over the host transport", async () => {
     const stale = message()
     stale.info.time.completed = Date.now() - 121_000
     const client = createOpencodeClient({ baseUrl: "http://localhost:4096", directory,
-      fetch: async () => Response.json([stale]) })
+      fetch: async (request: Request) => new URL(request.url).pathname === "/config/providers" ? providerResponse() : Response.json([user(), stale]) })
     const hooks = await ContextBudgetPlugin({ client, directory, worktree } as Parameters<typeof ContextBudgetPlugin>[0])
     dispose = hooks.dispose
     expect(JSON.parse(await budgetTool.execute({}, ctx()) as string)).toMatchObject({

@@ -101,15 +101,16 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `tools/create-folder-structure.ts` | Folder creation tool — creates `design-docs/`, `planning/`, `tasks/` for a pipeline context | Folder structure changes; new pipeline contexts |
 | `tools/get-git-diff.ts` | Git diff tool — returns diff between two refs with optional path filter | Diff logic changes |
 | `tools/read-pipeline-state.ts` | Pipeline state reader — reads `pipeline.yaml` fields via dot-separated paths | Pipeline YAML structure changes |
-| `tools/read-context-budget.ts` | OpenCode tool default export: host-injected SDK caller-session snapshot, optional loopback override, 20 recent messages, 5-second async wait (not a parsing/byte bound); invoke from principal after restart | Context budget tool interface changes |
+| `tools/read-context-budget.ts` | Host SDK caller-session snapshot and configured current-model capacity via `config.providers`; optional loopback override, 20 recent messages, shared 5-second async deadline; invoke from principal after restart | Context budget tool interface changes |
 | `plugins/context-budget.plugin.ts` | Registers host SDK transport for the current directory/worktree; no duplicate tool registration | Host plugin/client contract changes |
 | `lib/context-budget-client.ts` | Project-scoped client registry with disposal guard | Host client lifecycle changes |
-| `context-budget.json` | Single editable policy source: closeout target, new-work stop, close-by boundary, user-selected model-context reference and protected dispatch reserve; invalid/missing config stops new work | Budget policy changes |
-| `lib/context-budget.ts` | Loads and validates policy per reading; snapshot helper: usable completed assistant input, conservative cache sum, 120-second freshness, unknown for failed/missing/zero-token observation; caller identity is not principal identity | Budget semantics or limits change |
+| `context-budget.json` | Auto policy ratios/caps and optional exact provider/model usable-input overrides; missing/invalid policy stops new work | Budget policy changes |
+| `lib/context-budget.ts` | Validates config, resolves configured-model usable input (context minus max output and optional input bound), scales effective limits and validates same-model completed snapshot with 120-second freshness; caller identity is not principal identity | Budget semantics or limits change |
 | `tests/read-context-budget.test.ts` | Tool/helper behavior tests, including explicitly configured historical boundary scenarios | Context-budget behavior changes |
 | `tests/context-budget-config.test.ts` | Configuration validation, alternate policy and current default boundary regression tests | Context-budget policy changes |
 | `tests/context-budget-invalid-tool.test.ts` | Invalid config prevents SDK requests and returns unknown | Context-budget failure policy changes |
 | `tests/context-budget-host.test.ts` | Real SDK custom-fetch regression tests; not live host-discovery evidence | Context-budget host transport changes |
+| `tests/context-budget-manual-host.test.ts` | Real SDK custom-fetch exact-model manual fallback, metadata failure/deadline and abort regressions; not live discovery | Context-budget fallback contract changes |
 | `tools/resolve-template.ts` | Template renderer — resolves `[VARIABLES]` from variables.md with pipeline context | Variable definitions or template paths change |
 | `tools/run-package-command.ts` | Package command runner — runs build/lint/typecheck/test in a workspace subpackage | New commands added |
 | `project-structure.md` | Project structure map | Important folders/files change |

@@ -86,17 +86,18 @@ Read in this order:
 
 # Tools
 
-- context-budget.json — Single configurable budget policy (`target`, `stopNewWork`, `closeBy`, `absoluteContextReference`, `dispatchReserve`); invalid or missing config stops new work
+- context-budget.json — Auto ratios/caps and exact-model usable-input overrides; effective limits come from the current model, not a global context reference
 - tools/create-folder-structure.ts — Create `design-docs/`, `planning/`, `tasks/` for a pipeline context
 - tools/get-git-diff.ts — Return git diff between two refs with optional path filter
 - tools/read-pipeline-state.ts — Read fields from `pipeline.yaml` via dot-separated paths
 - tools/read-context-budget.ts — Caller-session completed-assistant context snapshot; invoke from principal after restart (unknown stops new work)
-- lib/context-budget.ts — Snapshot validation, freshness limits and conservative context accounting
+- lib/context-budget.ts — Config/model-capacity validation, effective limits, freshness and conservative context accounting
 - lib/context-budget-client.ts — Directory/worktree-scoped host SDK client registration
 - tests/read-context-budget.test.ts — OpenCode context-budget tool/helper behavior tests
 - tests/context-budget-config.test.ts — Config validation, alternate limits and default policy boundaries
 - tests/context-budget-invalid-tool.test.ts — Invalid config fails closed before SDK requests
 - tests/context-budget-host.test.ts — Real SDK custom-transport regressions (not live OpenCode discovery)
+- tests/context-budget-manual-host.test.ts — Exact full-model manual fallback on metadata errors/timeouts via real SDK custom transport
 - tools/resolve-template.ts — Render a template by resolving `[VARIABLES]` from variables.md
 - tools/run-package-command.ts — Run `build/lint/typecheck/test` in a workspace subpackage
 - tools/save-session.ts — Save session evaluation with 2-file retention policy
