@@ -1,6 +1,0 @@
-{
-  "mode": "auto",
-  "ratios": { "target": 0.70, "stopNewWork": 0.80, "closeBy": 0.90, "dispatchReserve": 0.10 },
-  "caps": { "target": 450000, "stopNewWork": 580000, "closeBy": 600000, "dispatchReserve": 20000 },
-  "modelOverrides": {}
-}
