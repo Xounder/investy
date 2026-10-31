@@ -42,14 +42,12 @@ Starts a new delivery workflow.
 
 Responsibilities:
 
-1. Generate a context name.
-2. Create the planning folder structure using the `create-folder-structure` tool. The tool creates `design-docs/`, `planning/`, and `tasks/` subfolders. If the selected workflow does not use all folders, unused ones remain empty — this is expected.
-3. Create [PIPELINE_FILE] using [PIPELINE_TEMPLATE_FILE].
+1. Check whether [PIPELINE_FILE] already exists **before** creating folders or writing state. If it is incomplete, default to [Resume Execution](#resume-execution); replacing it requires explicit user approval. Before any authorized replacement, reconcile Git and uncommitted user changes, and durably preserve the prior state, history and referenced artifacts inside the repo at a non-overwriting archive path. Verify the preservation by read-back; if it fails or conflicts with user changes, stop without replacing state or artifacts.
+2. For a genuinely new execution, generate a neutral context name and initialize [PIPELINE_FILE] from [PIPELINE_TEMPLATE_FILE] with that context and actual start/update timestamps. Leave task, batch and blocker lists empty, `current_batch: null`, and recovery fields neutral; do not copy product-specific values or evidence from a previous execution.
+3. Create the planning folder structure using the `create-folder-structure` tool. The tool creates `design-docs/`, `planning/`, and `tasks/` subfolders. If the selected workflow does not use all folders, unused ones remain empty — this is expected.
 4. Check whether the architecture documentation set is complete: `.opencode/architecture/` with `[ARCHITECTURE_ENTRY_FILE]` (`.opencode/architecture/architecture.md`) and `[ARCHITECTURE_INDEX_FILE]`, `[DOCS_CATALOG_FILE]` (`.opencode/docs-catalog.md`), `[PROJECT_STRUCTURE_FILE]` (`.opencode/project-structure.md`), and the INDEX.md `# Architecture` section. If any piece is missing (including when a codebase exists without these docs), execute the [Architecture Initialization Flow](references/execution-phases.md#architecture-initialization-flow) before routing.
-5. Invoke the Workflow Router skill.
-6. Execute the selected workflow.
-7. Persist progress after every agent execution.
-8. After Tech Lead, persist all known unfinished tasks in bounded `pipeline.batches` before implementation; dispatch only within `current_batch` under [session-batch gates](references/session-batches.md).
+5. Invoke the Workflow Router skill and execute the selected workflow.
+6. Persist progress after every agent execution. After Tech Lead, persist all known unfinished tasks exactly once in bounded `pipeline.batches`, including future `pending` batches, before implementation; set `current_batch` only when a batch actually starts and dispatch only within it under [session-batch gates](references/session-batches.md).
 
 ### Resume Execution
 
@@ -78,6 +76,10 @@ Pipeline state is stored in:
 
 The pipeline file is the source of truth for workflow execution; a per-batch handoff under `[PLAN_FOLDER_LOCATION]/references/` preserves detailed evidence outside the two-file session retention policy.
 It must be updated after every agent execution by the orchestrator.
+
+Populate `pipeline.tasks` from approved task artifacts: use unique IDs, actual titles and owners; start task, implementation, QA and validation statuses as pending. Record `open_findings` and precise evidence as work proceeds. A code/config QA approval or authorized implementation commit may coexist with deferred or blocked runtime acceptance: leave the task unfinished until full acceptance is evidenced. Record `feat_commit`/`docs_commit` only for commits that exist and were authorized; otherwise keep null with the pending reason. See [Task Tracking](references/task-tracking.md) and [Task Commit](references/execution-phases.md#task-commit).
+
+Use `blocked_by` only for current blockers with an ID, unmet requirement and fresh observed evidence (no secrets); clear resolved blockers. After each attempt, append actual outcomes and attempts to `history`, and update `resume.next_action` with the exact next step and `resume.recovery_notes` with partial artifacts, uncertainty and reconciliation needs (or null when none). Set optional `history_archive` only to an existing readable record of preserved history. `commit_recovery` is for legacy migration only, never new initialization. Follow [Failure Recovery](references/failure-recovery.md) and [Resume and legacy recovery](references/session-batches.md#resume-and-legacy-recovery); do not infer validation from files or reports without evidence.
 
 ## Responsibilities
 
