@@ -106,15 +106,18 @@ Investy/
     │       ├── tasks/
     │       └── references/         # Archived history + durable batch-BATCH-XX-handoff.md
     ├── plugins/
+    │   ├── context-budget.plugin.ts # Register the host SDK client; no duplicate tool
     │   ├── code-validator.plugin.ts
     │   ├── secure-access.plugin.ts
     │   ├── secure-access.test.ts
     │   ├── session-load-autoloader.plugin.ts
     │   └── sound-alert.plugin.ts
     ├── lib/
+    │   ├── context-budget-client.ts # Scoped host client and disposal
     │   └── context-budget.ts       # Snapshot semantics, limits and freshness
     ├── tests/
-    │   └── read-context-budget.test.ts  # Tool/helper regression tests
+    │   ├── context-budget-host.test.ts # Real SDK transport regressions
+    │   └── read-context-budget.test.ts # Tool/helper regression tests
     ├── sessions/                  # Local saved evaluations, Git-ignored
     ├── tools/                     # Folder/diff/state/template/validation/save
     │   └── read-context-budget.ts  # Caller-session context snapshot tool

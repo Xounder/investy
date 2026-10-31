@@ -79,6 +79,7 @@ Read in this order:
 # Plugins
 
 - plugins/code-validator.plugin.ts — Auto-validate code files after AI write/edit
+- plugins/context-budget.plugin.ts — Inject the host SDK client for project-scoped context readings
 - plugins/secure-access.plugin.ts — Access control for sensitive commands
 - plugins/session-load-autoloader.plugin.ts — Auto-load previous session context
 - plugins/sound-alert.plugin.ts — Audible alerts on permission/idle events
@@ -90,7 +91,9 @@ Read in this order:
 - tools/read-pipeline-state.ts — Read fields from `pipeline.yaml` via dot-separated paths
 - tools/read-context-budget.ts — Caller-session completed-assistant context snapshot; invoke from principal after restart (unknown stops new work)
 - lib/context-budget.ts — Snapshot validation, freshness limits and conservative context accounting
+- lib/context-budget-client.ts — Directory/worktree-scoped host SDK client registration
 - tests/read-context-budget.test.ts — OpenCode context-budget tool/helper behavior tests
+- tests/context-budget-host.test.ts — Real SDK custom-transport regressions (not live OpenCode discovery)
 - tools/resolve-template.ts — Render a template by resolving `[VARIABLES]` from variables.md
 - tools/run-package-command.ts — Run `build/lint/typecheck/test` in a workspace subpackage
 - tools/save-session.ts — Save session evaluation with 2-file retention policy

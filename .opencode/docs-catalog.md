@@ -101,9 +101,12 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `tools/create-folder-structure.ts` | Folder creation tool — creates `design-docs/`, `planning/`, `tasks/` for a pipeline context | Folder structure changes; new pipeline contexts |
 | `tools/get-git-diff.ts` | Git diff tool — returns diff between two refs with optional path filter | Diff logic changes |
 | `tools/read-pipeline-state.ts` | Pipeline state reader — reads `pipeline.yaml` fields via dot-separated paths | Pipeline YAML structure changes |
-| `tools/read-context-budget.ts` | OpenCode tool default export: loopback SDK caller-session snapshot, 20 recent messages, 5-second async wait (not a parsing/byte bound); invoke from principal after restart | Context budget tool interface changes |
+| `tools/read-context-budget.ts` | OpenCode tool default export: host-injected SDK caller-session snapshot, optional loopback override, 20 recent messages, 5-second async wait (not a parsing/byte bound); invoke from principal after restart | Context budget tool interface changes |
+| `plugins/context-budget.plugin.ts` | Registers host SDK transport for the current directory/worktree; no duplicate tool registration | Host plugin/client contract changes |
+| `lib/context-budget-client.ts` | Project-scoped client registry with disposal guard | Host client lifecycle changes |
 | `lib/context-budget.ts` | Snapshot helper: usable completed assistant input, conservative cache sum, 120-second freshness, unknown for failed/missing/zero-token observation; caller identity is not principal identity | Budget semantics or limits change |
 | `tests/read-context-budget.test.ts` | Tool/helper behavior tests (15 cases reported after backend QA corrections) | Context-budget behavior changes |
+| `tests/context-budget-host.test.ts` | Real SDK custom-fetch regression tests; not live host-discovery evidence | Context-budget host transport changes |
 | `tools/resolve-template.ts` | Template renderer — resolves `[VARIABLES]` from variables.md with pipeline context | Variable definitions or template paths change |
 | `tools/run-package-command.ts` | Package command runner — runs build/lint/typecheck/test in a workspace subpackage | New commands added |
 | `project-structure.md` | Project structure map | Important folders/files change |
