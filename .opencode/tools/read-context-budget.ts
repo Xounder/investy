@@ -1,6 +1,6 @@
 import { tool } from "@opencode-ai/plugin"
 import { createOpencodeClient } from "@opencode-ai/sdk"
-import { snapshotContextBudget, unknown } from "../lib/context-budget"
+import { loadContextBudgetConfig, snapshotContextBudget, unknown } from "../lib/context-budget"
 import { contextBudgetClient } from "../lib/context-budget-client"
 
 // Bounds asynchronous SDK work, including awaited response parsing; not synchronous JSON.parse time or bytes.
@@ -13,6 +13,8 @@ export default tool({
     serverUrl: tool.schema.string().url().optional().describe("Optional uncredentialed loopback OpenCode server URL override; normally uses the host-injected SDK client"),
   },
   async execute({ serverUrl }, ctx) {
+    const limits = loadContextBudgetConfig()
+    if (!limits) return JSON.stringify(unknown(ctx.sessionID, "Context budget configuration unavailable or invalid", null))
     const invokedAt = Date.now()
     const controller = new AbortController()
     const abort = () => controller.abort()
@@ -25,10 +27,10 @@ export default tool({
         if (!["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) ||
             !["http:", "https:"].includes(url.protocol) || url.username || url.password ||
             url.pathname !== "/" || url.search || url.hash) {
-          return JSON.stringify(unknown(ctx.sessionID, "Only an uncredentialed loopback OpenCode server URL is allowed"))
+          return JSON.stringify(unknown(ctx.sessionID, "Only an uncredentialed loopback OpenCode server URL is allowed", limits))
         }
       }
-      if (ctx.abort.aborted) return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted"))
+      if (ctx.abort.aborted) return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted", limits))
       // Preserve standalone/legacy behavior when a plugin has not initialized yet.
       // A refused localhost:4096 request is unknown, never a fabricated measurement.
       const client = serverUrl
@@ -44,23 +46,23 @@ export default tool({
         timer = setTimeout(() => { controller.abort(); resolve("timeout") }, requestTimeoutMs)
       })
       const result = await Promise.race([response, timeout])
-      if (result === "timeout") return JSON.stringify(unknown(ctx.sessionID, "Session messages request timed out after 5000 ms"))
-      if (result === "aborted") return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted"))
-      if (ctx.abort.aborted) return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted"))
+      if (result === "timeout") return JSON.stringify(unknown(ctx.sessionID, "Session messages request timed out after 5000 ms", limits))
+      if (result === "aborted") return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted", limits))
+      if (ctx.abort.aborted) return JSON.stringify(unknown(ctx.sessionID, "Tool invocation aborted", limits))
       if (result.error || !result.data) {
         const status = result.response?.status
         const reason = !result.error ? "Session messages response is empty"
           : status === 401 || status === 403 ? "Session messages access denied (HTTP 401/403)"
           : status === 404 ? "Session not found in caller's directory (HTTP 404)"
           : "Session messages request failed (check session access and server availability)"
-        return JSON.stringify(unknown(ctx.sessionID, reason))
+        return JSON.stringify(unknown(ctx.sessionID, reason, limits))
       }
-      return JSON.stringify(snapshotContextBudget(ctx.sessionID, result.data, invokedAt))
+      return JSON.stringify(snapshotContextBudget(ctx.sessionID, result.data, invokedAt, limits))
     } catch {
       const fallback = !serverUrl && !contextBudgetClient(ctx.directory, ctx.worktree)
       return JSON.stringify(unknown(ctx.sessionID, fallback
         ? "OpenCode session request unavailable (host client not registered; localhost:4096 fallback failed)"
-        : "OpenCode session request unavailable or invalid response"))
+        : "OpenCode session request unavailable or invalid response", limits))
     } finally {
       if (timer) clearTimeout(timer)
       if (onAbort) ctx.abort.removeEventListener("abort", onAbort)

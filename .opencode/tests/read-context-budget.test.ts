@@ -8,9 +8,11 @@ const { messages, createClient } = vi.hoisted(() => {
 vi.mock("@opencode-ai/sdk", () => ({ createOpencodeClient: createClient }))
 
 import budgetTool from "../tools/read-context-budget"
-import { snapshotContextBudget } from "../lib/context-budget"
+import { parseContextBudgetConfig, snapshotContextBudget } from "../lib/context-budget"
 
 const sessionID = "principal"
+// Preserve historical boundary scenarios using an explicit, non-default policy fixture.
+const previousLimits = parseContextBudgetConfig({ target: 140_000, stopNewWork: 160_000, closeBy: 180_000, absoluteContextReference: 200_000, dispatchReserve: 20_000 })
 function assistant(id: string, completed: number, input: number, read = 0, write = 0, session = sessionID) {
   return {
     info: {
@@ -30,7 +32,7 @@ describe("context budget snapshot", () => {
       assistant("child", 4000, 199_000, 0, 0, "child-session"),
       { ...assistant("inflight", 5000, 190_000), info: { ...assistant("inflight", 5000, 190_000).info, time: { created: 5000 } } } as ReturnType<typeof assistant>,
     )
-    const result = snapshotContextBudget(sessionID, data, 3000)
+    const result = snapshotContextBudget(sessionID, data, 3000, previousLimits)
     expect(result).toMatchObject({
       status: "measured", policy: "continue", messageID: "latest", sessionID,
       inputContextTokens: 121_000, uncachedInputTokens: 70_000,
@@ -43,8 +45,8 @@ describe("context budget snapshot", () => {
   it.each([
     [139_999, "continue"], [140_000, "continue"], [160_000, "stop-new-work"],
     [180_000, "close-now"], [200_000, "close-now"],
-  ] as const)("uses guidance bands at %i", (input, policy) => {
-    expect(snapshotContextBudget(sessionID, entries(assistant("one", 1000, input)), 1000).policy).toBe(policy)
+  ] as const)("uses historical explicitly configured guidance bands at %i", (input, policy) => {
+    expect(snapshotContextBudget(sessionID, entries(assistant("one", 1000, input)), 1000, previousLimits).policy).toBe(policy)
   })
 
   it("does not borrow older measurements when the newest completed counters are invalid", () => {

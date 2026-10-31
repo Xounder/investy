@@ -1,0 +1,7 @@
+{
+  "target": 450000,
+  "stopNewWork": 580000,
+  "closeBy": 600000,
+  "absoluteContextReference": 1000000,
+  "dispatchReserve": 20000
+}

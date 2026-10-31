@@ -114,6 +114,8 @@ Responsible for:
 
 ### Agent Dispatch Rules
 
+**Budget authorization is separate from policy:** a `continue` result alone never authorizes a new implementation or QA dispatch. Before each dispatch (including a parallel group), apply the [principal context budget gate](references/session-batches.md#principal-context-budget-guidance-not-a-hard-limit) to measured intake, additional principal work and the closeout reserve.
+
 **Primary agents** (Architecture Initializer, Planning Analyst, Solution Designer) are defined with `mode: primary` in their agent files. They must be dispatched using their proper agent type name via `task` with `subagent_type` matching the agent name. Do NOT dispatch primary agents as `general` or any other type — this skips their workflow and prevents file creation.
 
 **Subagents** (Senior Frontend, Senior Backend, QA) use `mode: subagent` and are dispatched using their proper agent type name via `task` with `subagent_type` matching the agent name, with their task instructions inline.
@@ -273,6 +275,8 @@ concerns:
 ### Pipeline Completion
 
 When all tasks have full QA **and runtime** acceptance, follow [Execution Phases — Completion](references/execution-phases.md#completion); close bounded batches independently even while the pipeline remains in progress.
+
+**Mandatory closeout capacity:** protect the configured `dispatchReserve` in `.opencode/context-budget.json` for the complete closeout, including `learning-improvement` → `continuous-learning` → `session-save`, durable handoff and final state/commit verification. These skills must run in order at every applicable batch or planning-session closeout, not only at final product completion. Stop new work early enough to preserve that capacity; `continue` never permits spending the reserve on implementation. If capacity cannot cover closeout, stop earlier or reduce scope. Follow the [resumable closeout checkpoints](references/session-batches.md#closeout-state-machine-resume-each-missing-checkpoint-only): approval waits or interruptions leave closeout pending, never skipped or falsely complete.
 
 ## References
 

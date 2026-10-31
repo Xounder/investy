@@ -112,11 +112,14 @@ Investy/
     │   ├── secure-access.test.ts
     │   ├── session-load-autoloader.plugin.ts
     │   └── sound-alert.plugin.ts
+    ├── context-budget.json         # Single editable context budget policy source
     ├── lib/
     │   ├── context-budget-client.ts # Scoped host client and disposal
-    │   └── context-budget.ts       # Snapshot semantics, limits and freshness
+    │   └── context-budget.ts       # Config parsing, snapshot semantics and freshness
     ├── tests/
+    │   ├── context-budget-config.test.ts # Budget config and boundaries
     │   ├── context-budget-host.test.ts # Real SDK transport regressions
+    │   ├── context-budget-invalid-tool.test.ts # Invalid policy fails closed
     │   └── read-context-budget.test.ts # Tool/helper regression tests
     ├── sessions/                  # Local saved evaluations, Git-ignored
     ├── tools/                     # Folder/diff/state/template/validation/save

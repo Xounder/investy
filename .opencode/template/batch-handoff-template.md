@@ -21,7 +21,7 @@
 
 ## Principal budget and closeout
 
-- Observed principal input context (or unknown + reason), observation metadata and current-session baseline including startup/design/planning/retries; per-task dispatch/context, condensed return, QA/correction, commit/state and closure estimates with size/uncertainty, proposed batch sum and 20,000 reserve (estimates are not measured telemetry):
+- Observed principal input context (or unknown + reason), observation metadata and current-session baseline including startup/design/planning/retries; per-task dispatch/context, condensed return, QA/correction, commit/state and closure estimates with size/uncertainty, proposed batch sum and configured `dispatchReserve` from `.opencode/context-budget.json` (estimates are not measured telemetry):
 - Documentation refresh: `INDEX.md` / `docs-catalog.md` / `project-structure.md` (updated or checked-no-change with reason):
 - Checkpoints: active review; task commits reconciled; preliminary handoff; learning-improvement; continuous-learning approval/decline and application; session-save path; final handoff; final docs/state commit SHA or pending reason; read-back verified:
 - STOP chain pending user approval and exact next question (if any):
