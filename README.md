@@ -8,7 +8,7 @@ The application is a full-stack, responsive web platform with authenticated acco
 
 Investy uses the Delivery Pipeline harness through the `.opencode` Git submodule. It provides the development workflow, agents, skills, and documentation entry points.
 
-For instructions on initializing the submodule, selecting this project's branch, configuring remote tracking, and pulling updates, see the [submodule setup guide](.opencode/.docs/07-submodule-install.md#cloning-a-codebase-that-contains-the-submodule). The guide also links to the required OpenCode plugin-dependency installation steps.
+For instructions on initializing the submodule, selecting this project's branch, configuring remote tracking, and pulling updates, see the [submodule setup guide](https://github.com/Xounder/delivery-pipeline/blob/dlvr-ppln/investy/.docs/07-submodule-install.md#cloning-a-codebase-that-contains-the-submodule). The guide also links to the required OpenCode plugin-dependency installation steps.
 
 ## Product Scope
 
