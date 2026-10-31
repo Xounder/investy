@@ -1,6 +1,6 @@
 # Deployment and verification
 
-For the isolated, Docker-first **local** application stack, see `DOCKER.md`.
+For the isolated, Docker-first **local** application stack, see the [Docker guide](DOCKER.md).
 
 Deploy the React web build and Hono API on the same origin (reverse-proxy
 `/api` to the API; SPA fallback serves `index.html`). Set `APP_ORIGIN` to the
@@ -16,7 +16,7 @@ backup artifact **inside the project root** (no symlink escaping the root).
 The backup verifier has a strict 32 MiB per-artifact cap: larger exports are
 not verified backups. A mounted volume is not a cloud-backup guarantee; test
 durable off-host copies and restore before relying on it. Supply the same database and backup storage to the worker;
-keep worker and API secrets in server-side secret storage. See `.env.example`
+keep worker and API secrets in server-side secret storage. See [`.env.example`](../.env.example)
 for variable names, not production values. `E2E_DATABASE_URL` is test-only
 and must never be set to the production `DATABASE_URL`.
 
@@ -29,4 +29,4 @@ development `tsx`). Verify `GET /api/health` returns HTTP 200 and
 check, not a guarantee that PostgreSQL or market providers are available.
 Verify database-backed auth separately. Verify persistent backup status and
 restore procedures before relying on backups. Use the dedicated test-runbook
-at `apps/web/e2e/real/README.md` for isolated real-DB browser validation.
+at [the E2E runbook](../apps/web/e2e/real/README.md) for isolated real-DB browser validation.

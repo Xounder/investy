@@ -84,7 +84,7 @@ erased users, overwrite other owners, or roll back erasure history. Arrange
 an audited recovery procedure and off-host storage before relying on backups.
 
 **Isolation:** For the Docker-only real-browser suite, see
-`apps/web/e2e/real/README.md`. `compose.e2e.yaml` uses the independent
+[the E2E runbook](../apps/web/e2e/real/README.md). `compose.e2e.yaml` uses the independent
 `investy-local-e2e` project, `investy_e2e` database, and named PostgreSQL
 and artifact volumes. Its browser and migration containers connect to
 `postgres-e2e:5432` on their private network, while the optional host helper

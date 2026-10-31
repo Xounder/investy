@@ -65,6 +65,7 @@ apps/
 packages/
   domain/           Shared domain types and financial calculations
 docker/             Local bootstrap and E2E helpers
+docs/               Local operation and production deployment guides
 .opencode/          Delivery Pipeline submodule and project documentation
 ```
 
@@ -80,7 +81,7 @@ docker compose -f compose.yaml config --quiet
 docker compose -f compose.yaml up --build -d --wait
 ```
 
-Open **http://localhost:8080**. The stack includes PostgreSQL, migrations, the API, worker, and web application. Bootstrap generates the ignored local settings; the detailed setup and optional provider-token configuration are documented in the [Docker guide](DOCKER.md).
+Open **http://localhost:8080**. The stack includes PostgreSQL, migrations, the API, worker, and web application. Bootstrap generates the ignored local settings; the detailed setup and optional provider-token configuration are documented in the [Docker guide](docs/DOCKER.md).
 
 Stop the local stack when finished:
 
@@ -88,13 +89,13 @@ Stop the local stack when finished:
 docker compose -f compose.yaml stop
 ```
 
-Database and backup volumes persist across stops. The local stack uses HTTP; production deployment is covered separately in the [deployment guide](DEPLOYMENT.md).
+Database and backup volumes persist across stops. The local stack uses HTTP; production deployment is covered separately in the [deployment guide](docs/DEPLOYMENT.md).
 
 ## Validation
 
-- **Static checks and unit/API tests:** use the existing package commands listed in the [Docker guide](DOCKER.md#static-checks-without-docker-optional-host-nodepnpm).
+- **Static checks and unit/API tests:** use the existing package commands listed in the [Docker guide](docs/DOCKER.md#static-checks-without-docker-optional-host-nodepnpm).
 - **Browser and PostgreSQL integration:** follow the [isolated E2E runbook](apps/web/e2e/real/README.md#docker-only-postgresql-and-playwright-preferred), which uses a separate Compose project and database.
-- **Operational checks:** see the [Docker guide](DOCKER.md) for process health and database readiness, and the [deployment guide](DEPLOYMENT.md) for production configuration and backup requirements.
+- **Operational checks:** see the [Docker guide](docs/DOCKER.md) for process health and database readiness, and the [deployment guide](docs/DEPLOYMENT.md) for production configuration and backup requirements.
 
 Real-database browser cases require the dedicated E2E environment. Skipped cases or fixture-only results do not establish PostgreSQL integration coverage.
 
@@ -104,8 +105,8 @@ Real-database browser cases require the dedicated E2E environment. Skipped cases
 | --- | --- |
 | Project documentation and workflow navigation | [Documentation index](.opencode/INDEX.md) |
 | Product scope, system design, data model, and decisions | [Architecture](.opencode/architecture/index.md) |
-| Local startup, configuration, migrations, and diagnostics | [Docker guide](DOCKER.md) |
-| Production deployment, health checks, and backups | [Deployment guide](DEPLOYMENT.md) |
+| Local startup, configuration, migrations, and diagnostics | [Docker guide](docs/DOCKER.md) |
+| Production deployment, health checks, and backups | [Deployment guide](docs/DEPLOYMENT.md) |
 | Isolated PostgreSQL browser validation | [E2E runbook](apps/web/e2e/real/README.md) |
 | Server environment variable names | [Environment example](.env.example) |
 | Contribution and agent operating rules | [AGENTS.md](AGENTS.md) |
