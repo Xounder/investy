@@ -1,9 +1,0 @@
-{
-  "name": "codebase-analysis-scan",
-  "type": "module",
-  "private": true,
-  "dependencies": {
-    "tree-sitter": "^0.22.6",
-    "tree-sitter-typescript": "^0.23.0"
-  }
-}
