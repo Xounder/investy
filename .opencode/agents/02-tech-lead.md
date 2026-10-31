@@ -36,6 +36,7 @@ Possible inputs:
 - Create task files
 - Create task index
 - Ensure implementation clarity
+- Propose bounded principal-session batches for all known unfinished tasks, not just the next wave.
 
 ## Workflow
 
@@ -195,7 +196,7 @@ The index must contain:
 
 ### 9. Update Pipeline
 
-Return implementation metadata to the Delivery Pipeline (pipeline.yaml is updated by the orchestrator).
+Return implementation metadata to the Delivery Pipeline (pipeline.yaml is updated by the orchestrator). Include stable `BATCH-XX` IDs, each unfinished task ID exactly once, batch-level dependencies only where technically required, safe file-overlap/ownership boundaries, planned principal-context estimates, and pending future batches. See [Bounded Delivery Sessions](../skills/delivery-pipeline/references/session-batches.md). Estimate principal intake, condensed dispatch reports, QA, retries and closure (including 20,000 reserve), **not** entire child-agent histories. Aim for 140k–180k principal tokens per session, stop new dispatch at 160k and close by 180k; one independently reviewable task is a valid batch. Split oversized tasks **before** work, with new IDs and explicit acceptance/ownership/file boundaries, while preserving approved task history and avoiding duplicate IDs. The historical "Batch 1" parallelization waves in old task indexes are not session-batch records; do not silently rewrite completed tasks.
 
 ## Task Rules
 

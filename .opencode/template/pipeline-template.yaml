@@ -5,6 +5,19 @@ pipeline:
   updated_at: "<current-date-time>"
   current_step: null
   current_agent: null
+  current_batch: null # Set after task planning; never infer batch completion from code-QA only.
+  ready_for_new_session: false
+  batches: [] # Plan ALL unfinished task IDs exactly once; see session-batches.md.
+  # Batch item schema (populate for each BATCH-XX before implementation):
+  # - id: BATCH-01
+  #   state: pending # pending | running | closing | completed | blocked
+  #   close_reason: null
+  #   task_ids: [TASK-01]
+  #   depends_on: []
+  #   context_estimate: {principal_tokens: 100000, assumptions: "intake, reports, QA, retries, closeout; excludes child histories"}
+  #   handoff_path: ".opencode/plan/<context>/references/batch-BATCH-01-handoff.md"
+  #   principal_session_id: null
+  #   closeout: {task_commits: pending, docs_refresh: pending, preliminary_handoff: pending, learning_improvement: pending, continuous_learning: pending, session_save: pending, final_handoff: pending, final_commit: pending, verified: pending}
   steps:
     architecture-initializer:
       status: pending
@@ -72,3 +85,4 @@ pipeline:
     last_completed_agent: null
     last_completed_step: null
     recovery_required: false
+    next_action: null

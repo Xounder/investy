@@ -93,6 +93,7 @@ Expected outputs:
 - Task dependencies
 - Ownership assignments
 - Execution order
+- Bounded session batch proposal for all remaining tasks (see [session-batches.md](session-batches.md)); orchestrator persists the entire plan, including pending future batches, before implementation.
 
 Update pipeline.
 
@@ -100,13 +101,13 @@ Update pipeline.
 
 Read task ownership and dependencies.
 
-Tasks without unmet dependencies may execute immediately.
+Tasks without unmet dependencies **within the current batch** may execute after the principal-context dispatch gate. Future-batch tasks never execute in this principal session after closeout.
 
 The orchestrator must maximize parallel execution whenever dependencies allow.
 
 ## Parallel Execution Phase
 
-Dispatch **multiple** Senior Frontend/Backend agents simultaneously when independent tasks are available. Do not limit to one agent per role — if 3 frontend tasks are independent, create 3 Senior Frontend agents in parallel. Each agent receives exactly one task.
+Dispatch **multiple** Senior Frontend/Backend agents simultaneously when independent tasks are available **within the current batch and the budget allows all dispatch/report costs**. Do not limit to one agent per role — if 3 frontend tasks are independent, create 3 Senior Frontend agents in parallel. Each agent receives exactly one task. Record dispatch/return/QA observations per [session-batches.md](session-batches.md#principal-context-budget-guidance-not-a-hard-limit).
 
 Pass:
 
@@ -209,6 +210,6 @@ Workflow completes when:
 
 Upon completion, the orchestrator MUST:
 
-1. Update `pipeline.yaml` status to `completed`, record final errors/concerns, set `updated_at`, and commit the remaining non-task changes (e.g., pipeline state) following the [commit pattern](../../../architecture/commit-pattern.md) — task work is already committed per task.
-2. Invoke the mandatory STOP chain: load `learning-improvement` skill → after it completes, load `continuous-learning` skill → after it completes, load `session-save` skill.
-3. Do NOT return to the user or end the session before the STOP chain completes. The STOP chain is part of the pipeline, not optional cleanup.
+1. Close the final bounded batch with the [idempotent closeout procedure](session-batches.md#closeout-state-machine-resume-each-missing-checkpoint-only); its STOP chain runs once, honoring the continuous-learning approval gate.
+2. Only after all tasks' full QA and runtime acceptance (no skips/deferred checks treated as passes), update `pipeline.yaml` status to `completed` with final concerns/history. Commit authorized remaining non-task docs/state **after** the chain per [commit pattern](../../../architecture/commit-pattern.md), never re-commit task work.
+3. Verify durable handoff and final state before reporting completion; blocked/partial pipelines remain in progress.

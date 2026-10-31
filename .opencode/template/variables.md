@@ -17,5 +17,7 @@
 [TASK_TEMPLATE_FILE] = .opencode/template/task-template.md
 [PLANNING_TEMPLATE_FILE] = .opencode/template/planning-template.md
 [PIPELINE_TEMPLATE_FILE] = .opencode/template/pipeline-template.yaml
+[BATCH_HANDOFF_TEMPLATE_FILE] = .opencode/template/batch-handoff-template.md
+[BATCH_HANDOFF_FILE] = [PLAN_FOLDER_LOCATION]/references/batch-<BATCH-XX>-handoff.md
 
 [PIPELINE_FILE] = .opencode/pipeline.yaml

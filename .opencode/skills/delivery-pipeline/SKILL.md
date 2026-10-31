@@ -23,6 +23,7 @@ Before dispatching any agent, the orchestrator MUST:
 3. Resolve all dependent variables (`[DESIGN_FOLDER_LOCATION]`, `[TASKS_FOLDER_LOCATION]`, etc.)
 4. Resolve architecture variables (`[ARCHITECTURE_FOLDER_LOCATION]`, `[ARCHITECTURE_ENTRY_FILE]`, `[ARCHITECTURE_INDEX_FILE]`, `[ARCHITECTURE_TEMPLATE_FILE]`, `[DOCS_CATALOG_FILE]`, `[PROJECT_STRUCTURE_FILE]`)
 5. Pass the resolved values to the agent as part of the execution context
+6. Resolve `[BATCH_HANDOFF_TEMPLATE_FILE]` and `[BATCH_HANDOFF_FILE]` for durable, per-batch recovery.
 
 Example:
 - `pipeline.yaml.name = "documentation-analysis"`
@@ -48,6 +49,7 @@ Responsibilities:
 5. Invoke the Workflow Router skill.
 6. Execute the selected workflow.
 7. Persist progress after every agent execution.
+8. After Tech Lead, persist all known unfinished tasks in bounded `pipeline.batches` before implementation; dispatch only within `current_batch` under [session-batch gates](references/session-batches.md).
 
 ### Resume Execution
 
@@ -55,7 +57,7 @@ Responsibilities:
 delivery-pipeline:resume
 ```
 
-Resumes the last execution from [PIPELINE_FILE].
+Resumes the last execution from [PIPELINE_FILE] and the current batch's durable handoff. Do not treat this command alone as proof of a new session.
 
 Responsibilities:
 
@@ -64,6 +66,7 @@ Responsibilities:
 3. Resume execution from the last known state.
 4. Avoid re-executing completed work.
 5. If the `architecture-initializer` step is `pending` (or `running` without output) and the architecture documentation set is missing or incomplete (no `[ARCHITECTURE_ENTRY_FILE]`, no `[DOCS_CATALOG_FILE]`, no `[PROJECT_STRUCTURE_FILE]`, or empty INDEX.md `# Architecture` section), resume the [Architecture Initialization Flow](references/execution-phases.md#architecture-initialization-flow). Never re-run it when the step is `completed` or when the documentation set is already complete. For legacy pipelines without the step, infer from the files — skip if the set is complete, otherwise run it.
+6. Follow [Resume and legacy recovery](references/session-batches.md#resume-and-legacy-recovery): reconcile Git, validations, active session ID and missing STOP checkpoints before any new dispatch. Same principal session may only finish closeout. When session identity is unavailable, request explicit user confirmation of a fresh session.
 
 ## Pipeline State
 
@@ -73,7 +76,7 @@ Pipeline state is stored in:
 [PIPELINE_FILE]
 ```
 
-The pipeline file is the source of truth for workflow execution.
+The pipeline file is the source of truth for workflow execution; a per-batch handoff under `[PLAN_FOLDER_LOCATION]/references/` preserves detailed evidence outside the two-file session retention policy.
 It must be updated after every agent execution by the orchestrator.
 
 ## Responsibilities
@@ -105,6 +108,7 @@ Responsible for:
 * Tracking concerns
 * Maintaining execution history
 * Supporting workflow recovery
+* Recording batch assignments, principal-context budget, closeout checkpoints and exact next action
 
 ### Agent Dispatch Rules
 
@@ -123,7 +127,7 @@ If an agent:
 - Returns a partial result → re-call to complete the remaining work
 - Returns non-standard format → re-call with format requirements
 - Asks a question → respond to the agent directly (do not resolve it yourself)
-- Times out → verify output dir; if files were created, mark done; otherwise re-call with higher timeout
+- Times out → inspect output and last known validations/QA; files alone do not prove completion. Persist partial output and attempts, then re-call the same agent only if budget and retry gates allow.
 
 **Never fix agent output yourself.** If an agent's code has a bug or build error, re-call the agent with the error details. Do not edit the agent's files, run build commands, or patch the code manually.
 
@@ -214,6 +218,10 @@ QABE -->|Approved| DONE
 
 The detailed phase execution — Architecture Initialization Flow, Routing, Solution Designer Flow, Planning Flow, Tech Lead Flow, Parallel Execution, QA, Corrections, Task Commit, and Completion — is documented in [references/execution-phases.md](references/execution-phases.md).
 
+## Session Batches
+
+[Bounded Delivery Sessions](references/session-batches.md) defines the mandatory batch schema, budget checks, durable handoff, per-batch STOP closure and idempotent new-session resume. A completed batch does **not** imply all tasks or runtime checks passed. At unknown context usage stop new work; do not manufacture telemetry. The context-budget tool becomes discoverable only after restarting OpenCode; never require it in an already-running harness.
+
 ## Parallelization Rules
 
 See [references/parallelization-rules.md](references/parallelization-rules.md)
@@ -262,7 +270,7 @@ concerns:
 
 ### Pipeline Completion
 
-When all steps are completed (all tasks approved by QA), follow the [Execution Phases — Completion](references/execution-phases.md#completion) procedure.
+When all tasks have full QA **and runtime** acceptance, follow [Execution Phases — Completion](references/execution-phases.md#completion); close bounded batches independently even while the pipeline remains in progress.
 
 ## References
 
@@ -271,6 +279,7 @@ When all steps are completed (all tasks approved by QA), follow the [Execution P
 - [Parallelization Rules](references/parallelization-rules.md)
 - [Failure Recovery](references/failure-recovery.md)
 - [Execution Phases](references/execution-phases.md)
+- [Bounded Delivery Sessions](references/session-batches.md)
 - [Constraints](references/constraints.md)
 
 ## Constraints

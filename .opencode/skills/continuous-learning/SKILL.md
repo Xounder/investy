@@ -49,8 +49,9 @@ Use this skill after `learning-improvement` in the STOP hook. It is the **second
    - If **yes**: apply all changes
    - If **adjustments**: user informs what to adjust
      - **RE-PLAN PHASE**: Create NEW plan (do NOT edit files), present updated `<changes>` template, wait for "yes"
-     - **NEVER edit files between receiving 'adjustments' and receiving 'yes' on updated plan**
-6. **Chain to `session-save` IMMEDIATELY** — after applying changes (or determining no changes are needed), you MUST load the `session-save` skill without waiting for user input. Never stop after step 5.
+      - **NEVER edit files between receiving 'adjustments' and receiving 'yes' on updated plan**
+    - If **no/declined**: record the decision and rationale in the delivery batch handoff; apply nothing and proceed to `session-save`. If no response, leave the batch `closing` and wait; do not skip approval.
+ 6. **Chain to `session-save` IMMEDIATELY** — after applying approved changes, recording a decline, or determining no changes are needed, load `session-save` without further user input. Never stop after a resolved step 5.
 
 ## Rules
 

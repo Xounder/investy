@@ -1,5 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
   // Enable built-in Language Server Protocol (LSP) support.
-  "lsp": true
+  "lsp": true,
+  "commands": {
+    "delivery-pipeline:resume": {
+      "description": "Resume the persisted bounded delivery batch safely",
+      "template": "Invoke the delivery-pipeline skill in resume mode. Follow .opencode/commands/delivery-pipeline-resume.md and .opencode/skills/delivery-pipeline/references/session-batches.md. Reconcile the batch handoff and Git state; require fresh-session confirmation when session ID is unavailable. Never replay completed commits or infer validation from file existence."
+    },
+    "delivery-pipeline:new": {
+      "description": "Start a new bounded delivery workflow",
+      "template": "Invoke the delivery-pipeline skill in new-execution mode. Follow .opencode/commands/delivery-pipeline-new.md and .opencode/skills/delivery-pipeline/references/session-batches.md. Do not replace an active pipeline without explicit user approval."
+    }
+  }
 }

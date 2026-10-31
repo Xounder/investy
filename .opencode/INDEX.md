@@ -30,6 +30,9 @@ Read in this order:
 
 - skills/delivery-pipeline/SKILL.md
 - skills/delivery-pipeline/references/execution-phases.md — detailed phase execution (architecture init, planning, parallel execution, QA, task commit, completion)
+- skills/delivery-pipeline/references/session-batches.md — principal-session context gates, durable handoffs, batch closeout and idempotent resume
+- skills/delivery-pipeline/references/failure-recovery.md — reconcile partial artifacts without inferring validation
+- skills/delivery-pipeline/references/task-tracking.md — task/commit and deferred runtime evidence
 
 ## Workflow Router
 
@@ -62,12 +65,14 @@ Read in this order:
 - template/task-template.md
 - template/planning-template.md
 - template/pipeline-template.yaml
+- template/batch-handoff-template.md — durable per-batch handoff outside two-file session retention
 - template/variables.md
 
 # Commands
 
 - commands/delivery-pipeline-new.md
 - commands/delivery-pipeline-resume.md
+- `opencode.jsonc` registers `/delivery-pipeline:resume` and `/delivery-pipeline:new` explicitly (command filenames alone register hyphenated names)
 - commands/doc-audit.md
 - commands/learning-improvement.md
 
@@ -83,6 +88,9 @@ Read in this order:
 - tools/create-folder-structure.ts — Create `design-docs/`, `planning/`, `tasks/` for a pipeline context
 - tools/get-git-diff.ts — Return git diff between two refs with optional path filter
 - tools/read-pipeline-state.ts — Read fields from `pipeline.yaml` via dot-separated paths
+- tools/read-context-budget.ts — Caller-session completed-assistant context snapshot; invoke from principal after restart (unknown stops new work)
+- lib/context-budget.ts — Snapshot validation, freshness limits and conservative context accounting
+- tests/read-context-budget.test.ts — OpenCode context-budget tool/helper behavior tests
 - tools/resolve-template.ts — Render a template by resolving `[VARIABLES]` from variables.md
 - tools/run-package-command.ts — Run `build/lint/typecheck/test` in a workspace subpackage
 - tools/save-session.ts — Save session evaluation with 2-file retention policy
@@ -94,6 +102,7 @@ Generated artifacts:
 - plan/<context>/design-docs/
 - plan/<context>/tasks/
 - [plan/investy-dashboard/tasks/TASK-19-docker-first-stack-e2e.md](plan/investy-dashboard/tasks/TASK-19-docker-first-stack-e2e.md) — Docker-first main stack and isolated E2E delivery task
+- [plan/investy-dashboard/references/batch-BATCH-01-handoff.md](plan/investy-dashboard/references/batch-BATCH-01-handoff.md) — current blocked runtime batch recovery; future batch paths are reserved in pipeline state
 
 ---
 

@@ -41,6 +41,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `skills/delivery-pipeline/references/agent-response-format.md` | Standard agent response format | Response format changes |
 | `skills/delivery-pipeline/references/constraints.md` | Pipeline constraint list | Constraint rules change |
 | `skills/delivery-pipeline/references/execution-phases.md` | Phase execution details — architecture init, routing, planning, tech lead, parallel execution, QA, corrections, task commit, completion | Phase flows change |
+| `skills/delivery-pipeline/references/session-batches.md` | Bounded principal-session batches, token guidance, closeout checkpoints and idempotent resume | Batch budget/closeout/recovery rules change |
 | `skills/workflow-router/SKILL.md` | Request classification and workflow routing | Classification logic or routing changes |
 | `skills/learning-improvement/SKILL.md` | Session evaluation (step 1/3 of STOP) | Evaluation format changes; chaining enforcement |
 | `skills/continuous-learning/SKILL.md` | Doc update proposal (step 2/3 of STOP) | Scope of analyzed docs changes |
@@ -60,6 +61,8 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `template/design-template.md` | Design document template — options, trade-offs, decision, impact, risks | Design template format changes |
 | `template/task-template.md` | Task artifact template | Task format changes |
 | `template/planning-template.md` | Planning document template | Planning format changes |
+| `template/pipeline-template.yaml` | Pipeline state skeleton and session batch fields | State schema changes |
+| `template/batch-handoff-template.md` | Durable per-batch resume evidence outside retained sessions | Batch recovery fields change |
 | `template/variables.md` | Shared template variables | Variable set changes |
 
 ---
@@ -83,6 +86,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 |---|---|---|
 | `commands/delivery-pipeline-new.md` | Start new delivery workflow | Pipeline flow changes |
 | `commands/delivery-pipeline-resume.md` | Resume delivery workflow | Pipeline recovery changes |
+| `opencode.jsonc` | Explicit colon-named `/delivery-pipeline:resume` and `/delivery-pipeline:new` registrations; Markdown filenames register their own hyphenated aliases | Slash command names change |
 | `commands/doc-audit.md` | `/doc-audit` command to run doc audit skill | Audit flow changes; new detection rules |
 | `commands/learning-improvement.md` | `/learning-improvement` STOP hook command | Learning evaluation changes |
 
@@ -97,7 +101,16 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `tools/create-folder-structure.ts` | Folder creation tool — creates `design-docs/`, `planning/`, `tasks/` for a pipeline context | Folder structure changes; new pipeline contexts |
 | `tools/get-git-diff.ts` | Git diff tool — returns diff between two refs with optional path filter | Diff logic changes |
 | `tools/read-pipeline-state.ts` | Pipeline state reader — reads `pipeline.yaml` fields via dot-separated paths | Pipeline YAML structure changes |
+| `tools/read-context-budget.ts` | OpenCode tool default export: loopback SDK caller-session snapshot, 20 recent messages, 5-second async wait (not a parsing/byte bound); invoke from principal after restart | Context budget tool interface changes |
+| `lib/context-budget.ts` | Snapshot helper: usable completed assistant input, conservative cache sum, 120-second freshness, unknown for failed/missing/zero-token observation; caller identity is not principal identity | Budget semantics or limits change |
+| `tests/read-context-budget.test.ts` | Tool/helper behavior tests (15 cases reported after backend QA corrections) | Context-budget behavior changes |
 | `tools/resolve-template.ts` | Template renderer — resolves `[VARIABLES]` from variables.md with pipeline context | Variable definitions or template paths change |
 | `tools/run-package-command.ts` | Package command runner — runs build/lint/typecheck/test in a workspace subpackage | New commands added |
 | `project-structure.md` | Project structure map | Important folders/files change |
 | `docs-catalog.md` | This file — doc catalog | New .md file created in .opencode/ |
+
+## Generated Planning Artifacts
+
+| File | Content | When to modify |
+|---|---|---|
+| `plan/investy-dashboard/references/batch-BATCH-01-handoff.md` | Durable legacy TASK-19 runtime blocker/commit/validation and next-action handoff; other batch handoffs created on entry | Batch scope or observed recovery evidence changes |

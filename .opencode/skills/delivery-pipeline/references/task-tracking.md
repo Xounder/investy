@@ -2,6 +2,8 @@
 
 Implementation tasks must be tracked in pipeline state.
 
+Task IDs remain unique across `pipeline.tasks` and appear exactly once across `pipeline.batches` while unfinished. `status: in-progress` with `qa_status: approved` and deferred/blocked `validation_status` remains unfinished, even if a code-QA implementation SHA exists. Batch `completed` is a session handoff outcome only; task `completed` requires full acceptance. Preserve historical SHAs/status and archived history during migration. See [session-batches.md](session-batches.md).
+
 Each finalized task records the commits created at QA approval time:
 
 - `feat_commit` — SHA of the `feat(<feature>)[TASK-XX]` implementation commit

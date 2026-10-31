@@ -29,6 +29,7 @@ Use this skill at the end of the STOP hook, after `learning-improvement` and `co
 
 - File `.opencode/sessions/YYYYMMDD-HH-MM-description-session.tmp` created
 - Only 2 session files retained in the directory
+- For delivery batches, the detailed handoff remains under `plan/<context>/references/` and is not deleted by this tool; record the saved session path in the batch closeout checkpoint.
 
 ## Rules
 
@@ -39,7 +40,7 @@ Use this skill at the end of the STOP hook, after `learning-improvement` and `co
 
 ## Chain position
 
-This is the **LAST** (3rd) skill in the STOP chain — see [learning-improvement/references/stop-chain.md](../learning-improvement/references/stop-chain.md). After saving, the chain is complete — report to the user and stop. Do not load any further skills.
+This is the **LAST** (3rd) skill in the STOP chain — see [learning-improvement/references/stop-chain.md](../learning-improvement/references/stop-chain.md). After saving, the chain is complete; load no further skills in this STOP chain. For delivery batches, the orchestrator still must finalize the handoff/state, authorized remaining docs commit and read-back verification before reporting ready for a new session; this is not a second STOP chain.
 
 ## Tool Reference
 

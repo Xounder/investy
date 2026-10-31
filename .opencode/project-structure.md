@@ -14,7 +14,7 @@ Investy/
 ├── .gitignore
 ├── .dockerignore                   # Keep private/local artifacts out of images
 ├── .env.example                    # Public environment-variable template
-├── opencode.jsonc                  # Project OpenCode settings
+├── opencode.jsonc                  # Project settings and colon-named delivery commands
 ├── Dockerfile                      # Application and browser-runner images
 ├── compose.yaml                    # Main PostgreSQL/migrate/API/worker/web
 ├── compose.bootstrap.yaml          # Docker-native private configuration setup
@@ -57,6 +57,7 @@ Investy/
     ├── project-structure.md        # This map
     ├── OPENCODE_PLUGINS.md         # Plugin development guide
     ├── pipeline.yaml               # Canonical execution state; already tracked
+    ├── .gitignore                  # Keeps plan private except versioned batch handoffs
     ├── package.json                # Standalone OpenCode/npm test package
     ├── package-lock.json           # npm tooling dependency lock
     ├── pnpm-workspace.yaml         # Existing tooling installation metadata
@@ -85,9 +86,9 @@ Investy/
     │   ├── delivery-pipeline-new.md
     │   ├── delivery-pipeline-resume.md
     │   ├── doc-audit.md
-    │   └── learning-improvement.md
+    │   └── learning-improvement.md  # Colon command aliases configured at root
     ├── skills/
-    │   ├── delivery-pipeline/      # SKILL.md and execution references
+    │   ├── delivery-pipeline/      # SKILL.md, session-batches.md and phase/recovery references
     │   ├── workflow-router/
     │   ├── learning-improvement/   # Evaluation; first STOP-chain skill
     │   ├── continuous-learning/    # Approved documentation improvements
@@ -97,21 +98,26 @@ Investy/
     │       ├── SKILL.md
     │       ├── scripts/            # scan.mjs and parser dependencies
     │       └── output/             # Generated local reports, Git-ignored
-    ├── template/                  # Artifact templates and variables
+    ├── template/                  # Artifact templates, batch-handoff-template.md, variables
     ├── plan/
     │   └── <context>/
     │       ├── design-docs/
     │       ├── planning/
     │       ├── tasks/
-    │       └── references/         # Includes archived pipeline history
+    │       └── references/         # Archived history + durable batch-BATCH-XX-handoff.md
     ├── plugins/
     │   ├── code-validator.plugin.ts
     │   ├── secure-access.plugin.ts
     │   ├── secure-access.test.ts
     │   ├── session-load-autoloader.plugin.ts
     │   └── sound-alert.plugin.ts
+    ├── lib/
+    │   └── context-budget.ts       # Snapshot semantics, limits and freshness
+    ├── tests/
+    │   └── read-context-budget.test.ts  # Tool/helper regression tests
     ├── sessions/                  # Local saved evaluations, Git-ignored
     ├── tools/                     # Folder/diff/state/template/validation/save
+    │   └── read-context-budget.ts  # Caller-session context snapshot tool
     └── node_modules/              # Installed tooling dependencies, ignored
 ```
 
@@ -125,6 +131,9 @@ Investy/
   validator: it can trigger dependency reinstallation instead of the test script.
 - Generated scanner reports and saved session evaluations stay local. Their
   existence does not mean a pipeline task or a runtime validation completed.
+- `pipeline.yaml` carries compact session-batch pointers; detailed handoffs
+  live in versioned `plan/<context>/references/`, not the two retained sessions.
+  A batch checkpoint is not evidence of deferred Docker/runtime acceptance.
 
 ## Runtime Guides
 
