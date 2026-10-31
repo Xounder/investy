@@ -140,7 +140,7 @@ Tasks should not be:
 Target:
 
 - Meaningful implementation scope
-- Several hours to several days of work
+- Several hours to several days of work **only when that scope fits a bounded session**; split an oversized task into independently reviewable deliverables before implementation, never force a large task into one batch because of duration
 - Clear acceptance criteria
 
 ### 7. Create Task Files
@@ -193,10 +193,11 @@ The index must contain:
 - Ownership mapping
 - **File Overlaps** — files touched by multiple tasks with their merge strategy (sequential vs parallel with careful merge)
 - **Parallelization Plan** — recommended batches with justification (e.g., "Batch 1: TASK-A + TASK-B independent; Batch 2: TASK-C (depends on TASK-A)")
+- **Session Scope Plan** — stable `BATCH-XX` assignments for every unfinished task (future entries pending), per-task principal cost components and uncertainty, baseline/reserve assumptions, real dependencies and overlap boundaries. Label parallelization waves within a batch separately from principal-session batches.
 
 ### 9. Update Pipeline
 
-Return implementation metadata to the Delivery Pipeline (pipeline.yaml is updated by the orchestrator). Include stable `BATCH-XX` IDs, each unfinished task ID exactly once, batch-level dependencies only where technically required, safe file-overlap/ownership boundaries, planned principal-context estimates, and pending future batches. See [Bounded Delivery Sessions](../skills/delivery-pipeline/references/session-batches.md). Estimate principal intake, condensed dispatch reports, QA, retries and closure (including 20,000 reserve), **not** entire child-agent histories. Aim for 140k–180k principal tokens per session, stop new dispatch at 160k and close by 180k; one independently reviewable task is a valid batch. Split oversized tasks **before** work, with new IDs and explicit acceptance/ownership/file boundaries, while preserving approved task history and avoiding duplicate IDs. The historical "Batch 1" parallelization waves in old task indexes are not session-batch records; do not silently rewrite completed tasks.
+Return implementation metadata to the Delivery Pipeline (pipeline.yaml is updated by the orchestrator). Include stable `BATCH-XX` IDs, each unfinished task ID exactly once, batch-level dependencies only where technically required, safe file-overlap/ownership boundaries, planned principal-context estimates, and pending future batches. Follow the [scope-slicing procedure](../skills/delivery-pipeline/references/session-batches.md#slice-work-before-implementation): estimate current measured principal intake (including startup/design/planning/retries), per-task dispatch/context, condensed returns, QA/corrections, commit handoffs and closure with uncertainty and a 20,000 reserve, **not** entire child-agent histories. Unknown intake or unestimable cost stops new work; do not manufacture numbers. Aim for 140k–180k principal tokens per session, stop new dispatch at 160k and close by 180k; one independently reviewable task is a valid batch. Split oversized tasks **before** work, with new IDs and explicit acceptance/ownership/file boundaries, while preserving approved task history and avoiding duplicate IDs. If planning exhausts room, preserve the full pending plan for a fresh session rather than launching implementation or fabricating a completed task batch. The historical "Batch 1" parallelization waves in old task indexes are not session-batch records; do not silently rewrite completed tasks.
 
 ## Task Rules
 

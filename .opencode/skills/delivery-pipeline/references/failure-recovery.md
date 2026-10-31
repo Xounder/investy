@@ -44,7 +44,7 @@ If a pipeline step remains `running` for more than 24 hours without state update
 
 1. Verify the step's agent actually produced output (check for target files, git diff, build artifacts).
 2. Compare the actual output/diff, relevant last-edit validation evidence, QA result and recorded SHAs to the handoff. **File existence or build artifacts alone are not proof of validation, QA, or completion.** Keep partial/running or blocked until evidence is recovered or checks rerun.
-3. If evidence is missing, record the uncertainty, partial output and retry count; re-dispatch the same named agent only when dependency, fresh-session and budget gates allow. Never overwrite uncommitted user work.
+3. If evidence is missing, record the uncertainty, partial output and retry count; re-dispatch the same named agent only when dependency and budget gates allow. A reconciled `running` current batch can resume in the same principal session; a later pending batch requires a fresh confirmed session after closeout. Never overwrite uncommitted user work.
 4. If re-dispatch fails repeatedly (3 attempts), stop, record the failure and escalate rather than declaring the output completed.
 
 This prevents stale `running` states from blocking pipeline recovery.

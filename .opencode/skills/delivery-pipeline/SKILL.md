@@ -66,7 +66,7 @@ Responsibilities:
 3. Resume execution from the last known state.
 4. Avoid re-executing completed work.
 5. If the `architecture-initializer` step is `pending` (or `running` without output) and the architecture documentation set is missing or incomplete (no `[ARCHITECTURE_ENTRY_FILE]`, no `[DOCS_CATALOG_FILE]`, no `[PROJECT_STRUCTURE_FILE]`, or empty INDEX.md `# Architecture` section), resume the [Architecture Initialization Flow](references/execution-phases.md#architecture-initialization-flow). Never re-run it when the step is `completed` or when the documentation set is already complete. For legacy pipelines without the step, infer from the files — skip if the set is complete, otherwise run it.
-6. Follow [Resume and legacy recovery](references/session-batches.md#resume-and-legacy-recovery): reconcile Git, validations, active session ID and missing STOP checkpoints before any new dispatch. Same principal session may only finish closeout. When session identity is unavailable, request explicit user confirmation of a fresh session.
+6. Follow [Resume and legacy recovery](references/session-batches.md#resume-and-legacy-recovery): reconcile Git, validations, active session ID and missing STOP checkpoints before any new dispatch. A still-`running` current batch may resume in the same session if reconciled and budget-safe; a `closing` batch resumes missing closeout only. Never advance to a later batch in the same principal session after closure. When session identity is unavailable, request explicit user confirmation of a fresh session before advancing.
 
 ## Pipeline State
 
@@ -220,7 +220,7 @@ The detailed phase execution — Architecture Initialization Flow, Routing, Solu
 
 ## Session Batches
 
-[Bounded Delivery Sessions](references/session-batches.md) defines the mandatory batch schema, budget checks, durable handoff, per-batch STOP closure and idempotent new-session resume. A completed batch does **not** imply all tasks or runtime checks passed. At unknown context usage stop new work; do not manufacture telemetry. The context-budget tool becomes discoverable only after restarting OpenCode; never require it in an already-running harness.
+[Bounded Delivery Sessions](references/session-batches.md) defines scope slicing, the mandatory batch schema, budget checks, early-stop task carryover, durable handoff, per-batch STOP closure and idempotent resume. A completed batch does **not** imply all tasks or runtime checks passed. At unknown context usage stop new work; do not manufacture telemetry. The context-budget tool becomes discoverable only after restarting OpenCode; never require it in an already-running harness.
 
 ## Parallelization Rules
 

@@ -30,7 +30,7 @@ Read in this order:
 
 - skills/delivery-pipeline/SKILL.md
 - skills/delivery-pipeline/references/execution-phases.md — detailed phase execution (architecture init, planning, parallel execution, QA, task commit, completion)
-- skills/delivery-pipeline/references/session-batches.md — principal-session context gates, durable handoffs, batch closeout and idempotent resume
+- skills/delivery-pipeline/references/session-batches.md — session scope slicing, principal-context gates, early-stop task carryover, durable handoffs and idempotent resume
 - skills/delivery-pipeline/references/failure-recovery.md — reconcile partial artifacts without inferring validation
 - skills/delivery-pipeline/references/task-tracking.md — task/commit and deferred runtime evidence
 
@@ -65,7 +65,7 @@ Read in this order:
 - template/task-template.md
 - template/planning-template.md
 - template/pipeline-template.yaml
-- template/batch-handoff-template.md — durable per-batch handoff outside two-file session retention
+- template/batch-handoff-template.md — durable planning/batch handoff with carryover evidence outside two-file session retention
 - template/variables.md
 
 # Commands

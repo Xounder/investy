@@ -20,7 +20,7 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 | `agents/00-architecture-initializer.md` | Architecture Initializer — bootstraps the architecture documentation set (architecture folder with index.md, architecture.md, schema, ADRs; docs-catalog.md; project-structure.md) when no app exists or when a codebase lacks the set | Architecture documentation set changes; pipeline flow adjustments |
 | `agents/00-planning-agent.md` | Planning Analyst — feasibility, risk, impact analysis, on-demand planning docs for PM | New analysis types; planning output format changes |
 | `agents/01-solution-designer.md` | Solution Designer instructions — collaborative design analysis, trade-off evaluation, web research, design document creation in design-docs/ | SD flow changes; new artifact types |
-| `agents/02-tech-lead.md` | TL instructions — decomposition, folder-per-task output, one .md per task, pipeline.yaml | Task format changes; allocation changes |
+| `agents/02-tech-lead.md` | TL instructions — decomposition, per-task cost/uncertainty and all pending session scopes, one .md per task | Task format, context sizing or allocation changes |
 | `agents/03-senior-frontend.md` | Frontend agent instructions | Frontend conventions change |
 | `agents/04-senior-backend.md` | Backend agent instructions | Backend conventions change |
 | `agents/05-qa-reviewer.md` | QA agent instructions — pipeline.yaml, frontend/backend verification, checklist | QA checklist changes; new patterns |
@@ -36,12 +36,12 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 |---|---|---|
 | `skills/delivery-pipeline/SKILL.md` | Orchestrator — Full Pipeline + Direct Task Mode | Pipeline flow changes; new steps; new rules |
 | `skills/delivery-pipeline/references/parallelization-rules.md` | Rules for parallel task execution | Parallelization rules change |
-| `skills/delivery-pipeline/references/failure-recovery.md` | Failure recovery and state persistence rules | Recovery logic changes |
+| `skills/delivery-pipeline/references/failure-recovery.md` | Failure recovery, evidence reconciliation and same-running-batch retry gates | Recovery logic changes |
 | `skills/delivery-pipeline/references/task-tracking.md` | Task tracking in pipeline state | Tracking format changes |
 | `skills/delivery-pipeline/references/agent-response-format.md` | Standard agent response format | Response format changes |
 | `skills/delivery-pipeline/references/constraints.md` | Pipeline constraint list | Constraint rules change |
 | `skills/delivery-pipeline/references/execution-phases.md` | Phase execution details — architecture init, routing, planning, tech lead, parallel execution, QA, corrections, task commit, completion | Phase flows change |
-| `skills/delivery-pipeline/references/session-batches.md` | Bounded principal-session batches, token guidance, closeout checkpoints and idempotent resume | Batch budget/closeout/recovery rules change |
+| `skills/delivery-pipeline/references/session-batches.md` | Principal-session scope slicing, budget guidance, early-stop carryover, closeout checkpoints and idempotent resume | Batch sizing/closeout/recovery rules change |
 | `skills/workflow-router/SKILL.md` | Request classification and workflow routing | Classification logic or routing changes |
 | `skills/learning-improvement/SKILL.md` | Session evaluation (step 1/3 of STOP) | Evaluation format changes; chaining enforcement |
 | `skills/continuous-learning/SKILL.md` | Doc update proposal (step 2/3 of STOP) | Scope of analyzed docs changes |
@@ -59,10 +59,10 @@ Catalog of all `.md` files in `.opencode/` with content description and when to 
 |---|---|---|
 | `template/architecture-template.md` | Architecture base document template — overview, principles, stack, decisions, success criteria | Architecture template format changes |
 | `template/design-template.md` | Design document template — options, trade-offs, decision, impact, risks | Design template format changes |
-| `template/task-template.md` | Task artifact template | Task format changes |
+| `template/task-template.md` | Task artifact template with deliverable boundary, batch scope, cost uncertainty and validation closure | Task format or scope estimates change |
 | `template/planning-template.md` | Planning document template | Planning format changes |
 | `template/pipeline-template.yaml` | Pipeline state skeleton and session batch fields | State schema changes |
-| `template/batch-handoff-template.md` | Durable per-batch resume evidence outside retained sessions | Batch recovery fields change |
+| `template/batch-handoff-template.md` | Durable planning checkpoint, budget baseline, early-stop carryover and resume evidence outside retained sessions | Batch recovery fields change |
 | `template/variables.md` | Shared template variables | Variable set changes |
 
 ---
