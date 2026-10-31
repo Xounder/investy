@@ -112,6 +112,8 @@ Verify:
 - No unused imports
 - No unused variables
 
+**Only when reviewing OpenCode custom-tool work:** check tool discovery shape/location (discovered exports are valid tools; helpers/tests are not discovered as tools) against the installed SDK/loader. Review SDK query result bounds, asynchronous timeout and stale/error/unknown semantics without claiming a hard parsing or byte-size bound. Use `npm --prefix .opencode test` for standalone tooling; mark absent `.opencode` build/lint scripts N/A rather than running unrelated app checks. Distinguish passing units from live restart, tool discovery and actual SDK/API request validation: claim each only with observed evidence, otherwise mark it explicitly unverified.
+
 ### 6. Review Error Handling
 
 Verify:
